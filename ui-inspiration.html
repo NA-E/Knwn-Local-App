@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Known Local — UI Inspiration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:               #F7F6F1;
+      --bg-panel:         #FFFFFF;
+      --sidebar:          #141412;
+      --sidebar-hover:    #1E1E1B;
+      --sidebar-active:   #262622;
+      --border:           #E6E3DC;
+      --border-light:     #EDEAE2;
+      --text-1:           #1A1916;
+      --text-2:           #78756C;
+      --text-3:           #A8A59D;
+      --accent:           #C8782A;
+      --accent-bg:        #FEF0DE;
+
+      --active-text:      #1A6B40;
+      --active-bg:        #D9F5E8;
+      --onboard-text:     #78580A;
+      --onboard-bg:       #FEF3D0;
+      --inactive-text:    #68655E;
+      --inactive-bg:      #EEEBE3;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--bg);
+      color: var(--text-1);
+      font-size: 14px;
+      line-height: 1.5;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── SIDEBAR ──────────────────────────────── */
+    .sidebar {
+      width: 216px;
+      flex-shrink: 0;
+      background: var(--sidebar);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .sidebar-logo {
+      padding: 20px 20px 18px;
+      border-bottom: 1px solid #222220;
+    }
+    .sidebar-logo-text {
+      font-size: 12px;
+      font-weight: 700;
+      color: #FFFFFF;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .sidebar-logo-sub {
+      font-size: 10.5px;
+      color: #48463E;
+      margin-top: 2px;
+      letter-spacing: 0.04em;
+    }
+
+    .sidebar-nav {
+      padding: 12px 10px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .nav-section {
+      margin-top: 12px;
+      margin-bottom: 4px;
+    }
+    .nav-section:first-child { margin-top: 0; }
+
+    .nav-section-label {
+      font-size: 9.5px;
+      font-weight: 600;
+      color: #3E3C36;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 0 10px;
+      margin-bottom: 3px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      padding: 7px 10px;
+      border-radius: 5px;
+      font-size: 12.5px;
+      color: #8A8880;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+    }
+    .nav-item:hover { background: var(--sidebar-hover); color: #D8D4CC; }
+    .nav-item.active { background: var(--sidebar-active); color: #FFFFFF; font-weight: 500; }
+    .nav-item.sub { padding-left: 20px; font-size: 12px; }
+
+    .sidebar-user {
+      padding: 14px 20px;
+      border-top: 1px solid #222220;
+    }
+    .sidebar-user-name { font-size: 12px; font-weight: 500; color: #C4C0B8; }
+    .sidebar-user-role { font-size: 11px; color: #48463E; margin-top: 1px; }
+
+    /* ── MAIN ─────────────────────────────────── */
+    .main {
+      flex: 1;
+      padding: 36px 44px;
+      min-width: 0;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .page-title {
+      font-size: 19px;
+      font-weight: 600;
+      letter-spacing: -0.025em;
+      color: var(--text-1);
+    }
+    .page-meta {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-left: 10px;
+    }
+
+    /* ── BUTTONS ──────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      font-family: 'Sora', sans-serif;
+      line-height: 1;
+      transition: all 0.12s;
+    }
+    .btn-dark { background: var(--text-1); color: #FFF; }
+    .btn-dark:hover { background: #2A2925; }
+    .btn-ghost { background: transparent; color: var(--text-2); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: var(--border-light); color: var(--text-1); }
+
+    /* ── FILTERS ──────────────────────────────── */
+    .filters-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+      align-items: center;
+    }
+    .input-base {
+      padding: 7px 11px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-family: 'Sora', sans-serif;
+      background: white;
+      color: var(--text-1);
+      outline: none;
+      transition: border-color 0.12s;
+    }
+    .input-base:focus { border-color: var(--text-3); }
+    .input-search { width: 220px; }
+    .select-base {
+      padding: 7px 28px 7px 11px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-family: 'Sora', sans-serif;
+      background: white;
+      color: var(--text-2);
+      outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2378756C' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      cursor: pointer;
+    }
+
+    /* ── TABLE ────────────────────────────────── */
+    .table-wrap {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      padding: 9px 16px;
+      text-align: left;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--text-3);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+      background: #FAFAF6;
+      white-space: nowrap;
+    }
+    thead th:first-child { padding-left: 20px; }
+    tbody tr { border-bottom: 1px solid var(--border-light); cursor: pointer; transition: background 0.1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #FAFAF6; }
+    tbody td { padding: 11px 16px; font-size: 12.5px; }
+    tbody td:first-child { padding-left: 20px; }
+
+    .client-name { font-weight: 500; color: var(--text-1); }
+    .td-muted { color: var(--text-2); }
+
+    /* ── BADGES ───────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .badge::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .badge-active   { color: var(--active-text);   background: var(--active-bg);   }
+    .badge-active::before   { background: var(--active-text);   }
+    .badge-onboard  { color: var(--onboard-text);  background: var(--onboard-bg);  }
+    .badge-onboard::before  { background: var(--onboard-text);  }
+    .badge-inactive { color: var(--inactive-text); background: var(--inactive-bg); }
+    .badge-inactive::before { background: var(--inactive-text); }
+
+    .pod-tag {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      background: var(--border-light);
+      color: var(--text-2);
+    }
+
+    .id-mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-3);
+      font-weight: 400;
+    }
+
+    /* ── SECTION DIVIDER ─────────────────────── */
+    .section-gap { height: 52px; }
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-3);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── KANBAN ──────────────────────────────── */
+    .kanban-scroll {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .kanban-scroll::-webkit-scrollbar { height: 4px; }
+    .kanban-scroll::-webkit-scrollbar-track { background: transparent; }
+    .kanban-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .k-col { flex-shrink: 0; width: 210px; }
+
+    .k-col-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2px 10px;
+    }
+    .k-col-name {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--text-3);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .k-col-count {
+      font-size: 10.5px;
+      font-weight: 500;
+      color: var(--text-3);
+      background: var(--border-light);
+      padding: 1px 6px;
+      border-radius: 20px;
+    }
+
+    .k-cards { display: flex; flex-direction: column; gap: 7px; }
+
+    /* ── PROJECT CARD ─────────────────────────── */
+    .p-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 11px 13px;
+      cursor: pointer;
+      transition: box-shadow 0.15s, transform 0.12s;
+    }
+    .p-card:hover {
+      box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+      transform: translateY(-1px);
+    }
+    .card-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--text-3);
+      margin-bottom: 5px;
+    }
+    .card-title {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-1);
+      line-height: 1.45;
+      margin-bottom: 8px;
+    }
+    .card-client {
+      font-size: 11px;
+      color: var(--text-2);
+      margin-bottom: 9px;
+    }
+    .card-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .avatars { display: flex; gap: -2px; }
+    .av {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 600;
+      border: 1.5px solid white;
+    }
+    .av-w { background: #D9F5E8; color: var(--active-text); }
+    .av-e { background: #D9E8F5; color: #1A406B; }
+    .av-empty { background: var(--border-light); color: var(--text-3); }
+
+    .design-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+    .dd-none    { background: #D2CFC6; }
+    .dd-prog    { background: var(--accent); }
+    .dd-done    { background: var(--active-text); }
+
+    /* ── CLIENT DETAIL PREVIEW ─────────────────── */
+    .detail-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .detail-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+    .detail-name {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+    .detail-meta { display: flex; gap: 8px; align-items: center; }
+    .detail-meta-item { font-size: 12px; color: var(--text-2); }
+    .detail-meta-sep { color: var(--border); }
+
+    .detail-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    .detail-section {
+      padding: 18px 24px;
+      border-right: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
+    }
+    .detail-section:nth-child(even) { border-right: none; }
+    .detail-section:nth-last-child(-n+2) { border-bottom: none; }
+
+    .detail-section-title {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-3);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .field-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 4px 0;
+      font-size: 12.5px;
+    }
+    .field-label { color: var(--text-2); }
+    .field-value { color: var(--text-1); font-weight: 400; text-align: right; }
+    .field-link { color: var(--accent); text-decoration: none; font-size: 12px; }
+    .field-link:hover { text-decoration: underline; }
+
+    .team-role-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 0;
+      font-size: 12.5px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .team-role-row:last-child { border-bottom: none; }
+    .team-role-label { color: var(--text-2); }
+    .team-member-name { color: var(--text-1); font-weight: 500; }
+    .team-member-empty { color: var(--text-3); font-style: italic; }
+
+    /* ── DESIGN TOKENS ────────────────────────── */
+    .token-grid {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .token-group-title {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-3);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+    .swatch-wrap { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+    .swatch {
+      width: 40px;
+      height: 40px;
+      border-radius: 7px;
+      border: 1px solid rgba(0,0,0,0.07);
+    }
+    .swatch-name { font-size: 9.5px; color: var(--text-3); text-align: center; }
+
+    .type-scale > * { margin-bottom: 4px; }
+    .t-title { font-size: 19px; font-weight: 600; letter-spacing: -0.025em; }
+    .t-head  { font-size: 14px; font-weight: 500; }
+    .t-body  { font-size: 13px; color: var(--text-2); }
+    .t-meta  { font-size: 11px; color: var(--text-3); }
+    .t-mono  { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-3); }
+
+    .badge-stack { display: flex; flex-direction: column; gap: 7px; }
+    .dot-row { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2); }
+  </style>
+</head>
+<body>
+
+  <!-- ════ SIDEBAR ════════════════════════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-text">Known Local</div>
+      <div class="sidebar-logo-sub">Ops Platform</div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-item active">Dashboard</div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-label">Clients</div>
+        <div class="nav-item sub active">Client List</div>
+        <div class="nav-item sub">Add Client</div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-label">Projects</div>
+        <div class="nav-item sub">Pipeline</div>
+        <div class="nav-item sub">My Board</div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-label">Admin</div>
+        <div class="nav-item sub">Team</div>
+        <div class="nav-item sub">Pods</div>
+      </div>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="sidebar-user-name">Paulo R.</div>
+      <div class="sidebar-user-role">Manager</div>
+    </div>
+  </aside>
+
+  <!-- ════ MAIN ════════════════════════════════════════ -->
+  <main class="main">
+
+    <!-- ── 1. CLIENT LIST ─────────────────────────── -->
+    <div class="page-header">
+      <div>
+        <span class="page-title">Clients</span>
+        <span class="page-meta">68 total</span>
+      </div>
+      <button class="btn btn-dark">+ Add Client</button>
+    </div>
+
+    <div class="filters-row">
+      <input class="input-base input-search" placeholder="Search clients…" />
+      <select class="select-base"><option>All Statuses</option></select>
+      <select class="select-base"><option>All Pods</option></select>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Market</th>
+            <th>Pod</th>
+            <th>Status</th>
+            <th>Vid / wk</th>
+            <th>Strategist</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="client-name">Acme Co</span></td>
+            <td class="td-muted">Chicago</td>
+            <td><span class="pod-tag">Pod 1</span></td>
+            <td><span class="badge badge-active">Active</span></td>
+            <td class="td-muted">3</td>
+            <td class="td-muted">Clayton</td>
+          </tr>
+          <tr>
+            <td><span class="client-name">BrightPath Media</span></td>
+            <td class="td-muted">Austin</td>
+            <td><span class="pod-tag">Pod 2</span></td>
+            <td><span class="badge badge-active">Active</span></td>
+            <td class="td-muted">2</td>
+            <td class="td-muted">Ana</td>
+          </tr>
+          <tr>
+            <td><span class="client-name">GreenLeaf Health</span></td>
+            <td class="td-muted">Miami</td>
+            <td><span class="pod-tag">Pod 1</span></td>
+            <td><span class="badge badge-onboard">Onboarding</span></td>
+            <td class="td-muted">4</td>
+            <td class="td-muted">Clayton</td>
+          </tr>
+          <tr>
+            <td><span class="client-name">Summit Financial</span></td>
+            <td class="td-muted">Denver</td>
+            <td><span class="pod-tag">Pod 3</span></td>
+            <td><span class="badge badge-active">Active</span></td>
+            <td class="td-muted">1</td>
+            <td class="td-muted">Maria</td>
+          </tr>
+          <tr>
+            <td><span class="client-name">Northside Dental</span></td>
+            <td class="td-muted">Seattle</td>
+            <td><span class="pod-tag">Pod 2</span></td>
+            <td><span class="badge badge-inactive">Inactive</span></td>
+            <td class="td-muted">—</td>
+            <td class="td-muted">Ana</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── 2. CLIENT DETAIL PREVIEW ──────────────── -->
+    <div class="section-gap"></div>
+    <div class="section-label">Client Detail — Acme Co</div>
+
+    <div class="detail-card">
+      <div class="detail-header">
+        <div>
+          <div class="detail-name">Acme Co</div>
+          <div class="detail-meta">
+            <span class="badge badge-active">Active</span>
+            <span class="detail-meta-sep">·</span>
+            <span class="detail-meta-item"><span class="pod-tag">Pod 1</span></span>
+            <span class="detail-meta-sep">·</span>
+            <span class="detail-meta-item">Chicago · EST</span>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-ghost">Edit</button>
+          <button class="btn btn-dark">+ Add Project</button>
+        </div>
+      </div>
+
+      <div class="detail-body">
+
+        <!-- Info -->
+        <div class="detail-section">
+          <div class="detail-section-title">Client Info</div>
+          <div class="field-row"><span class="field-label">Package</span><span class="field-value">Growth Pro</span></div>
+          <div class="field-row"><span class="field-label">Contract Start</span><span class="field-value">Jan 15, 2024</span></div>
+          <div class="field-row"><span class="field-label">Posting Schedule</span><span class="field-value">Mon / Thu</span></div>
+          <div class="field-row"><span class="field-label">Script Format</span><span class="field-value">Teleprompter</span></div>
+          <div class="field-row"><span class="field-label">Communication</span><span class="field-value">Slack</span></div>
+          <div class="field-row"><span class="field-label">Special Notes</span><span class="field-value" style="color: var(--text-2); font-size: 11.5px;">Avoid competitor mentions</span></div>
+          <div class="field-row"><span class="field-label">Dropbox</span><a href="#" class="field-link">↗ Open</a></div>
+          <div class="field-row"><span class="field-label">Slack Channel</span><a href="#" class="field-link">#acme-co ↗</a></div>
+        </div>
+
+        <!-- Team -->
+        <div class="detail-section">
+          <div class="detail-section-title" style="display: flex; justify-content: space-between;">
+            <span>Team</span>
+            <a href="#" class="field-link">Edit</a>
+          </div>
+          <div class="team-role-row"><span class="team-role-label">Strategist</span><span class="team-member-name">Clayton</span></div>
+          <div class="team-role-row"><span class="team-role-label">Jr Strategist</span><span class="team-member-empty">—</span></div>
+          <div class="team-role-row"><span class="team-role-label">Manager</span><span class="team-member-name">Paulo</span></div>
+          <div class="team-role-row"><span class="team-role-label">Senior Writer</span><span class="team-member-name">Maria</span></div>
+          <div class="team-role-row"><span class="team-role-label">Senior Editor</span><span class="team-member-name">Raj</span></div>
+          <div class="team-role-row"><span class="team-role-label">Designer</span><span class="team-member-name">Tess</span></div>
+        </div>
+
+        <!-- Channels -->
+        <div class="detail-section">
+          <div class="detail-section-title" style="display: flex; justify-content: space-between;">
+            <span>Channels</span>
+            <a href="#" class="field-link">+ Add</a>
+          </div>
+          <div class="field-row"><span class="field-label">Acme Official</span><span class="field-value">2 / wk</span></div>
+          <div class="field-row"><span class="field-label">Acme Shorts</span><span class="field-value">1 / wk</span></div>
+        </div>
+
+        <!-- Contacts -->
+        <div class="detail-section">
+          <div class="detail-section-title" style="display: flex; justify-content: space-between;">
+            <span>Contacts</span>
+            <a href="#" class="field-link">+ Add</a>
+          </div>
+          <div class="field-row">
+            <span class="field-label">John Doe <span style="font-size: 10px; background: var(--accent-bg); color: var(--accent); padding: 1px 5px; border-radius: 3px; margin-left: 4px;">Primary</span></span>
+            <span class="field-value" style="font-size: 11.5px; color: var(--text-2);">john@acmeco.com</span>
+          </div>
+          <div class="field-row">
+            <span class="field-label">Jane Smith</span>
+            <span class="field-value" style="font-size: 11.5px; color: var(--text-2);">jane@acmeco.com</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── 3. KANBAN CARDS ─────────────────────────── -->
+    <div class="section-gap"></div>
+    <div class="section-label">Kanban — Project Cards</div>
+
+    <div class="kanban-scroll">
+
+      <div class="k-col">
+        <div class="k-col-head">
+          <span class="k-col-name">Idea</span>
+          <span class="k-col-count">8</span>
+        </div>
+        <div class="k-cards">
+          <div class="p-card">
+            <div class="card-id">KN-150</div>
+            <div class="card-title">Top 10 Chicago Restaurants in 2026</div>
+            <div class="card-client">Acme Co</div>
+            <div class="card-foot">
+              <div class="avatars"><div class="av av-empty">—</div></div>
+              <div class="design-dot dd-none" title="Design: not started"></div>
+            </div>
+          </div>
+          <div class="p-card">
+            <div class="card-id">KN-149</div>
+            <div class="card-title">How We Grew Our YouTube to 50k Subs</div>
+            <div class="card-client">BrightPath Media</div>
+            <div class="card-foot">
+              <div class="avatars"><div class="av av-empty">—</div></div>
+              <div class="design-dot dd-none"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="k-col">
+        <div class="k-col-head">
+          <span class="k-col-name">Script Writing</span>
+          <span class="k-col-count">12</span>
+        </div>
+        <div class="k-cards">
+          <div class="p-card">
+            <div class="card-id">KN-142</div>
+            <div class="card-title">5 Foods to Avoid if You Have High Cholesterol</div>
+            <div class="card-client">Acme Co</div>
+            <div class="card-foot">
+              <div class="avatars">
+                <div class="av av-w" title="Writer: Marcus">M</div>
+                <div class="av av-e" title="Editor: Raj">R</div>
+              </div>
+              <div class="design-dot dd-prog" title="Design: in progress"></div>
+            </div>
+          </div>
+          <div class="p-card">
+            <div class="card-id">KN-141</div>
+            <div class="card-title">Why Your Morning Routine Kills Productivity</div>
+            <div class="card-client">GreenLeaf Health</div>
+            <div class="card-foot">
+              <div class="avatars">
+                <div class="av av-w" title="Writer: Sofia">S</div>
+                <div class="av av-e" title="Editor: Raj">R</div>
+              </div>
+              <div class="design-dot dd-none"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="k-col">
+        <div class="k-col-head">
+          <span class="k-col-name">Review Script</span>
+          <span class="k-col-count">5</span>
+        </div>
+        <div class="k-cards">
+          <div class="p-card">
+            <div class="card-id">KN-138</div>
+            <div class="card-title">Complete Guide to Passive Income in Real Estate</div>
+            <div class="card-client">Summit Financial</div>
+            <div class="card-foot">
+              <div class="avatars">
+                <div class="av av-w" title="Writer: Leo">L</div>
+                <div class="av av-e" title="Editor: Tanya">T</div>
+              </div>
+              <div class="design-dot dd-prog"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="k-col">
+        <div class="k-col-head">
+          <span class="k-col-name">Script Ready</span>
+          <span class="k-col-count">3</span>
+        </div>
+        <div class="k-cards">
+          <div class="p-card">
+            <div class="card-id">KN-131</div>
+            <div class="card-title">How to Save on Taxes as a Small Business Owner</div>
+            <div class="card-client">GreenLeaf Health</div>
+            <div class="card-foot">
+              <div class="avatars">
+                <div class="av av-w">M</div>
+                <div class="av av-e">R</div>
+              </div>
+              <div class="design-dot dd-done" title="Design: done"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="k-col">
+        <div class="k-col-head">
+          <span class="k-col-name">Edit Writing</span>
+          <span class="k-col-count">7</span>
+        </div>
+        <div class="k-cards">
+          <div class="p-card">
+            <div class="card-id">KN-126</div>
+            <div class="card-title">10 Signs You Need a New Financial Advisor</div>
+            <div class="card-client">Summit Financial</div>
+            <div class="card-foot">
+              <div class="avatars">
+                <div class="av av-w">S</div>
+                <div class="av av-e">T</div>
+              </div>
+              <div class="design-dot dd-done"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="k-col">
+        <div class="k-col-head">
+          <span class="k-col-name">Ready to Post</span>
+          <span class="k-col-count">2</span>
+        </div>
+        <div class="k-cards">
+          <div class="p-card">
+            <div class="card-id">KN-118</div>
+            <div class="card-title">The Truth About Index Funds in 2026</div>
+            <div class="card-client">Acme Co</div>
+            <div class="card-foot">
+              <div class="avatars">
+                <div class="av av-w">L</div>
+                <div class="av av-e">R</div>
+              </div>
+              <div class="design-dot dd-done"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── 4. DESIGN TOKENS ───────────────────────── -->
+    <div class="section-gap"></div>
+    <div class="section-label">Design Tokens</div>
+
+    <div class="token-grid">
+
+      <div>
+        <div class="token-group-title">Colors</div>
+        <div class="swatches">
+          <div class="swatch-wrap"><div class="swatch" style="background:#141412"></div><div class="swatch-name">Sidebar</div></div>
+          <div class="swatch-wrap"><div class="swatch" style="background:#1A1916"></div><div class="swatch-name">Text</div></div>
+          <div class="swatch-wrap"><div class="swatch" style="background:#78756C"></div><div class="swatch-name">Secondary</div></div>
+          <div class="swatch-wrap"><div class="swatch" style="background:#A8A59D"></div><div class="swatch-name">Muted</div></div>
+          <div class="swatch-wrap"><div class="swatch" style="background:#C8782A"></div><div class="swatch-name">Accent</div></div>
+          <div class="swatch-wrap"><div class="swatch" style="background:#F7F6F1"></div><div class="swatch-name">Background</div></div>
+          <div class="swatch-wrap"><div class="swatch" style="background:#E6E3DC"></div><div class="swatch-name">Border</div></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="token-group-title">Client Status</div>
+        <div class="badge-stack">
+          <span class="badge badge-active">Active</span>
+          <span class="badge badge-onboard">Onboarding</span>
+          <span class="badge badge-inactive">Inactive</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="token-group-title">Design Status Dots</div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div class="dot-row"><div class="design-dot dd-none"></div> Not Started</div>
+          <div class="dot-row"><div class="design-dot dd-prog"></div> In Progress</div>
+          <div class="dot-row"><div class="design-dot dd-done"></div> Completed</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="token-group-title">Typography — Sora</div>
+        <div class="type-scale">
+          <div class="t-title">Page Title / 19px 600</div>
+          <div class="t-head">Section Heading / 14px 500</div>
+          <div class="t-body">Body text · table rows / 13px 400</div>
+          <div class="t-meta">Labels · meta · caps / 10px 600</div>
+          <div class="t-mono">KN-142 · JetBrains Mono 11px</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="height: 60px;"></div>
+  </main>
+
+</body>
+</html>

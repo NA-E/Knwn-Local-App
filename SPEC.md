@@ -13,18 +13,20 @@ Internal operations app for Known Local, a YouTube content agency managing ~70 a
 ---
 
 ## Roles & Permissions
-Eight roles in the system. Every user has exactly one role.
+Ten roles in the system. Every user has exactly one role.
 
 | Role | Can see | Can do |
 |------|---------|--------|
 | Admin | Everything | Full CRUD on all entities. Manage users. |
-| Strategist | All projects for their assigned clients. All clients in their pod(s). | Edit client info. Move project statuses. Add notes. |
+| Strategist | All projects for clients in their pod. All clients in their pod. | **Create projects** for their pod's clients. Edit client info. Move any project status within valid transitions. Assign writers to projects (at brief→scriptwriting). Add notes. |
+| Jr Strategist | Same as Strategist — all projects for clients in their pod. | **Create projects** for their pod's clients. Same as Strategist + Manager combined: edit client info, move any status, assign writers, send scripts/edits to client, schedule posts. |
 | Manager | Projects in handoff statuses for their assigned clients. All their assigned clients. | Move statuses: Script Ready to Send → Script Sent, Edit Ready to Send → Edit Sent, Ready to Post → Posted. |
-| Senior Editor | Projects in review statuses for editors they oversee. | Approve/reject edits. Move status: Ready for Internal Review → Edit Ready to Send OR Internal Adjustments Needed. |
-| Senior Writer | Projects in script review for writers they oversee. | Approve/reject scripts. Move status: Review Script → Script Ready to Send OR Fix Script. |
+| Senior Editor | Projects in Ready for Internal Review for editors they oversee. | Approve/reject edits. Move status: Ready for Internal Review → Edit Ready to Send OR Internal Adjustments Needed. |
+| Senior Writer | Projects in Review Script for writers they oversee. | Approve/reject scripts. Move status: Review Script → Script Ready to Send OR Fix Script. |
+| Senior Designer | Same board as Designer. Manages designer assignments to clients. | Update design_status on any client's projects. Assign designers to clients (admin-level for design assignments). |
 | Editor | Only projects assigned to them in editing statuses. | Move statuses within editing range. |
 | Writer | Only projects assigned to them in writing statuses. | Move statuses within writing range. |
-| Designer | Projects for their assigned clients from Client Uploaded through Edit Sent. | Update design checklist/status on projects. |
+| Designer | Projects for their assigned clients from Client Uploaded through Edit Ready to Send. | Update design_status on their assigned clients' projects. View-only for pipeline status. |
 
 ---
 
@@ -45,6 +47,7 @@ Eight roles in the system. Every user has exactly one role.
 CREATE TYPE team_role AS ENUM (
   'admin',
   'strategist',
+  'jr_strategist',
   'manager',
   'senior_editor',
   'senior_writer',
@@ -54,7 +57,15 @@ CREATE TYPE team_role AS ENUM (
   'designer'
 );
 
+-- Design parallel track status
+CREATE TYPE design_status AS ENUM (
+  'not_started',
+  'in_progress',
+  'completed'
+);
+
 -- Client lifecycle status
+-- Definitions for pending/disengaged/template deferred to phase 2 — migrate only 'active' and 'onboarding' for V1.
 CREATE TYPE client_status AS ENUM (
   'template',
   'onboarding',
@@ -98,7 +109,11 @@ CREATE TYPE project_status AS ENUM (
   'posted_scheduled'
 );
 
--- Assignment role type — how a team member relates to a client
+-- Assignment role type — named slots on a client record, populated during client onboarding.
+-- These represent the fixed per-client team. Writers are excluded (round-robin, per-project).
+-- jr_strategist is NOT here — Jr Strategists use the 'strategist' slot on the client record.
+-- senior_writer is included for Client Detail Team Section display only — it is NOT used for board filtering.
+--   Senior Writer board uses supervised_by chain, not client_assignments. Confirmed: keep this value.
 CREATE TYPE assignment_role AS ENUM (
   'strategist',
   'manager',
@@ -113,7 +128,9 @@ CREATE TYPE assignment_role AS ENUM (
 ### Tables
 
 ```sql
--- Pods: lightweight grouping for profitability tracking
+-- Pods: grouping unit for profitability tracking and org structure.
+-- NOT used as the operational filter for Strategist/Jr Strategist boards — client_assignments is.
+-- Used for: Admin board pod filter, dashboard aggregations, client list Pod column, team roster display.
 CREATE TABLE pods (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL UNIQUE,
@@ -130,12 +147,14 @@ CREATE TABLE team_members (
   email TEXT NOT NULL UNIQUE,
   role team_role NOT NULL,
   status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+  -- Supervision chain: for writers, points to their senior_writer. For editors, points to their senior_editor. NULL for all other roles.
+  supervised_by UUID REFERENCES team_members(id),
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
 -- Team Member ↔ Pod junction (many-to-many)
--- Writers/editors can span multiple pods
+-- Strategists, managers, designers are pod-scoped. Writers/senior writers are cross-pod (round-robin). Editors are departmental — pod assignment is a future goal, not current V1 state.
 CREATE TABLE team_member_pods (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   team_member_id UUID NOT NULL REFERENCES team_members(id) ON DELETE CASCADE,
@@ -213,7 +232,7 @@ CREATE TABLE projects (
   editor_id UUID REFERENCES team_members(id),
   script_v1_due DATE,
   actual_post_date DATE,
-  design_status TEXT DEFAULT 'not_started' CHECK (design_status IN ('not_started', 'in_progress', 'completed')),
+  design_status design_status NOT NULL DEFAULT 'not_started',
   notes TEXT,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
@@ -236,6 +255,16 @@ CREATE TRIGGER set_task_number
   FOR EACH ROW
   WHEN (NEW.task_number IS NULL)
   EXECUTE FUNCTION generate_task_number();
+
+-- Project Status History: audit log for all status changes
+CREATE TABLE project_status_history (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  from_status project_status,
+  to_status project_status NOT NULL,
+  changed_by UUID NOT NULL REFERENCES team_members(id),
+  changed_at TIMESTAMPTZ DEFAULT now()
+);
 ```
 
 ### Indexes
@@ -251,6 +280,9 @@ CREATE INDEX idx_client_assignments_client ON client_assignments(client_id);
 CREATE INDEX idx_client_assignments_member ON client_assignments(team_member_id);
 CREATE INDEX idx_team_member_pods_member ON team_member_pods(team_member_id);
 CREATE INDEX idx_team_member_pods_pod ON team_member_pods(pod_id);
+CREATE INDEX idx_team_members_supervised_by ON team_members(supervised_by);
+CREATE INDEX idx_project_status_history_project ON project_status_history(project_id);
+CREATE INDEX idx_project_status_history_changed_at ON project_status_history(changed_at);
 ```
 
 ---
@@ -266,8 +298,35 @@ POST-PRODUCTION: ready_to_post
 COMPLETE:        posted_scheduled
 ```
 
+### Transition Ownership
+Each transition has a designated role owner. Enforce in both application layer and RLS.
+
+| Transition | Owner(s) |
+|---|---|
+| `idea → brief` | Strategist, Jr Strategist, Admin |
+| `idea → on_hold` | Strategist, Jr Strategist, Admin |
+| `on_hold → idea` | Strategist, Jr Strategist, Admin |
+| `on_hold → brief` | Strategist, Jr Strategist, Admin |
+| `brief → scriptwriting` | Strategist, Jr Strategist, Admin — **assign writer at this step**. No client approval gate — `brief` means idea is fully fleshed out and internally ready. |
+| `scriptwriting → review_script` | Writer, Jr Strategist, Admin |
+| `review_script → script_ready_to_send` | Senior Writer, Jr Strategist, Admin |
+| `review_script → fix_script` | Senior Writer, Jr Strategist, Admin |
+| `fix_script → review_script` | Writer, Jr Strategist, Admin |
+| `script_ready_to_send → script_sent_to_client` | Manager, Jr Strategist, Admin |
+| `script_sent_to_client → client_uploaded` | **Manager** (monitors Slack for client upload confirmation), Jr Strategist, Admin |
+| `client_uploaded → editing` | Editor, Jr Strategist, Admin |
+| `editing → ready_for_internal_review` | Editor, Jr Strategist, Admin |
+| `ready_for_internal_review → edit_ready_to_send` | Senior Editor, Jr Strategist, Admin |
+| `ready_for_internal_review → internal_adjustments_needed` | Senior Editor, Jr Strategist, Admin |
+| `internal_adjustments_needed → ready_for_internal_review` | Editor, Jr Strategist, Admin |
+| `edit_ready_to_send → edit_sent_to_client` | Manager, Jr Strategist, Admin |
+| `edit_sent_to_client → client_adjustments_needed` | **Manager** (monitors Slack for client feedback), Jr Strategist, Admin |
+| `edit_sent_to_client → ready_to_post` | **Manager** (client approved, no changes), Jr Strategist, Admin |
+| `client_adjustments_needed → editing` | Editor, Jr Strategist, Admin |
+| `ready_to_post → posted_scheduled` | Manager, Jr Strategist, Admin |
+
 ### Valid Transitions
-Each status can only move to specific next statuses. Enforce this in the application layer.
+Each status can only move to specific next statuses. Enforce in the application layer.
 
 ```
 idea → brief, on_hold
@@ -318,26 +377,46 @@ Each role sees a filtered Kanban board showing only the statuses relevant to the
 - **Actions:** Update `design_status` on projects. View-only for pipeline status — designers don't move pipeline statuses.
 - **Special:** Show `design_status` badge prominently. Sort/group by `design_status`.
 
+### Jr Strategist Board
+- **Columns:** All statuses
+- **Filter:** `projects WHERE client_id IN (SELECT client_id FROM client_assignments WHERE team_member_id = current_user.team_member_id AND assignment_role = 'strategist')`. Same scope as Strategist — assigned via `client_assignments` with `assignment_role = 'strategist'` (Jr Strategist does NOT have a separate assignment_role entry; they use the 'strategist' slot on the client record).
+- **Actions:** Same as Strategist (move any status within valid transitions) AND same as Manager (handoff transitions). Combined role.
+- **Special:** Show project counts per status. Show design_status badges.
+- **CRITICAL IMPLEMENTATION NOTE:** Handoff transition permissions for Jr Strategist must be enforced by checking `team_role = 'jr_strategist'` — NOT by checking `client_assignments WHERE assignment_role = 'manager'`. Jr Strategists will never have a 'manager' assignment row. Any RLS policy that gates Manager actions on `client_assignments` membership will silently block Jr Strategists.
+
 ### Senior Writer Board
 - **Columns:** Review Script
-- **Filter:** Projects where the assigned writer reports to this senior writer. (V1 simplification: show all projects in Review Script status within the senior writer's pod(s).)
+- **Filter:** `projects WHERE status = 'review_script' AND writer_id IN (SELECT id FROM team_members WHERE supervised_by = current_user.team_member_id)`. Writers are cross-pod round-robin — pod is irrelevant. The `supervised_by` column on `team_members` is the scope. Each senior writer only sees scripts from writers they directly supervise.
 - **Actions:** Move Review Script → Script Ready to Send (approve) OR Review Script → Fix Script (reject).
 
 ### Senior Editor Board
 - **Columns:** Ready for Internal Review
-- **Filter:** Projects where the assigned editor reports to this senior editor. (V1 simplification: show all projects in Ready for Internal Review status within the senior editor's pod(s).)
+- **Filter:** `projects WHERE status = 'ready_for_internal_review' AND client_id IN (SELECT client_id FROM client_assignments WHERE team_member_id = current_user.team_member_id AND assignment_role = 'senior_editor')`. Editors are not in pods (departmental, not pod-scoped). Use `client_assignments` as the scope — each client has a senior editor assigned during onboarding. Pod-based filtering does NOT work for this role.
 - **Actions:** Move Ready for Internal Review → Edit Ready to Send (approve) OR Ready for Internal Review → Internal Adjustments Needed (reject).
 
 ### Manager Board
-- **Columns:** Script Ready to Send, Edit Ready to Send, Ready to Post
+- **Columns:** Script Ready to Send, Script Sent to Client, Edit Ready to Send, Edit Sent to Client, Ready to Post
 - **Filter:** Projects for clients assigned to this manager (via `client_assignments`)
-- **Actions:** Move Script Ready to Send → Script Sent to Client. Move Edit Ready to Send → Edit Sent to Client. Move Ready to Post → Posted/Scheduled.
+- **Actions:**
+  - Move Script Ready to Send → Script Sent to Client (manager sends script)
+  - Move Script Sent to Client → Client Uploaded (manager confirms client has filmed and uploaded footage via Slack)
+  - Move Edit Ready to Send → Edit Sent to Client (manager sends edit)
+  - Move Edit Sent to Client → Client Adjustments Needed (client left feedback)
+  - Move Edit Sent to Client → Ready to Post (client approved, no changes needed)
+  - Move Ready to Post → Posted/Scheduled
+- **Note:** Script Sent to Client and Edit Sent to Client columns are "watching" columns — the manager monitors client responses (via Slack) and moves status accordingly. These are the two external-action transition owners that were previously undefined.
 
 ### Strategist Board
 - **Columns:** All statuses
-- **Filter:** Projects for clients in the strategist's pod(s)
-- **Actions:** Full visibility. Can move any status within valid transitions.
+- **Filter:** `projects WHERE client_id IN (SELECT client_id FROM client_assignments WHERE team_member_id = current_user.team_member_id AND assignment_role = 'strategist')`. Uses `client_assignments` as scope — NOT pod. Pod path is fragile (can go out of sync) and is reserved for analytics/profitability only.
+- **Actions:** Full visibility. Can move any status within valid transitions. Create projects for their clients.
 - **Special:** Show project counts per status. Show design_status badges.
+
+### Senior Designer Board
+- **Columns:** Client Uploaded, Editing, Ready for Internal Review, Edit Ready to Send, Edit Sent to Client
+- **Filter:** All projects across all clients assigned to any designer (no pod restriction — senior designer has company-wide design visibility)
+- **Actions:** Update `design_status` on any project. Assign/reassign designers to clients (via client_assignments). View-only for pipeline status.
+- **Special:** Show `design_status` badge prominently. Filter by designer to see individual workloads.
 
 ### Admin Board
 - **Columns:** All statuses
@@ -408,12 +487,22 @@ Settings (Admin only)
 #### Project Detail Page
 - **Header:** Task ID, Title, Status badge, Design Status badge
 - **Status Controls:** Next valid status buttons (not a dropdown — explicit action buttons like "Send to Review", "Approve", "Needs Fix")
-- **Assignment:** Writer picker, Editor picker
+- **Assignment:**
+  - Writer picker — nullable. Assigned by Strategist/Jr Strategist/Admin **when moving brief → scriptwriting**. Null at creation and until that point. Round-robin is a manual process in V1 (automation out of scope).
+  - Editor picker — nullable. Assignable by Strategist, Jr Strategist, Admin, **or the editor themselves**. Must be set before project reaches `client_uploaded`.
 - **Dates:** Script V1 Due, Actual Post Date
 - **Client Info:** Client name (linked), Pod
 - **Design:** Design status toggle (Not Started / In Progress / Completed)
 - **Notes:** Free text field for handoff context
-- **Activity Log:** (V1 basic) Timestamp + status change history
+- **Activity Log:** Renders from `project_status_history` table — timestamp, from_status, to_status, changed_by name
+
+#### Project Creation
+- **Who can create:** Admin, Strategist, Jr Strategist only.
+- **Entry point:** "Add Project" button on Client Detail Page (Projects section) OR from the Strategist/Admin board Idea column.
+- **Required fields at creation:** `title`, `client_id`. All other fields nullable.
+- **Default status:** `idea`.
+- **writer_id:** NULL at creation.
+- **editor_id:** NULL at creation for new projects. For migration: auto-populate from `client_assignments` (client's assigned editor). Post-migration new projects: set manually by Strategist, Jr Strategist, Admin, or the editor themselves.
 
 #### Team Members List Page
 - Table: Name, Role, Email, Status, Pod(s)
@@ -480,16 +569,23 @@ Migration script reads from a structured Notion export (CSV or JSON) and inserts
 8. **Projects** — Import active KnwnTasks. Map Master Status to `project_status` enum. Link writer/editor. Preserve task IDs (KN-XXXX). Set sequence to start after highest existing ID.
 
 ### Migration Edge Cases
-- **Pod 3 agency editors:** Create one `team_member` record for the agency contact. Role = `editor`. Note in `special_instructions` that this represents an external agency with their own team.
-- **Pod 3 agency designer:** Same approach — one record for the agency contact.
+- **Pod 3 agency editing:** Create one `team_member` record for the agency contact. Role = `senior_editor` (NOT `editor` — this person acts as the senior editor approving work for Pod 3 clients). Assign them to all Pod 3 clients via `client_assignments` with `assignment_role = 'senior_editor'`. Note in their record that this represents an external agency. There are no in-house editor records for Pod 3 — Pod 3 editing projects will have `editor_id` pointing to this agency contact.
+- **Pod 3 agency designer:** Create one `team_member` record for the agency contact. Role = `designer`. Assign via `client_assignments` to all Pod 3 clients.
 - **Multi-pod team members:** Ensure junction table records are created for all pod associations. Flag the primary pod with `is_primary = true`.
 - **Null/empty fields:** Many Notion fields are sparse (Posting Schedule, Communication Method, Special Instructions). Import as NULL — don't skip the record.
 - **Task number sequence:** After migration, set `project_task_seq` to `MAX(existing task numbers) + 1`.
+- **Supervision mapping:** After importing team members, populate `supervised_by` for all writers and editors. Requires Paulo or Clayton to provide the explicit list of which writers report to which senior writer, and which editors report to which senior editor. This data must be confirmed before migration runs — it is required for Senior Writer and Senior Editor board filters to work correctly.
 
 ---
 
 ## Module Implementation Order
 Build in this exact order. Each module should be committed before starting the next.
+
+### Pre-Build: Design Review (Before Any Code)
+- Build dummy/wireframe screens for all major pages (Client List, Client Detail, Full Pipeline Kanban, My Board, Project Detail, Dashboard)
+- Review with Clayton + Paulo — get explicit sign-off on layout, navigation, and card design
+- Incorporate feedback into this spec before starting Module 0
+- No code written until this step is complete
 
 ### Module 0: Foundation
 - Initialize Next.js project with TypeScript, Tailwind, shadcn/ui
@@ -514,22 +610,24 @@ Build in this exact order. Each module should be committed before starting the n
 ### Module 2: Production Pipeline
 - Build Project CRUD — auto task number, title, client (FK), status, writer, editor, dates
 - Implement status state machine — validate transitions in server actions
-- Build Full Pipeline Kanban — all statuses as columns, drag-and-drop, project cards
+- **Build reusable Kanban board component first** — accepts config: visible statuses, project filter function. Used for Full Pipeline AND all role boards.
+- Build Full Pipeline Kanban using the reusable component — all statuses as columns, drag-and-drop, project cards
 - Build Project Detail page — status action buttons, assignments, dates, notes, design status
 - Add pipeline filters — pod, client, status group, team member, date range
 - Add bulk status update — multi-select projects, move to next valid status
 - Add design parallel track — `design_status` field, badge on cards, toggle on detail page
-- Add basic activity log — store status changes with timestamp and user
+- Add activity log — write to `project_status_history` on every status change (server action)
 
 ### Module 3: Team Boards
-- Build reusable Kanban board component — accepts config: visible statuses, project filter function
-- Build role detection → board config mapping
+- Build role detection → board config mapping (reusable Kanban component already exists from Module 2)
 - Implement Writer board
 - Implement Editor board
 - Implement Designer board
+- Implement Senior Designer board
 - Implement Senior Writer board
 - Implement Senior Editor board
 - Implement Manager board
+- Implement Jr Strategist board
 - Implement Strategist board
 - Implement Admin board (same as Full Pipeline with extra controls)
 - Build My Board page — auto-renders correct board based on logged-in user's role

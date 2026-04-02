@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Knwn Local App — Entity Relationship Diagram</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  body {
+    background: #0f1117;
+    color: #e2e8f0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    margin: 0;
+    padding: 24px;
+  }
+  h1 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  p.sub {
+    font-size: 13px;
+    color: #475569;
+    margin: 0 0 24px;
+  }
+  .mermaid {
+    background: #1e2130;
+    border-radius: 12px;
+    padding: 32px;
+  }
+</style>
+</head>
+<body>
+<h1>Knwn Local — Database Schema</h1>
+<p class="sub">Entity Relationship Diagram · V1</p>
+<div class="mermaid">
+erDiagram
+    pods {
+        uuid id PK
+        text name
+        timestamptz created_at
+    }
+
+    team_members {
+        uuid id PK
+        uuid auth_user_id FK
+        text first_name
+        text last_name
+        text email
+        enum role
+        text status
+        uuid supervised_by FK
+    }
+
+    team_member_pods {
+        uuid id PK
+        uuid team_member_id FK
+        uuid pod_id FK
+        bool is_primary
+    }
+
+    clients {
+        uuid id PK
+        text name
+        text email
+        text phone
+        text market
+        text timezone
+        enum status
+        uuid pod_id FK
+        text package
+        date contract_start_date
+        enum script_format
+        enum communication_method
+    }
+
+    client_channels {
+        uuid id PK
+        uuid client_id FK
+        text channel_name
+        text channel_url
+        numeric videos_per_week
+    }
+
+    client_contacts {
+        uuid id PK
+        uuid client_id FK
+        text contact_name
+        text email
+        bool is_primary
+        bool is_assistant
+    }
+
+    client_assignments {
+        uuid id PK
+        uuid client_id FK
+        uuid team_member_id FK
+        enum assignment_role
+    }
+
+    projects {
+        uuid id PK
+        text task_number
+        text title
+        uuid client_id FK
+        enum status
+        uuid writer_id FK
+        uuid editor_id FK
+        date script_v1_due
+        date actual_post_date
+        enum design_status
+        text notes
+    }
+
+    project_status_history {
+        uuid id PK
+        uuid project_id FK
+        enum from_status
+        enum to_status
+        uuid changed_by FK
+        timestamptz changed_at
+    }
+
+    pods ||--o{ team_member_pods : "members"
+    pods ||--o{ clients : "clients"
+    team_members ||--o{ team_member_pods : "pod assignments"
+    team_members |o--o{ team_members : "supervised_by"
+    team_members ||--o{ client_assignments : "role assignments"
+    team_members ||--o{ projects : "writer_id"
+    team_members ||--o{ projects : "editor_id"
+    team_members ||--o{ project_status_history : "changed_by"
+    clients ||--o{ client_channels : "channels"
+    clients ||--o{ client_contacts : "contacts"
+    clients ||--o{ client_assignments : "team"
+    clients ||--o{ projects : "projects"
+    projects ||--o{ project_status_history : "history"
+</div>
+</body>
+</html>
