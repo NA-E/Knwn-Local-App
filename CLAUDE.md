@@ -6,11 +6,19 @@ Internal ops app for a YouTube content agency. Client management, production pip
 **IMPORTANT: For all UI/design tasks, components, styling, and visual implementation — read `brand.md` first for complete design system specifications including colors, typography, buttons, tables, Kanban cards, modals, and layout guidelines.**
 
 ## Stack
-- Next.js 14+ (App Router, Server Actions, Server Components)
+- Next.js 16 (App Router, Server Actions, Server Components)
 - Supabase (PostgreSQL, Auth, RLS)
 - TypeScript (strict mode)
-- Tailwind CSS + shadcn/ui
+- Tailwind CSS v4 + shadcn/ui v4 (base-nova style)
 - Deployed on Vercel
+
+## Next.js 16 / Tailwind v4 / shadcn v4 Gotchas
+- **Tailwind v4:** No `tailwind.config.ts` — all config in CSS via `@theme inline` in `globals.css`
+- **shadcn v4 uses base-ui, NOT radix:** `asChild` does NOT exist on components like `DialogTrigger`. Use `render` prop instead: `<DialogTrigger render={<button>text</button>} />`
+- **Page params are Promises:** `{ params }: { params: Promise<{ id: string }> }` — must `await params`. Same for `searchParams`.
+- **Color format:** Brand tokens are hex values in `:root` CSS vars, mapped to Tailwind via `@theme inline` `--color-*` vars
+- **`toast` is deprecated** in shadcn v4 — use `sonner` component instead
+- **Middleware deprecation warning:** Next.js 16 shows "use proxy instead" — middleware still works, address in future
 
 ## Code Style
 - Use ES modules (import/export)
@@ -99,8 +107,21 @@ Module 0 → 1 → 2 → 3 → 4. Commit after each module. See SPEC.md for deta
 - `wireframes.md` — ASCII wireframes for all major pages (Clayton/Paulo review)
 - `ui-inspiration.html` — live HTML design system demo (open in browser)
 - `docs/superpowers/plans/2026-04-02-client-onboarding.md` — Module 0+1 implementation plan (14 tasks)
+- `docs/module01-test-review.md` — Module 0+1 bug tracker: browser test results, code review findings, fix priority plan
 - `erd.html` — entity relationship diagram (open in browser)
 - `first meeting transcript.md` — original planning call, reference for business logic questions
+
+### Supabase Project
+- Project ref: `tcpynxcruaddahdhuugb`
+- Region: East US (North Virginia)
+- Admin user: `admin@knownlocal.com` (linked to team_members table)
+- All 3 migrations (001_schema, 002_rls, 003_seed) applied successfully
+
+### Testing Workflow
+- Test module-by-module in browser (login, navigate, CRUD operations, check console errors)
+- Run parallel code review agents (auth, server actions, pages/components, SQL/types)
+- Consolidate bugs into `docs/module01-test-review.md` with severity and fix priority
+- Fix critical → medium → low, then re-test in browser
 
 ## Design System Reference
 
