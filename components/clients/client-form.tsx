@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { createClientAction, updateClientAction } from '@/lib/actions/clients'
 import { CLIENT_STATUS_LABELS } from '@/lib/constants/status'
+import { OnboardingModal } from '@/components/clients/onboarding-modal'
 import type { Pod } from '@/lib/types'
 
 interface ClientFormProps {
@@ -17,6 +18,8 @@ interface ClientFormProps {
 export function ClientForm({ client, pods }: ClientFormProps) {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
+  const [onboardingClientId, setOnboardingClientId] = useState<string | null>(null)
+  const [onboardingClientName, setOnboardingClientName] = useState<string | null>(null)
   const isEdit = !!client
 
   async function handleSubmit(formData: FormData) {
@@ -28,7 +31,18 @@ export function ClientForm({ client, pods }: ClientFormProps) {
     } else {
       const result = await createClientAction(formData)
       if (result?.error) { setError(result.error); return }
-      router.push(`/clients/${result.id}`)
+
+      // Open onboarding modal and fire off onboarding
+      const clientName = (formData.get('name') as string) ?? ''
+      setOnboardingClientId(result.id)
+      setOnboardingClientName(clientName)
+
+      // Fire-and-forget POST to start onboarding
+      fetch('/api/onboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId: result.id }),
+      }).catch(err => console.error('Failed to start onboarding:', err))
     }
   }
 
@@ -118,6 +132,20 @@ export function ClientForm({ client, pods }: ClientFormProps) {
         <Button type="button" variant="outline" onClick={() => router.back()}>Cancel</Button>
         <Button type="submit">{isEdit ? 'Save Changes' : 'Create Client'}</Button>
       </div>
+
+      {onboardingClientId && onboardingClientName && (
+        <OnboardingModal
+          clientId={onboardingClientId}
+          clientName={onboardingClientName}
+          open={!!onboardingClientId}
+          onOpenChange={(open) => {
+            if (!open) {
+              setOnboardingClientId(null)
+              setOnboardingClientName(null)
+            }
+          }}
+        />
+      )}
     </form>
   )
 }

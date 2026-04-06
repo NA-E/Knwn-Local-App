@@ -12,6 +12,37 @@
 
 ---
 
+## Status Tracker
+
+| Task | Description | Status |
+|------|-------------|--------|
+| 1 | Project Bootstrap | Done |
+| 2 | Database Schema | Done |
+| 3 | TypeScript Types + Supabase Client Helpers | Done |
+| 4 | Auth Middleware + Login Page | Done |
+| 5 | App Shell (Layout + Sidebar) | Done |
+| 6 | Pods CRUD | Done |
+| 7 | Team Members CRUD | Done |
+| 8 | Client List Page | Done |
+| 9 | Add/Edit Client Form | Done |
+| 10 | Client Detail Page — Shell + Info Section | Done |
+| 11 | Client Channels Section | Done |
+| 12 | Client Contacts Section | Done |
+| 13 | Client Assignments (Team Picker) | Done |
+| 14 | Seed Data + RLS Policies | Done |
+| — | Onboarding Automation (spec, services, API routes, modal) | Done |
+| — | Adversarial Code Review + 13 bug fixes | Done |
+| — | Onboarding Test Plan (`docs/onboarding-test-plan.md`) | Done |
+| — | MCP Server (22 tools, dual transport) | Done |
+| — | Module 0+1 Bug Tracker — 45 bugs fixed | Done |
+| — | Migration 007: onboarding_steps table + RLS + Realtime | Done (2026-04-03) |
+| — | Migration 008: schema fixes (indexes, enum, triggers, FK) | Done (2026-04-03) |
+| — | DB Schema Review + Supabase CLI migration sync | Done (2026-04-03) |
+
+**Next:** Client data migration from Notion export → Module 2 (Production Pipeline + Kanban)
+
+---
+
 ## File Structure
 
 ```

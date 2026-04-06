@@ -99,6 +99,7 @@ export function TeamMemberForm({ member, pods, supervisors }: TeamMemberFormProp
           <div className="mt-2">
             <Label htmlFor="primary_pod_id">Primary Pod</Label>
             <select id="primary_pod_id" name="primary_pod_id"
+              key={selectedPods.join(',')}
               defaultValue={member?.team_member_pods?.find((p: any) => p.is_primary)?.pod_id ?? ''}
               className="mt-1 w-full px-3 py-2 border border-border rounded-md text-sm bg-card">
               {selectedPods.map((pid) => {

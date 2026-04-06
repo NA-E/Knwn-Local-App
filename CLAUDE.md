@@ -57,9 +57,9 @@ Module 0 → 1 → 2 → 3 → 4. Commit after each module. See SPEC.md for deta
 
 ## Do NOT
 - Implement anything listed in "Out of Scope for V1" in SPEC.md
-- Add API routes when Server Actions work
+- Add API routes unless the use case requires it (e.g., fire-and-forget background work)
 - Use client-side state management libraries (no Redux, Zustand) — server components + URL state
-- Over-engineer auth — email/password only, no social providers
+- Over-engineer auth — email/password + Google OAuth only
 
 ## Persistent Context
 
@@ -102,20 +102,77 @@ Module 0 → 1 → 2 → 3 → 4. Commit after each module. See SPEC.md for deta
 - Client portal
 
 ### Key Files
+- `docs/master-tasklist.md` — **single source of truth for all project tasks.** Add every new task, plan, or action item here.
+- `docs/schema-review.md` — Principal engineer schema review (2026-04-06), 4 critical + 7 important findings
 - `SPEC.md` — full V1 spec, authoritative source for schema, state machine, board configs
 - `brand.md` — design system reference: colors, typography, components, layout rules. Read before any UI work.
 - `wireframes.md` — ASCII wireframes for all major pages (Clayton/Paulo review)
 - `ui-inspiration.html` — live HTML design system demo (open in browser)
 - `docs/superpowers/plans/2026-04-02-client-onboarding.md` — Module 0+1 implementation plan (14 tasks)
+- `docs/superpowers/specs/2026-04-03-client-onboarding-automation.md` — Onboarding automation design spec (Slack, Dropbox, GDrive, realtime modal)
+- `docs/onboarding-test-plan.md` — Onboarding test plan with env var setup, 9 test phases
 - `docs/module01-test-review.md` — Module 0+1 bug tracker: browser test results, code review findings, fix priority plan
 - `erd.html` — entity relationship diagram (open in browser)
 - `first meeting transcript.md` — original planning call, reference for business logic questions
 
+### MCP Server
+- Located at `mcp-server/` — dual transport: stdio (Claude Desktop) + Streamable HTTP (Claude.ai)
+- 22 tools: all Module 0+1 entities + `get_onboarding_status`
+- Auth: Supabase PostgREST with JWT auto-refresh
+- Config: `mcp-server/.env` (SUPABASE_URL, SUPABASE_ANON_KEY, credentials, PORT)
+- Build: `cd mcp-server && npm run build` → `node dist/index.js`
+- Claude Desktop config: `AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\claude_desktop_config.json`
+
+### Status Machine
+- `lib/constants/status.ts` — STATUS_TRANSITIONS (21 transitions with role arrays), STATUS_TO_GROUP, STATUS_GROUPS
+- `lib/constants/index.ts` — barrel export for all constants
+
+### Client Onboarding Automation
+- Architecture: fire-and-forget API route (`/api/onboard`) + Supabase Realtime + service-role client
+- Service layer: `lib/services/` (slack.ts, dropbox.ts, gdrive.ts, onboarding.ts)
+- Parallel execution: Phase 1 (Slack+Dropbox+GDrive), Phase 2 (invite+welcome+notify)
+- Modal: `components/clients/onboarding-modal.tsx` — realtime subscription, spinner/tick/X, retry, stall detection
+- Env vars in `.env.local`: SUPABASE_SERVICE_ROLE_KEY, SLACK_BOT_TOKEN, DROPBOX_APP_KEY/SECRET/REFRESH_TOKEN, GOOGLE_SERVICE_ACCOUNT_JSON, GOOGLE_DRIVE_PARENT_FOLDER_ID, ONBOARD_INVITE_EMAILS
+- Dependency: `google-auth-library` for Google Drive JWT auth
+
 ### Supabase Project
 - Project ref: `tcpynxcruaddahdhuugb`
+- Organization: **Known Local** org (transferred from NA-E's Org on 2026-04-07 to isolate from other apps, Free plan / Nano compute)
 - Region: East US (North Virginia)
 - Admin user: `admin@knownlocal.com` (linked to team_members table)
-- All 3 migrations (001_schema, 002_rls, 003_seed) applied successfully
+- 9 migrations (001_schema, 002_rls, 003_seed, 004_fixes, 005_phase4_fixes, 006_module2_prep, 007_onboarding, 008_schema_fixes, 009_notion_client_data)
+- 009_notion_client_data.sql: Real data from Notion — 80 clients (74 active + 6 onboarding), 35 team members, 306 assignments, 77 channels, 40 contacts. Replaced all test/seed data.
+- Realtime enabled on `onboarding_steps` table (via ALTER PUBLICATION in 007)
+- Supabase CLI migration tracking synced (all 9 migrations)
+- **`supabase db push` gotcha:** It wraps each migration file in its own transaction — do NOT include `BEGIN`/`COMMIT` in migration SQL files (causes nested transaction issues)
+
+### Meeting Transcripts & Process Maps
+- Transcripts directory: `docs/transcripts/YYYY-MM-DD/` — one directory per date
+- Naming: `{type}-{sequence}-{topic-slug}.md` where type is `recap` (Fathom AI summary) or `transcript` (full word-for-word)
+- Examples: `transcript-1-kpi-onboarding-storage.md`, `recap-2-video-workflow.md`
+- Process maps: `docs/process-maps/` — as-is and to-be Mermaid flowcharts, discovery scripts
+- Source: Fathom AI via email recaps → "View Meeting" link for full transcripts
+
+### Data Migration
+- Notion exports: `client database from notion/` (2 CSVs), `team members from notion/` (2 CSVs)
+- Generator script: `scripts/generate_migration.py` — reads both Notion exports, normalizes names/pods/roles, generates SQL
+- Review script: `scripts/review_migration_data.py` — prints 5 tables for data verification
+- 22/35 team members have real emails from Notion, 13 have `@knownlocal.com` placeholders
+- Name normalization: Mae=Mae Ariate, Anderson "Cirion" Ruan=Anderson Ruan, Juan Audiovisual=Juan Bravo, igor marques→Igor Marques
+
+### Google OAuth
+- Google Cloud project: `gen-lang-client-0914174214` (Gemini API project, shared with other apps)
+- OAuth client: "Known Local" (Web application), Client ID: `541238776209-65qo8qshroh7df4a8htjg50tl15q2cfs.apps.googleusercontent.com`
+- Authorized redirect URI: `https://tcpynxcruaddahdhuugb.supabase.co/auth/v1/callback`
+- Supabase Google provider: enabled in "Known Local" org with Client ID + Secret
+- OAuth consent screen: External, app name "Known Local", email: ekanourin@gmail.com
+- Code files: `app/(auth)/login/google-auth.ts` (client-side OAuth), `app/auth/callback/route.ts` (code exchange), `app/(app)/layout.tsx` (auto-link/provision team member)
+- **Gotcha:** Google Cloud new Auth Platform no longer shows client secrets after creation — must copy immediately or generate new
+
+### Bug Fix Status
+- All Phase 1–4 bugs fixed (45 total; BUG-7 skipped per user, BUG-21 not a bug)
+- Phase 3 Module 2 prep complete (BUG-22, 25-28, 29-31, 38, 41)
+- Tracker: `docs/module01-test-review.md`
 
 ### Testing Workflow
 - Test module-by-module in browser (login, navigate, CRUD operations, check console errors)

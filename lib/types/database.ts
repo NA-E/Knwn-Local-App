@@ -16,6 +16,7 @@ export type ProjectStatus =
 export type DesignStatus = 'not_started' | 'in_progress' | 'completed'
 export type ScriptFormat = 'word_for_word' | 'outline'
 export type CommMethod = 'slack' | 'email' | 'other'
+export type TeamMemberStatus = 'active' | 'inactive'
 
 export type AssignmentRole =
   | 'strategist' | 'manager' | 'editor' | 'senior_editor'
@@ -35,7 +36,7 @@ export interface TeamMember {
   last_name: string
   email: string
   role: TeamRole
-  status: 'active' | 'inactive'
+  status: TeamMemberStatus
   supervised_by: string | null
   created_at: string
   updated_at: string
@@ -123,4 +124,23 @@ export interface ProjectStatusHistory {
   to_status: ProjectStatus
   changed_by: string
   changed_at: string
+}
+
+// Onboarding types
+
+export type OnboardingStepName =
+  | 'slack_channel' | 'dropbox_folder' | 'gdrive_folder'
+  | 'slack_invite' | 'welcome_message' | 'team_notify'
+
+export type OnboardingStepStatus = 'pending' | 'running' | 'success' | 'failed' | 'skipped'
+
+export interface OnboardingStep {
+  id: string
+  client_id: string
+  step: OnboardingStepName
+  status: OnboardingStepStatus
+  result_data: Record<string, unknown> | null
+  error_message: string | null
+  completed_at: string | null
+  created_at: string
 }

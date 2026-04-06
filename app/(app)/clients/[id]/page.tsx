@@ -6,8 +6,10 @@ import { ClientInfoSection } from '@/components/clients/client-info-section'
 import { ClientChannelsSection } from '@/components/clients/client-channels-section'
 import { ClientContactsSection } from '@/components/clients/client-contacts-section'
 import { ClientTeamSection } from '@/components/clients/client-team-section'
+import { OnboardingStatusSection } from '@/components/clients/onboarding-status-section'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import type { OnboardingStep } from '@/lib/types'
 
 export default async function ClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -21,10 +23,11 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
 
   if (!client) notFound()
 
-  const [{ data: channels }, { data: contacts }, { data: assignments }] = await Promise.all([
+  const [{ data: channels }, { data: contacts }, { data: assignments }, { data: onboardingSteps }] = await Promise.all([
     supabase.from('client_channels').select('*').eq('client_id', id).order('channel_name'),
     supabase.from('client_contacts').select('*').eq('client_id', id).order('is_primary', { ascending: false }),
     supabase.from('client_assignments').select('*, team_members ( id, first_name, last_name, role )').eq('client_id', id),
+    supabase.from('onboarding_steps').select('*').eq('client_id', id).order('created_at'),
   ])
 
   function statusClass(status: string) {
@@ -60,6 +63,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         <ClientTeamSection clientId={id} assignments={assignments ?? []} />
         <ClientChannelsSection clientId={id} channels={channels ?? []} />
         <ClientContactsSection clientId={id} contacts={contacts ?? []} />
+        <OnboardingStatusSection clientId={id} steps={(onboardingSteps ?? []) as OnboardingStep[]} />
       </div>
     </div>
   )

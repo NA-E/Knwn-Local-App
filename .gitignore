@@ -34,3 +34,20 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# raw data exports (Notion)
+client database from notion/
+team members from notion/
+team members from notion.zip
+
+# schema dumps
+schema_dump.sql
+current_schema.sql
+
+# supabase temp
+supabase/.temp/
+
+# mcp server
+mcp-server/.env
+mcp-server/node_modules
+mcp-server/dist

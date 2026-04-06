@@ -17,14 +17,24 @@ interface Props {
 export function ClientTeamSection({ clientId, assignments }: Props) {
   const [editing, setEditing] = useState<AssignmentRole | null>(null)
   const [eligible, setEligible] = useState<any[]>([])
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (!editing) return
     let ignore = false
     setEligible([])
-    getEligibleMembers(editing).then((data) => {
-      if (!ignore) setEligible(data)
-    })
+    setLoading(true)
+    getEligibleMembers(editing)
+      .then((data) => {
+        if (!ignore) setEligible(data)
+      })
+      .catch((err) => {
+        console.error('Failed to load eligible members:', err)
+        if (!ignore) setEligible([])
+      })
+      .finally(() => {
+        if (!ignore) setLoading(false)
+      })
     return () => { ignore = true }
   }, [editing])
 
@@ -59,10 +69,16 @@ export function ClientTeamSection({ clientId, assignments }: Props) {
                   onBlur={() => setEditing(null)}
                   className="px-2 py-1 border border-border rounded text-[12px] bg-card"
                 >
-                  <option value="">— None —</option>
-                  {eligible.map((m: any) => (
-                    <option key={m.id} value={m.id}>{m.first_name} {m.last_name}</option>
-                  ))}
+                  {loading ? (
+                    <option disabled>Loading…</option>
+                  ) : (
+                    <>
+                      <option value="">— None —</option>
+                      {eligible.map((m: any) => (
+                        <option key={m.id} value={m.id}>{m.first_name} {m.last_name}</option>
+                      ))}
+                    </>
+                  )}
                 </select>
               ) : (
                 <button

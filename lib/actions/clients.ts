@@ -96,6 +96,25 @@ export async function createClientAction(formData: FormData) {
   const { data, error } = await supabase.from('clients').insert(fields).select().single()
   if (error) return { error: error.message, id: null }
 
+  // Insert 6 onboarding step rows (all pending)
+  const onboardingSteps = [
+    'slack_channel', 'dropbox_folder', 'gdrive_folder',
+    'slack_invite', 'welcome_message', 'team_notify',
+  ] as const
+
+  const { error: stepsError } = await supabase
+    .from('onboarding_steps')
+    .insert(onboardingSteps.map(step => ({
+      client_id: data.id,
+      step,
+      status: 'pending',
+    })))
+
+  if (stepsError) {
+    console.error('Failed to insert onboarding steps:', stepsError.message)
+    // Don't fail the whole operation — the client was created successfully
+  }
+
   revalidatePath('/clients')
   return { error: null, id: data.id }
 }
