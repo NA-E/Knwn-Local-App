@@ -34,7 +34,7 @@ export function ClientTable({ clients }: ClientTableProps) {
       <table className="w-full">
         <thead>
           <tr className="border-b border-border bg-background">
-            {['Client', 'Market', 'Pod', 'Status', 'Vid/wk', 'Strategist'].map((h) => (
+            {['Client', 'Market', 'Pod', 'Status', 'Strategist'].map((h) => (
               <th key={h} className="text-left px-4 py-2.5 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-muted-foreground whitespace-nowrap">{h}</th>
             ))}
           </tr>
@@ -57,7 +57,6 @@ export function ClientTable({ clients }: ClientTableProps) {
               <td className="px-4 py-3">
                 <Badge className={`text-[11px] font-medium ${statusBadgeClass(c.status)}`}>{c.status}</Badge>
               </td>
-              <td className="px-4 py-3 text-[13px] text-muted-foreground">{getVideosPerWeek(c)}</td>
               <td className="px-4 py-3 text-[13px] text-muted-foreground">{getStrategist(c)}</td>
             </tr>
           ))}

@@ -68,18 +68,10 @@ export function KanbanColumn({
       )}
     >
       {/* Column header */}
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-3">
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.10em] text-brand-text-2">
           {label}
         </h3>
-        <span
-          className={cn(
-            'inline-flex h-5 min-w-[20px] items-center justify-center rounded px-1.5 text-[10.5px] font-semibold',
-            groupColorClasses
-          )}
-        >
-          {projects.length}
-        </span>
       </div>
 
       {/* Droppable area */}

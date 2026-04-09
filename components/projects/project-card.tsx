@@ -104,20 +104,18 @@ export function ProjectCard({ project, isDragging: isDraggingProp }: ProjectCard
           : 'border-border shadow-[0_1px_3px_rgba(26,25,22,0.06),0_1px_2px_rgba(26,25,22,0.04)] hover:border-brand-accent hover:shadow-[0_2px_8px_rgba(200,120,42,0.10)]'
       )}
     >
-      {/* Row 1: Task number + edit version */}
-      <div className="flex items-center justify-between">
-        <span className="font-mono text-[10.5px] text-brand-text-3">
-          {project.task_number}
-        </span>
-        {project.edit_version > 0 && (
+      {/* Row 1: Edit version (if any) */}
+      {project.edit_version > 0 && (
+        <div className="flex items-center justify-end">
           <span className="rounded-sm bg-blue-50 px-1.5 py-0.5 text-[10px] font-medium text-blue-700">
             V{project.edit_version}
           </span>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Row 2: Title */}
-      <p className="mt-1.5 text-[13px] font-semibold leading-snug text-brand-text-1 line-clamp-2">
+      <p className={cn("text-[13px] font-semibold leading-snug text-brand-text-1 line-clamp-2", project.edit_version > 0 ? 'mt-1.5' : '')}>
+
         {project.title}
       </p>
 

@@ -48,7 +48,6 @@ export function Sidebar({ role, userName }: SidebarProps) {
         <div className="pt-3">
           <div className="px-3 mb-1 text-[9.5px] font-semibold uppercase tracking-[0.12em] text-white/25">Clients</div>
           {navItem('/clients', 'Client List')}
-          {navItem('/clients/new', 'Add Client')}
         </div>
 
         <div className="pt-3">
