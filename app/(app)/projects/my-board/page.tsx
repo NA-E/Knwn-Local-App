@@ -51,13 +51,11 @@ export default async function MyBoardPage() {
         </p>
       </div>
 
-      <div className="overflow-x-auto -mx-10 px-10">
-        <MyBoardClient
-          columns={columns}
-          projectsByStatus={projectsByStatus}
-          currentUserRole={userRole}
-        />
-      </div>
+      <MyBoardClient
+        columns={columns}
+        projectsByStatus={projectsByStatus}
+        currentUserRole={userRole}
+      />
     </div>
   )
 }

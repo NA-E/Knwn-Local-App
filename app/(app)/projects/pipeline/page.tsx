@@ -95,13 +95,11 @@ export default async function PipelinePage({
         />
       </Suspense>
 
-      <div className="overflow-x-auto -mx-10 px-10">
-        <PipelineClient
-          columns={PIPELINE_COLUMNS}
-          projectsByStatus={projectsByStatus}
-          currentUserRole={userRole}
-        />
-      </div>
+      <PipelineClient
+        columns={PIPELINE_COLUMNS}
+        projectsByStatus={projectsByStatus}
+        currentUserRole={userRole}
+      />
     </div>
   )
 }
