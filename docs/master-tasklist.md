@@ -18,10 +18,10 @@
 
 - [x] **BUG-P1**: Pipeline project cards — added click-to-navigate with drag guard (2026-04-10)
 - [ ] **BUG-P2**: Google OAuth sign-in untested on production — needs manual human test.
-- [ ] **BUG-P3**: Client portal magic link sign-in untested on production.
+- [x] **BUG-P3**: Client portal magic link — verified working on production (2026-04-10)
 - [ ] **BUG-C1**: Non-admin role access not tested (only admin account available). Sidebar section hiding, server action blocks, RLS enforcement unverified on production.
-- [ ] **BUG-C2**: Drag-and-drop transition validation untested on production.
-- [ ] **BUG-C3**: Pagination on client list untested (need >25 results to verify Previous/Next).
+- [x] **BUG-C2**: Drag-and-drop — verified working on production, both within-row and same-row (2026-04-10)
+- [x] **BUG-C3**: Pagination on client list — verified working (80 clients, 4 pages) (2026-04-10)
 - [x] **BUG-38**: `client-team-section.tsx` — already fixed (has .catch() and loading state)
 - [x] **BUG-41**: `team-member-form.tsx` — already fixed (key prop forces remount on pod change)
 
@@ -33,10 +33,10 @@
 ### Tasks — From User Instructions (2026-04-10)
 
 - [x] Fix BUG-P1: Make project cards clickable (navigate to project detail on click, keep drag working)
-- [ ] Test client portal magic link sign-in on production (BUG-P3)
+- [x] Test client portal magic link sign-in on production (BUG-P3)
 - [ ] Test Google OAuth on production — manual human test (BUG-P2)
 - [ ] Fix all remaining open bugs above
-- [ ] Verify drag-and-drop cross-row works on production (BUG-C2)
+- [x] Verify drag-and-drop cross-row works on production (BUG-C2)
 
 ### Recently Fixed (2026-04-10)
 
