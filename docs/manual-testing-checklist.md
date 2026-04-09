@@ -1,5 +1,7 @@
 # Manual Testing Checklist
 
+> Bug tracking: see `docs/bugs.md`
+
 ## Auth & Login
 - [ ] Email/password login works
 - [ ] Google OAuth login works
@@ -82,19 +84,25 @@
 - [ ] Form loads: Title, Client dropdown, Writer dropdown, Editor dropdown, Notes
 - [ ] Client dropdown populated with active/onboarding clients
 - [ ] Writer/Editor dropdowns populated with active members
+- [ ] Notes field accepts multiline text
 - [ ] Validation: empty title → error
 - [ ] Validation: no client selected → error
 - [ ] Fill Title + Client → Create → success (redirect or toast)
+- [ ] Writer and Editor are optional — form submits without them
 - [ ] Cancel navigates back
 - [ ] No console errors
 
 ## Projects Pipeline (/projects/pipeline)
-- [ ] Kanban board renders with correct columns per role
-- [ ] Columns organized into groups: Todo, Pre-Production, Production, Post-Production, Complete
-- [ ] Group separators visible between groups
+- [ ] Kanban board renders with correct statuses per role
+- [ ] Layout is stacked rows grouped by phase: To-Do, Pre-Production, Production, Post-Production, Complete
+- [ ] Each phase group row has a labelled header with project count
+- [ ] Click group header collapses/expands that row
+- [ ] Collapsed group shows project count in header
+- [ ] Expanded group shows all cards in that phase
 - [ ] Project cards show task number, title, client, writer, editor, design status
 - [ ] Cards show days in status and relevant due date icon
-- [ ] Drag and drop moves cards between columns
+- [ ] Drag and drop moves cards between statuses within the same row
+- [ ] Drag and drop moves cards across phase rows (cross-group)
 - [ ] Status transition validated (invalid moves rejected with error toast)
 - [ ] Click card navigates to project detail
 - [ ] Filter: Pod dropdown works
@@ -104,7 +112,7 @@
 - [ ] Clear all filters → full pipeline returns
 
 ## Project Detail (/projects/[id])
-- [ ] Back link to pipeline
+- [ ] Back to Pipeline link navigates to /projects/pipeline
 - [ ] Task number, title (editable), status badge, design status dot, version badge
 - [ ] Title inline edit: click pencil → edit → Enter saves, Escape cancels
 - [ ] Activity log shows status history with timestamps
@@ -112,16 +120,22 @@
 - [ ] Status actions: transition buttons based on current status + role
 - [ ] Forward transition: click → status updates, history logged
 - [ ] Conditional forms: transitions requiring data (edit URL, feedback) show inline form
-- [ ] Project links editable: script URL, edit URL, notes, thumbnail URL
+- [ ] Project links editable: script URL, edit URL, thumbnail URL + notes field
+- [ ] Project links: empty fields show placeholder, saved values persist after reload
 
 ## My Board (/projects/my-board)
 - [ ] Shows only projects relevant to current user's role
 - [ ] Correct columns for role
 
 ## Client Portal (/client/[token])
-- [ ] Valid token shows client name, projects, channels
-- [ ] Expired/invalid token shows not-found
-- [ ] No sensitive data exposed (no special instructions, contacts, etc.)
+- [ ] Generate portal link button on client detail page creates a magic link token
+- [ ] Copy link and open link buttons work after generation
+- [ ] Visit portal URL via magic link token — page loads without login
+- [ ] Valid token shows client name, projects, and channels
+- [ ] Projects list hides cancelled and idea statuses
+- [ ] No sensitive data exposed (no team assignments, special instructions, contacts, internal notes)
+- [ ] Upload link row visible and functional when a file upload link is provided
+- [ ] Expired/invalid token shows not-found or error page
 
 ## Security
 - [ ] RLS policies enforced (test with different roles)
@@ -133,6 +147,7 @@
 ## Responsive / Visual
 - [ ] Sidebar fixed, content scrolls independently
 - [ ] Forms readable and usable
+- [ ] Pipeline board: no horizontal scroll — stacked rows layout fills viewport vertically
 - [ ] No console errors on any page (ignore Chrome extension noise)
 - [ ] No React hydration warnings
 - [ ] No uncaught promise rejections
