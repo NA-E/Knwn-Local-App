@@ -1,0 +1,38 @@
+# Railway deployment configuration for Known Local App
+# https://docs.railway.com/reference/config-as-code
+
+[build]
+builder = "NIXPACKS"
+buildCommand = "npm install && npm run build"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
+# Railway auto-detects the PORT env var. Next.js will listen on $PORT
+# which Railway sets automatically (typically 3000).
+# No need to hardcode — Railway injects PORT at runtime.
+
+# ---------------------------------------------------------------------------
+# MCP Server (mcp-server/)
+# ---------------------------------------------------------------------------
+# The MCP server should be deployed as a SEPARATE service in the same
+# Railway project. To set it up:
+#
+# 1. In the Railway dashboard, click "+ New Service" in your project
+# 2. Connect the same GitHub repo
+# 3. Set the Root Directory to: mcp-server
+# 4. Set build command: npm install && npm run build
+# 5. Set start command: npm start
+# 6. Add these environment variables:
+#      SUPABASE_URL          - Supabase project URL (no /rest/v1 suffix)
+#      SUPABASE_ANON_KEY     - Supabase anon/public key
+#      KNOWNLOCAL_EMAIL      - Admin login email for the MCP server
+#      KNOWNLOCAL_PASSWORD   - Admin login password
+#      MCP_TRANSPORT         - Set to "http" for Railway deployment
+#      PORT                  - Railway injects this automatically
+# 7. The MCP server listens on the PORT env var (default 3001 if not set)
+#    Railway will assign a port via $PORT automatically.
