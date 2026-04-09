@@ -6,6 +6,8 @@ import { logout } from '@/app/(auth)/login/actions'
 import type { TeamRole } from '@/lib/types'
 import { ROLE_LABELS, ADMIN_ROLES } from '@/lib/constants/roles'
 
+const DASHBOARD_ROLES: TeamRole[] = ['admin', 'strategist', 'jr_strategist']
+
 interface SidebarProps {
   role: TeamRole
   userName: string
@@ -41,7 +43,7 @@ export function Sidebar({ role, userName }: SidebarProps) {
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
-        {navItem('/dashboard', 'Dashboard')}
+        {DASHBOARD_ROLES.includes(role) && navItem('/dashboard', 'Dashboard')}
 
         <div className="pt-3">
           <div className="px-3 mb-1 text-[9.5px] font-semibold uppercase tracking-[0.12em] text-white/25">Clients</div>
@@ -65,7 +67,7 @@ export function Sidebar({ role, userName }: SidebarProps) {
       </nav>
 
       {/* User */}
-      <div className="px-5 py-3.5 border-t border-white/8">
+      <div className="px-5 py-3.5 pb-12 border-t border-white/8">
         <div className="text-[12px] font-medium text-white/75">{userName}</div>
         <div className="text-[11px] text-white/30 mt-0.5">{ROLE_LABELS[role]}</div>
         <button
