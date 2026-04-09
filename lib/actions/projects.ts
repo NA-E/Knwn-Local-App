@@ -91,7 +91,7 @@ export async function createProject(input: CreateProjectInput) {
     // Non-fatal — the project was already created
   }
 
-  revalidatePath('/pipeline')
+  revalidatePath('/projects/pipeline')
   revalidatePath(`/clients/${input.client_id}`)
   return { error: null, project }
 }
@@ -194,7 +194,7 @@ export async function updateProject(id: string, input: UpdateProjectInput) {
 
   if (error) return { error: error.message }
 
-  revalidatePath('/pipeline')
+  revalidatePath('/projects/pipeline')
   revalidatePath(`/projects/${id}`)
   return { error: null }
 }
@@ -217,6 +217,6 @@ export async function deleteProject(id: string) {
 
   if (error) return { error: error.message }
 
-  revalidatePath('/pipeline')
+  revalidatePath('/projects/pipeline')
   return { error: null }
 }

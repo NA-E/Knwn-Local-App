@@ -215,7 +215,7 @@ export async function transitionProjectStatus(
     console.error('Slack notification failed (non-blocking):', err)
   })
 
-  revalidatePath('/pipeline')
+  revalidatePath('/projects/pipeline')
   revalidatePath(`/projects/${projectId}`)
   revalidatePath(`/clients/${project.client_id}`)
 

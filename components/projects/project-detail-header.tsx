@@ -73,7 +73,7 @@ export function ProjectDetailHeader({ project, onTitleUpdate }: ProjectDetailHea
         {/* Left section */}
         <div className="flex items-center gap-3 min-w-0">
           <Link
-            href="/pipeline"
+            href="/projects/pipeline"
             className="flex items-center gap-1.5 text-[13px] text-brand-text-2 hover:text-brand-text-1 transition-colors shrink-0"
           >
             <ArrowLeft className="size-4" />
@@ -129,7 +129,7 @@ export function ProjectDetailHeader({ project, onTitleUpdate }: ProjectDetailHea
 
           {/* Version badge */}
           <span className="inline-flex items-center px-2 py-0.5 rounded bg-secondary text-secondary-foreground text-[11px] font-medium">
-            V{project.edit_version}
+            {project.edit_version > 0 ? `V${project.edit_version}` : 'V—'}
           </span>
         </div>
       </div>

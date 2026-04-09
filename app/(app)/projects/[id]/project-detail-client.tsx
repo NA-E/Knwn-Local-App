@@ -33,7 +33,7 @@ export function ProjectDetailClient({ project, userRole }: ProjectDetailClientPr
       <div className="flex gap-6 px-6 py-6">
         {/* Main content area */}
         <div className="flex-1 min-w-0">
-          <ActivityLog projectId={project.id} />
+          <ActivityLog key={project.status} projectId={project.id} />
         </div>
 
         {/* Right sidebar */}
