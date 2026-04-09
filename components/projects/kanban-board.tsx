@@ -139,52 +139,78 @@ export function KanbanBoard({
     })
   }, [projectById])
 
-  return (
-    <div className="flex h-full gap-0 overflow-x-auto pb-4">
-      {groupedColumns.map((groupDef, groupIdx) => (
-        <div key={groupDef.group} className="flex shrink-0">
-          {/* Group separator (dot divider between groups) */}
-          {groupIdx > 0 && (
-            <div className="flex w-6 shrink-0 flex-col items-center justify-center gap-1 px-1">
-              <span className="text-[10px] leading-none text-brand-text-3">&bull;</span>
-              <span className="text-[10px] leading-none text-brand-text-3">&bull;</span>
-              <span className="text-[10px] leading-none text-brand-text-3">&bull;</span>
-            </div>
-          )}
+  // Track which groups are collapsed
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<StatusGroup>>(new Set())
 
-          {/* Group pill (vertical text) */}
-          <div className="flex shrink-0 flex-col items-center pt-10">
-            <div
-              className={cn(
-                'flex items-center justify-center rounded-full px-1.5 py-2',
-                GROUP_PILL_COLORS[groupDef.group]
-              )}
+  const toggleGroup = useCallback((group: StatusGroup) => {
+    setCollapsedGroups((prev) => {
+      const next = new Set(prev)
+      if (next.has(group)) {
+        next.delete(group)
+      } else {
+        next.add(group)
+      }
+      return next
+    })
+  }, [])
+
+  // Count total projects in a group
+  const groupProjectCount = useCallback(
+    (statuses: ProjectStatus[]) =>
+      statuses.reduce((sum, s) => sum + (projectsByStatus[s]?.length ?? 0), 0),
+    [projectsByStatus]
+  )
+
+  return (
+    <div className="flex flex-col gap-3 pb-4">
+      {groupedColumns.map((groupDef) => {
+        const isCollapsed = collapsedGroups.has(groupDef.group)
+        const totalCards = groupProjectCount(groupDef.statuses)
+
+        return (
+          <div key={groupDef.group} className="rounded-xl border border-border/60 bg-background/50">
+            {/* Group header — click to collapse/expand */}
+            <button
+              onClick={() => toggleGroup(groupDef.group)}
+              className="flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-background/80 transition-colors rounded-t-xl"
             >
+              <span className="text-[10px] text-brand-text-3 transition-transform duration-200"
+                style={{ transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)' }}
+              >
+                ▼
+              </span>
               <span
-                className="text-[9px] font-semibold uppercase tracking-[0.12em] whitespace-nowrap"
-                style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
+                className={cn(
+                  'inline-flex items-center gap-2 rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.10em]',
+                  GROUP_PILL_COLORS[groupDef.group]
+                )}
               >
                 {groupDef.label}
               </span>
-            </div>
-          </div>
+              <span className="text-[11px] text-brand-text-3">
+                {totalCards} {totalCards === 1 ? 'project' : 'projects'}
+              </span>
+            </button>
 
-          {/* Columns in this group */}
-          <div className="flex gap-2 pl-2">
-            {groupDef.statuses.map((status) => (
-              <KanbanColumn
-                key={status}
-                status={status}
-                projects={projectsByStatus[status] ?? []}
-                statusGroup={groupDef.group}
-                onDrop={handleDrop}
-                isDragActive={dragState !== null}
-                isValidTarget={columnValidity.get(status)}
-              />
-            ))}
+            {/* Columns row — hidden when collapsed */}
+            {!isCollapsed && (
+              <div className="flex gap-2 overflow-x-auto px-4 pb-3 pt-1">
+                {groupDef.statuses.map((status) => (
+                  <KanbanColumn
+                    key={status}
+                    status={status}
+                    projects={projectsByStatus[status] ?? []}
+                    statusGroup={groupDef.group}
+                    onDrop={handleDrop}
+                    isDragActive={dragState !== null}
+                    isValidTarget={columnValidity.get(status)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }

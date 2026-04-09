@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { dropTargetForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter'
 import { cn } from '@/lib/utils'
-import { PROJECT_STATUS_LABELS, STATUS_GROUP_COLORS } from '@/lib/constants/status'
+import { PROJECT_STATUS_LABELS } from '@/lib/constants/status'
 import type { ProjectStatus, ProjectWithRelations } from '@/lib/types'
 import type { StatusGroup } from '@/lib/constants/status'
 import { ProjectCard } from './project-card'
@@ -51,7 +51,6 @@ export function KanbanColumn({
     })
   }, [status, onDrop])
 
-  const groupColorClasses = STATUS_GROUP_COLORS[statusGroup]
   const label = PROJECT_STATUS_LABELS[status]
 
   // Determine border styling for drop target feedback
@@ -61,7 +60,7 @@ export function KanbanColumn({
   return (
     <div
       className={cn(
-        'flex h-full w-[280px] min-w-[280px] flex-col rounded-lg border bg-background p-3',
+        'flex w-[240px] min-w-[240px] flex-col rounded-lg border bg-background p-3',
         showValidFeedback && 'border-2 border-dashed border-cyan-500',
         showInvalidFeedback && 'border-2 border-dashed border-red-400',
         !showValidFeedback && !showInvalidFeedback && 'border-border'
