@@ -13,6 +13,22 @@
 10. [x] SQL migration 005_phase4_fixes.sql applied to Supabase
 11. [x] Browser battlefield test — all pages, CRUD, filters, console clean
 12. [ ] Commit Module 0+1
+13. [x] Railway deployment live (2026-04-10) — login page serves correctly
+14. [x] Supabase Auth URL config updated — Site URL + redirect URLs for Railway production
+15. [x] All 15 migrations applied to Supabase (001-015)
+16. [x] Schema review fixes applied (015_schema_cleanup.sql — C-1, C-3, I-6, S-1, S-2, S-5)
+
+### Production Testing (2026-04-10)
+- **App loads:** Login page renders at `knwn-local-app-production.up.railway.app` ✓
+- **Email/password login:** PASS ✓ (password was reset via SQL Editor, logged in as admin@knownlocal.com)
+- **Google OAuth:** Button renders ✓, redirect untestable via automation — **needs manual test**
+- **Dashboard:** 74 active clients, 11 projects, 2 stuck, Projects by Stage chart ✓
+- **Client List:** 80 clients with pods, statuses, strategists, search bar, filters ✓
+- **Pipeline Kanban:** 11 projects, Idea/On Hold/Brief/Script Writing columns, project cards with real data ✓
+- **Team page:** 37 members with roles, emails, pods, statuses ✓
+- **Sidebar nav:** All sections visible for admin (Dashboard, Clients, Projects, Admin) ✓
+- **Console errors:** None (only Chrome extension noise)
+
 
 ## Browser Testing Results
 

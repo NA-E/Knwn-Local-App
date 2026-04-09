@@ -10,7 +10,7 @@ Internal ops app for a YouTube content agency. Client management, production pip
 - Supabase (PostgreSQL, Auth, RLS)
 - TypeScript (strict mode)
 - Tailwind CSS v4 + shadcn/ui v4 (base-nova style)
-- Deployed on Vercel
+- Deployed on Railway (Nixpacks builder, `knwn-local-app-production.up.railway.app`)
 
 ## Next.js 16 / Tailwind v4 / shadcn v4 Gotchas
 - **Tailwind v4:** No `tailwind.config.ts` — all config in CSS via `@theme inline` in `globals.css`
@@ -160,11 +160,23 @@ Module 0 → 1 → 2 → 3 → 4. Commit after each module. See SPEC.md for deta
 - 22/35 team members have real emails from Notion, 13 have `@knownlocal.com` placeholders
 - Name normalization: Mae=Mae Ariate, Anderson "Cirion" Ruan=Anderson Ruan, Juan Audiovisual=Juan Bravo, igor marques→Igor Marques
 
+### Railway Deployment
+- Project: `creative-comfort` → Service: `Knwn-Local-App`
+- URL: `https://knwn-local-app-production.up.railway.app`
+- Builder: Nixpacks (Railpack failed to generate build plan)
+- Region: us-west2, 1 Replica
+- GitHub auto-deploy: connected to `main` branch
+- Env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SLACK_BOT_TOKEN`, `ONBOARD_INVITE_EMAILS`, `PORT=3000`
+- `PORT=3000` is required — Railway domain proxy forwards to port 3000, without this Railway injects PORT=8080 causing a mismatch
+- `package.json` start script: `next start -H 0.0.0.0 -p ${PORT:-3000}` — must bind to 0.0.0.0 for container networking
+- `.nvmrc` = `20` — tells Nixpacks to use Node 20+ (Next.js 16 requirement)
+
 ### Google OAuth
 - Google Cloud project: `gen-lang-client-0914174214` (Gemini API project, shared with other apps)
 - OAuth client: "Known Local" (Web application), Client ID: `541238776209-65qo8qshroh7df4a8htjg50tl15q2cfs.apps.googleusercontent.com`
-- Authorized redirect URI: `https://tcpynxcruaddahdhuugb.supabase.co/auth/v1/callback`
+- Authorized redirect URIs: `https://tcpynxcruaddahdhuugb.supabase.co/auth/v1/callback`
 - Supabase Google provider: enabled in "Known Local" org with Client ID + Secret
+- Supabase redirect URLs: includes `https://knwn-local-app-production.up.railway.app/**` for Railway production
 - OAuth consent screen: External, app name "Known Local", email: ekanourin@gmail.com
 - Code files: `app/(auth)/login/google-auth.ts` (client-side OAuth), `app/auth/callback/route.ts` (code exchange), `app/(app)/layout.tsx` (auto-link/provision team member)
 - **Gotcha:** Google Cloud new Auth Platform no longer shows client secrets after creation — must copy immediately or generate new

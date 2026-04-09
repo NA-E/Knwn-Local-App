@@ -1,0 +1,1760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Known Local — The Operating System</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F6F1;
+    --bg-panel: #FFFFFF;
+    --sidebar: #141412;
+    --sidebar-hover: #1E1E1B;
+    --border: #E6E3DC;
+    --border-light: #EDEAE2;
+    --text-1: #1A1916;
+    --text-2: #78756C;
+    --text-3: #A8A59D;
+    --accent: #C8782A;
+    --accent-bg: #FEF0DE;
+    --green: #1A6B40;
+    --green-bg: #D9F5E8;
+    --green-border: #A7F3D0;
+    --yellow: #78580A;
+    --yellow-bg: #FEF3D0;
+    --red: #9B2C2C;
+    --red-bg: #FEE2E2;
+    --red-border: #FECACA;
+    --blue: #1E5A8A;
+    --blue-bg: #DBEAFE;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text-1);
+    line-height: 1.6;
+  }
+
+  /* Fixed nav */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: var(--sidebar);
+    padding: 12px 32px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    z-index: 100;
+  }
+  nav .logo { color: #fff; font-weight: 700; font-size: 13px; letter-spacing: 0.03em; white-space: nowrap; }
+  nav .dot { color: var(--accent); }
+  nav .nav-links { display: flex; gap: 2px; flex-wrap: wrap; }
+  nav a {
+    color: var(--text-3); text-decoration: none; font-size: 11px; font-weight: 500;
+    padding: 5px 10px; border-radius: 5px; transition: all 0.2s;
+  }
+  nav a:hover, nav a.active { color: #fff; background: var(--sidebar-hover); }
+
+  /* Sections */
+  .page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 90px 40px 60px;
+  }
+  .page:first-of-type { padding-top: 100px; }
+  .page-divider {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+  .page-divider hr {
+    border: none;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .label {
+    font-size: 10px; font-weight: 600; color: var(--accent);
+    letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px;
+  }
+  h1 { font-size: 32px; font-weight: 700; line-height: 1.2; margin-bottom: 12px; }
+  h2 { font-size: 22px; font-weight: 600; line-height: 1.3; margin-bottom: 16px; }
+  h3 { font-size: 15px; font-weight: 600; margin-bottom: 10px; }
+  .subtitle { font-size: 15px; color: var(--text-2); max-width: 700px; margin-bottom: 32px; }
+
+  /* ==================== */
+  /* HORIZONTAL FLOW      */
+  /* ==================== */
+  .hflow-wrapper {
+    overflow-x: auto;
+    padding: 16px 0;
+    margin: 24px 0;
+  }
+  .hflow {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    min-width: max-content;
+  }
+  .hflow-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 140px;
+    max-width: 170px;
+  }
+  .hflow-box {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 12px;
+    text-align: center;
+    background: var(--bg-panel);
+    box-shadow: 0 1px 3px rgba(26,25,22,0.05);
+    position: relative;
+  }
+  .hflow-box .step-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; font-weight: 500; color: var(--text-3);
+    margin-bottom: 6px;
+  }
+  .hflow-box .step-name {
+    font-size: 12px; font-weight: 600; line-height: 1.3;
+  }
+  .hflow-box .step-who {
+    font-size: 10px; color: var(--text-2); margin-top: 4px;
+  }
+  .hflow-arrow {
+    display: flex; align-items: center; justify-content: center;
+    min-width: 28px; padding-top: 14px;
+    color: var(--text-3); font-size: 16px;
+  }
+
+  /* Tool badges under boxes */
+  .tool-badges {
+    display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; justify-content: center;
+  }
+  .tool-badge {
+    font-size: 9px; font-weight: 600; padding: 2px 6px; border-radius: 3px;
+    letter-spacing: 0.03em;
+  }
+  .tool-notion { background: #E8E5E0; color: #37352F; }
+  .tool-slack { background: #F0E6F6; color: #611F69; }
+  .tool-dropbox { background: #E3F0FF; color: #0061FF; }
+  .tool-gdrive { background: #E8F5E9; color: #1B873B; }
+  .tool-manual { background: var(--yellow-bg); color: var(--yellow); }
+  .tool-app { background: var(--accent-bg); color: var(--accent); }
+
+  /* Pain marker */
+  .pain-marker {
+    margin-top: 8px;
+    font-size: 10px;
+    color: var(--red);
+    font-weight: 500;
+    max-width: 150px;
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  /* Box variants */
+  .hflow-box.pain { border-color: var(--red-border); background: var(--red-bg); }
+  .hflow-box.gap { border: 1.5px dashed var(--text-3); background: #F5F4EF; }
+  .hflow-box.app-auto { border-color: var(--green); background: var(--green-bg); }
+  .hflow-box.app-manual { border-color: var(--accent); background: var(--accent-bg); }
+  .hflow-box.gone { border-color: var(--text-3); background: #EEEBE3; opacity: 0.5; text-decoration: line-through; }
+  .hflow-box.external { border-color: var(--blue); background: var(--blue-bg); }
+
+  /* Data capture callout */
+  .data-capture {
+    margin-top: 6px;
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--green);
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
+    padding: 2px 6px;
+    border-radius: 3px;
+    display: inline-block;
+  }
+
+  /* ==================== */
+  /* CASCADE DIAGRAM      */
+  /* ==================== */
+  .cascade {
+    margin: 32px 0;
+  }
+  .cascade-row {
+    display: flex;
+    align-items: stretch;
+    margin-bottom: 2px;
+  }
+  .cascade-action {
+    flex: 0 0 320px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 8px 0 0 8px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .cascade-action .ca-icon {
+    width: 32px; height: 32px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+    background: var(--accent-bg); color: var(--accent);
+  }
+  .cascade-action .ca-text {
+    font-size: 12px; font-weight: 600; line-height: 1.3;
+  }
+  .cascade-arrow {
+    flex: 0 0 32px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-3); font-size: 14px;
+    background: var(--bg);
+  }
+  .cascade-data {
+    flex: 0 0 200px;
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    font-size: 11px; font-weight: 500; color: var(--green);
+  }
+  .cascade-arrow2 {
+    flex: 0 0 32px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-3); font-size: 14px;
+    background: var(--bg);
+  }
+  .cascade-kpi {
+    flex: 1;
+    background: var(--sidebar);
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    font-size: 11px; font-weight: 500; color: #fff;
+  }
+
+  /* ==================== */
+  /* REPLACES TABLE       */
+  /* ==================== */
+  .replaces-grid {
+    display: grid;
+    grid-template-columns: 1fr 80px 1fr;
+    gap: 0;
+    margin: 24px 0;
+  }
+  .replaces-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .replaces-item:nth-child(3n+1) { background: var(--bg-panel); border-right: 1px solid var(--border); }
+  .replaces-item:nth-child(3n+2) {
+    justify-content: center;
+    font-size: 16px; color: var(--text-3);
+  }
+  .replaces-item:nth-child(3n+3) { background: var(--bg-panel); border-left: 1px solid var(--border); }
+  .replaces-item .ri-name { font-size: 13px; font-weight: 600; }
+  .replaces-item .ri-detail { font-size: 11px; color: var(--text-2); }
+  .replaces-header {
+    padding: 10px 20px;
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--text-3);
+    border-bottom: 1px solid var(--border);
+  }
+  .replaces-header:nth-child(1) { background: var(--red-bg); color: var(--red); }
+  .replaces-header:nth-child(2) { text-align: center; }
+  .replaces-header:nth-child(3) { background: var(--green-bg); color: var(--green); }
+
+  /* ==================== */
+  /* REASONING CARDS      */
+  /* ==================== */
+  .reason-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 12px;
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: 16px;
+    box-shadow: 0 1px 3px rgba(26,25,22,0.05);
+  }
+  .reason-num {
+    width: 48px; height: 48px;
+    background: var(--sidebar);
+    color: #fff;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700;
+  }
+  .reason-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .reason-content p { font-size: 13px; color: var(--text-2); line-height: 1.5; }
+  .reason-content .because {
+    margin-top: 8px; font-size: 12px; color: var(--accent); font-weight: 500;
+  }
+
+  /* Legend */
+  .legend {
+    display: flex; gap: 16px; flex-wrap: wrap; margin: 16px 0;
+    font-size: 11px; color: var(--text-2);
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-swatch {
+    width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid;
+  }
+
+  /* Quote */
+  .quote {
+    background: var(--bg-panel);
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    border-radius: 0 8px 8px 0;
+    margin: 20px 0;
+    box-shadow: 0 1px 3px rgba(26,25,22,0.05);
+  }
+  .quote p { font-size: 13px; font-style: italic; margin-bottom: 6px; }
+  .quote .attr { font-size: 11px; font-weight: 500; color: var(--text-3); font-style: normal; }
+
+  .footer {
+    text-align: center; padding: 40px; color: var(--text-3); font-size: 11px;
+  }
+
+  /* Parallel bracket */
+  .parallel-wrap {
+    position: relative;
+    margin: 0;
+    padding: 12px 0 12px 0;
+  }
+  .parallel-label-top {
+    font-size: 9px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--text-3); text-align: center; margin-bottom: 8px;
+  }
+  .parallel-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+  .parallel-row .hflow-step { min-width: 120px; max-width: 140px; }
+
+  /* Annotation line */
+  .annotation {
+    font-size: 11px;
+    color: var(--text-2);
+    padding: 8px 16px;
+    background: var(--bg);
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    margin: 16px 0;
+    max-width: 600px;
+  }
+
+  /* Scroll hint */
+  .scroll-hint {
+    font-size: 10px; color: var(--text-3); margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  /* Question box */
+  .question-box {
+    background: var(--accent-bg);
+    border: 1.5px dashed var(--accent);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 12px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .question-box .q-icon {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--accent); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; flex-shrink: 0;
+  }
+  .question-box .q-text {
+    font-size: 13px; font-weight: 500; color: var(--text-1);
+  }
+
+  /* Sub-section label */
+  .subsection {
+    font-size: 12px; font-weight: 600; color: var(--text-2);
+    margin-top: 32px; margin-bottom: 16px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  }
+
+  /* ==================== */
+  /* BEFORE / AFTER       */
+  /* ==================== */
+  .ba-role-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 16px; margin-top: 32px;
+  }
+  .ba-role-header:first-child { margin-top: 0; }
+  .ba-role-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700; color: #fff;
+    background: var(--sidebar); flex-shrink: 0;
+  }
+  .ba-role-name { font-size: 16px; font-weight: 600; }
+
+  .ba-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(26,25,22,0.05);
+  }
+  .ba-card-header {
+    padding: 14px 20px;
+    font-size: 13px; font-weight: 600;
+    border-bottom: 1px solid var(--border-light);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .ba-card-body {
+    display: grid; grid-template-columns: 1fr 60px 1fr;
+  }
+  .ba-before, .ba-after {
+    padding: 16px 20px;
+  }
+  .ba-before {
+    background: var(--red-bg);
+  }
+  .ba-after {
+    background: var(--green-bg);
+  }
+  .ba-col-label {
+    font-size: 9px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.12em; margin-bottom: 8px;
+  }
+  .ba-before .ba-col-label { color: var(--red); }
+  .ba-after .ba-col-label { color: var(--green); }
+  .ba-steps {
+    list-style: none; padding: 0; font-size: 12px; line-height: 1.7;
+  }
+  .ba-steps li { padding: 2px 0; }
+  .ba-steps li::before { margin-right: 6px; }
+  .ba-before .ba-steps li::before { content: ''; font-size: 10px; }
+  .ba-after .ba-steps li::before { content: ''; font-size: 10px; }
+  .ba-arrow-col {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: var(--text-3);
+    background: var(--bg);
+    border-left: 1px solid var(--border-light);
+    border-right: 1px solid var(--border-light);
+  }
+  .ba-step-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 500;
+    padding: 3px 8px; border-radius: 4px;
+  }
+  .ba-step-count.old { background: var(--red-bg); color: var(--red); }
+  .ba-step-count.new { background: var(--green-bg); color: var(--green); }
+  .ba-step-count.saved { background: var(--accent-bg); color: var(--accent); }
+  .ba-kpi-note {
+    font-size: 11px; color: var(--green); font-weight: 500;
+    margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--green-border);
+  }
+  .ba-summary {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    margin: 32px 0;
+  }
+  .ba-stat {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+  }
+  .ba-stat-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 28px; font-weight: 700; color: var(--green);
+  }
+  .ba-stat-label {
+    font-size: 11px; color: var(--text-2); margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Known Local <span class="dot">&bull;</span> Operating System</div>
+  <div class="nav-links">
+    <a href="#today">Today</a>
+    <a href="#onboarding-detail">Onboarding Detail</a>
+    <a href="#tobe">The App</a>
+    <a href="#cascade">Data Cascade</a>
+    <a href="#before-after">Before / After</a>
+    <a href="#replaces">What Goes</a>
+    <a href="#build-order">Build Order</a>
+  </div>
+</nav>
+
+<!-- ============================================ -->
+<!-- TITLE -->
+<!-- ============================================ -->
+<div class="page" id="title">
+  <div class="label">Known Local App</div>
+</div>
+
+<div class="page-divider"><hr></div>
+
+<!-- ============================================ -->
+<!-- SECTION 1: AS-IS END TO END -->
+<!-- ============================================ -->
+<div class="page" id="today">
+  <div class="label">Section 1 &mdash; Today</div>
+  <h2>The end-to-end process today</h2>
+  <p class="subtitle">Every step, every tool, every handoff.</p>
+
+  <div class="scroll-hint">&larr; scroll horizontally &rarr;</div>
+  <div class="hflow-wrapper">
+    <div class="hflow">
+
+      <div class="hflow-step">
+        <div class="hflow-box pain">
+          <div class="step-num">01</div>
+          <div class="step-name">Client Signs</div>
+          <div class="step-who">Sales / Clayton</div>
+        </div>
+        <div class="tool-badges">
+          <span class="tool-badge tool-manual">MANUAL</span>
+        </div>
+        <div class="pain-marker">No defined trigger. No handoff.</div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box pain">
+          <div class="step-num">02</div>
+          <div class="step-name">Onboarding Setup</div>
+          <div class="step-who">"Whoever is available"</div>
+        </div>
+        <div class="tool-badges">
+          <span class="tool-badge tool-slack">SLACK</span>
+          <span class="tool-badge tool-dropbox">DROPBOX</span>
+          <span class="tool-badge tool-gdrive">GDRIVE</span>
+          <span class="tool-badge tool-notion">NOTION</span>
+        </div>
+        <div class="pain-marker">4 tools. No owner. Steps may get missed.</div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box">
+          <div class="step-num">03</div>
+          <div class="step-name">Pod &amp; Team Assignment</div>
+          <div class="step-who">Clayton</div>
+        </div>
+        <div class="tool-badges">
+          <span class="tool-badge tool-notion">NOTION</span>
+        </div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box gap">
+          <div class="step-num">04</div>
+          <div class="step-name">Welcome &amp; Kickoff</div>
+          <div class="step-who">YouTube Mgr (?)</div>
+        </div>
+        <div class="tool-badges">
+          <span class="tool-badge tool-slack">SLACK</span>
+        </div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box">
+          <div class="step-num">05</div>
+          <div class="step-name">Script Writing</div>
+          <div class="step-who">Writer</div>
+        </div>
+        <div class="tool-badges">
+          <span class="tool-badge tool-gdrive">GDRIVE</span>
+          <span class="tool-badge tool-notion">NOTION</span>
+        </div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box">
+          <div class="step-num">06</div>
+          <div class="step-name">Client Films</div>
+          <div class="step-who">Client</div>
+        </div>
+        <div class="tool-badges">
+          <span class="tool-badge tool-dropbox">DROPBOX</span>
+        </div>
+        <div class="pain-marker">Upload link saved in Slack canvas.</div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box">
+          <div class="step-num">07</div>
+          <div class="step-name">Editing (V1)</div>
+          <div class="step-who">Editor</div>
+        </div>
+        <div class="tool-badges">
+          <span class="tool-badge tool-dropbox">DROPBOX</span>
+          <span class="tool-badge tool-notion">NOTION</span>
+        </div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box">
+          <div class="step-num">08</div>
+          <div class="step-name">Internal Review</div>
+          <div class="step-who">Sr. Editor</div>
+        </div>
+        <div class="tool-badges">
+          <span class="tool-badge tool-slack">SLACK</span>
+          <span class="tool-badge tool-notion">NOTION</span>
+        </div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box">
+          <div class="step-num">09</div>
+          <div class="step-name">Client Review (V2)</div>
+          <div class="step-who">Client via Dropbox</div>
+        </div>
+        <div class="tool-badges">
+          <span class="tool-badge tool-dropbox">DROPBOX</span>
+          <span class="tool-badge tool-slack">SLACK</span>
+        </div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box">
+          <div class="step-num">10</div>
+          <div class="step-name">Revisions (V3)</div>
+          <div class="step-who">Editor</div>
+        </div>
+        <div class="tool-badges">
+          <span class="tool-badge tool-dropbox">DROPBOX</span>
+        </div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box">
+          <div class="step-num">11</div>
+          <div class="step-name">Publish</div>
+          <div class="step-who">YouTube Mgr</div>
+        </div>
+        <div class="tool-badges">
+          <span class="tool-badge tool-manual">MANUAL</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div class="page-divider"><hr></div>
+
+<!-- ============================================ -->
+<!-- SECTION 2: ONBOARDING DEEP DIVE -->
+<!-- ============================================ -->
+<div class="page" id="onboarding-detail">
+  <div class="label">Section 2 &mdash; Onboarding Deep Dive</div>
+  <h2>What happens when a new client signs today</h2>
+  <p class="subtitle">Everything we've confirmed from Clayton and Paulo. Red = pain. Dashed = unknown.</p>
+
+  <div class="scroll-hint">&larr; scroll horizontally &rarr;</div>
+  <div class="hflow-wrapper">
+    <div class="hflow">
+
+      <div class="hflow-step">
+        <div class="hflow-box pain">
+          <div class="step-num">01</div>
+          <div class="step-name">Client Signs</div>
+          <div class="step-who">Sales / Clayton</div>
+        </div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box pain">
+          <div class="step-num">02</div>
+          <div class="step-name">Someone Starts Onboarding</div>
+          <div class="step-who">YouTube mgr, Clayton, Paulo,<br>or whoever is available</div>
+        </div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <!-- Parallel block -->
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div class="parallel-label-top">Created in parallel &mdash; independent of pod</div>
+        <div style="border: 1.5px dashed var(--border); border-radius: 10px; padding: 16px 12px;">
+          <div class="parallel-row">
+
+            <div class="hflow-step">
+              <div class="hflow-box" style="min-width: 120px;">
+                <div class="step-name" style="font-size: 11px;">Slack Channel</div>
+                <div class="step-who">client-firstname-lastname</div>
+              </div>
+              <div class="tool-badges"><span class="tool-badge tool-slack">SLACK</span></div>
+            </div>
+
+            <div class="hflow-step">
+              <div class="hflow-box" style="min-width: 120px;">
+                <div class="step-name" style="font-size: 11px;">Dropbox Folder</div>
+                <div class="step-who">A-roll, B-roll, Edited, Assets</div>
+              </div>
+              <div class="tool-badges"><span class="tool-badge tool-dropbox">DROPBOX</span></div>
+            </div>
+
+            <div class="hflow-step">
+              <div class="hflow-box" style="min-width: 120px;">
+                <div class="step-name" style="font-size: 11px;">File Request Link</div>
+                <div class="step-who">Permanent upload URL</div>
+              </div>
+              <div class="tool-badges"><span class="tool-badge tool-dropbox">DROPBOX</span></div>
+            </div>
+
+            <div class="hflow-step">
+              <div class="hflow-box" style="min-width: 120px;">
+                <div class="step-name" style="font-size: 11px;">GDrive Folder</div>
+                <div class="step-who">Scripts + Resources</div>
+              </div>
+              <div class="tool-badges"><span class="tool-badge tool-gdrive">GDRIVE</span></div>
+            </div>
+
+            <div class="hflow-step">
+              <div class="hflow-box" style="min-width: 120px;">
+                <div class="step-name" style="font-size: 11px;">Notion Page</div>
+                <div class="step-who">Client record</div>
+              </div>
+              <div class="tool-badges"><span class="tool-badge tool-notion">NOTION</span></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div style="border: 1.5px dashed var(--border); border-radius: 10px; padding: 16px 12px;">
+          <div class="parallel-label-top">Pod Assignment &mdash; Clayton</div>
+          <div class="parallel-row">
+            <div class="hflow-step">
+              <div class="hflow-box gap" style="min-width: 130px;">
+                <div class="step-name" style="font-size: 11px;">Team Assignment</div>
+                <div class="step-who">Strategist, Mgr, Writer... (?)</div>
+              </div>
+            </div>
+            <div class="hflow-step">
+              <div class="hflow-box gap" style="min-width: 130px;">
+                <div class="step-name" style="font-size: 11px;">Slack Members Added</div>
+                <div class="step-who">Clayton + Andrew + pod team (?)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box gap">
+          <div class="step-num">07</div>
+          <div class="step-name">Welcome Message</div>
+          <div class="step-who">YouTube Mgr (?)</div>
+        </div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box gap">
+          <div class="step-num">08</div>
+          <div class="step-name">First Project</div>
+          <div class="step-who">(?)</div>
+        </div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box" style="border-color: var(--green); background: var(--green-bg);">
+          <div class="step-name">Client Active</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div class="page-divider"><hr></div>
+
+<!-- ============================================ -->
+<!-- SECTION 3: ONBOARDING IN THE APP -->
+<!-- ============================================ -->
+<div class="page" id="tobe">
+  <div class="label">Section 3 &mdash; Onboarding in the App</div>
+  <h2>The same onboarding, running through one system</h2>
+  <p class="subtitle">Green = automated. Amber = manual but in the app. Strikethrough = eliminated.</p>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-swatch" style="background: var(--green-bg); border-color: var(--green);"></div>
+      App &mdash; automated
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background: var(--accent-bg); border-color: var(--accent);"></div>
+      App &mdash; manual action
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background: #EEEBE3; border-color: var(--text-3); opacity: 0.5;"></div>
+      Eliminated
+    </div>
+  </div>
+
+  <div class="subsection">Internal Side</div>
+
+  <div class="scroll-hint">&larr; scroll horizontally &rarr;</div>
+  <div class="hflow-wrapper">
+    <div class="hflow">
+
+      <div class="hflow-step">
+        <div class="hflow-box app-manual">
+          <div class="step-num">01</div>
+          <div class="step-name">Create Client</div>
+          <div class="step-who">Anyone, 30 seconds</div>
+        </div>
+        <div class="data-capture">Captures: client created timestamp</div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div class="parallel-label-top">Fires automatically &mdash; ~15 seconds</div>
+        <div style="border: 1.5px solid var(--green); border-radius: 10px; padding: 16px 12px; background: rgba(217,245,232,0.3);">
+          <div class="parallel-row">
+            <div class="hflow-step">
+              <div class="hflow-box app-auto" style="min-width: 130px;">
+                <div class="step-name" style="font-size: 11px;">Slack Channel</div>
+                <div class="step-who">client-firstname-lastname<br>Adds Clayton + Andrew</div>
+              </div>
+            </div>
+            <div class="hflow-step">
+              <div class="hflow-box app-auto" style="min-width: 130px;">
+                <div class="step-name" style="font-size: 11px;">Dropbox Folder</div>
+                <div class="step-who">Template duplicated<br>+ File Request link created</div>
+              </div>
+            </div>
+            <div class="hflow-step">
+              <div class="hflow-box gone" style="min-width: 110px;">
+                <div class="step-name" style="font-size: 11px;">GDrive Folder</div>
+                <div class="step-who">Not needed</div>
+              </div>
+            </div>
+            <div class="hflow-step">
+              <div class="hflow-box gone" style="min-width: 110px;">
+                <div class="step-name" style="font-size: 11px;">Notion Page</div>
+                <div class="step-who">App IS the record</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="data-capture" style="margin-top: 8px;">Captures: each setup step timestamp, success/fail</div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box app-manual">
+          <div class="step-num">03</div>
+          <div class="step-name">Team Assignment</div>
+          <div class="step-who">Strategist, Manager,<br>Writer, Editor, Designer</div>
+        </div>
+        <div class="data-capture">Captures: each role assigned timestamp</div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box app-manual">
+          <div class="step-num">04</div>
+          <div class="step-name">Pod Assignment</div>
+          <div class="step-who">Clayton<br>(app shows capacity per pod)</div>
+        </div>
+        <div class="data-capture">Captures: pod assigned timestamp</div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box" style="border-color: var(--green); background: var(--green-bg);">
+          <div class="step-name">Client Active</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="question-box">
+    <div class="q-icon">?</div>
+    <div class="q-text">Should we auto-add assigned team members to the client's Slack channel?</div>
+  </div>
+
+  <div class="question-box">
+    <div class="q-icon">?</div>
+    <div class="q-text">We should auto-send a welcome message to the client with their dashboard login link (magic link) via the Slack channel. Agree?</div>
+  </div>
+
+  <div class="subsection">Client Side &mdash; Dashboard</div>
+
+  <div class="scroll-hint">&larr; scroll horizontally &rarr;</div>
+  <div class="hflow-wrapper">
+    <div class="hflow">
+
+      <div class="hflow-step">
+        <div class="hflow-box app-auto">
+          <div class="step-num">01</div>
+          <div class="step-name">Magic Link Sent</div>
+          <div class="step-who">Auto-posted to Slack channel<br>as a canvas with login link</div>
+        </div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box app-manual">
+          <div class="step-num">02</div>
+          <div class="step-name">Client Opens Dashboard</div>
+          <div class="step-who">No signup, no password<br>Magic link = logged in</div>
+        </div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box external">
+          <div class="step-num">03</div>
+          <div class="step-name">Upload Footage</div>
+          <div class="step-who">Clicks Upload &rarr; Dropbox direct<br>(files never touch our server)</div>
+        </div>
+        <div class="tool-badges">
+          <span class="tool-badge tool-dropbox">DROPBOX</span>
+        </div>
+        <div class="data-capture">Captures: footage received timestamp (webhook)</div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box app-manual">
+          <div class="step-num">04</div>
+          <div class="step-name">View Project Status</div>
+          <div class="step-who">See what's in progress,<br>what's due, what's published</div>
+        </div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box external">
+          <div class="step-num">05</div>
+          <div class="step-name">Review Video</div>
+          <div class="step-who">Link appears when ready<br>Comments on Dropbox</div>
+        </div>
+        <div class="tool-badges">
+          <span class="tool-badge tool-dropbox">DROPBOX</span>
+        </div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box app-manual">
+          <div class="step-num">06</div>
+          <div class="step-name">Brand Documents</div>
+          <div class="step-who">Brand voice guide,<br>writing guidelines, resources</div>
+        </div>
+        <div class="tool-badges">
+          <span class="tool-badge tool-app">GOOGLE DOCS LINKS</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="annotation">
+    <strong>Every box captures a timestamp.</strong> No manual KPI entry. No "did you mark it as posted?" The act of doing the work IS the data.
+  </div>
+</div>
+
+<div class="page-divider"><hr></div>
+
+<!-- ============================================ -->
+<!-- SECTION 4: PRODUCTION FLOW + KPI CASCADE -->
+<!-- ============================================ -->
+<div class="page" id="cascade">
+  <div class="label">Section 4 &mdash; Production Flow in the App</div>
+  <h2>After onboarding &mdash; how each video moves through the system</h2>
+
+  <div class="scroll-hint">&larr; scroll horizontally &rarr;</div>
+  <div class="hflow-wrapper">
+    <div class="hflow">
+
+      <div class="hflow-step">
+        <div class="hflow-box app-auto">
+          <div class="step-num">01</div>
+          <div class="step-name">Writer Clicks "Create Script"</div>
+          <div class="step-who">Google Doc auto-created,<br>named, linked to project</div>
+        </div>
+        <div class="data-capture">Captures: script started timestamp</div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box external">
+          <div class="step-num">02</div>
+          <div class="step-name">Client Uploads Footage</div>
+          <div class="step-who">Via dashboard &rarr; Dropbox</div>
+        </div>
+        <div class="data-capture">Captures: footage received (webhook)</div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box app-manual">
+          <div class="step-num">03</div>
+          <div class="step-name">Editor Submits V1</div>
+          <div class="step-who">Submit button in app<br>Pastes Dropbox link, selects version</div>
+        </div>
+        <div class="data-capture">Captures: edit submitted timestamp</div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box app-auto">
+          <div class="step-num">04</div>
+          <div class="step-name">Sr. Editor + YT Mgr Notified</div>
+          <div class="step-who">Auto &mdash; app + Slack</div>
+        </div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box app-manual">
+          <div class="step-num">05</div>
+          <div class="step-name">Internal Review</div>
+          <div class="step-who">Sr. Editor approves in app</div>
+        </div>
+        <div class="data-capture">Captures: review decision + timestamp</div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box app-manual">
+          <div class="step-num">06</div>
+          <div class="step-name">Send to Client</div>
+          <div class="step-who">YT Mgr clicks &mdash; link<br>appears on client dashboard</div>
+        </div>
+        <div class="data-capture">Captures: sent for review timestamp</div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box external">
+          <div class="step-num">07</div>
+          <div class="step-name">Client Reviews V2</div>
+          <div class="step-who">Dropbox commenting</div>
+        </div>
+        <div class="tool-badges">
+          <span class="tool-badge tool-dropbox">DROPBOX</span>
+        </div>
+      </div>
+
+      <div class="hflow-arrow">&rarr;</div>
+
+      <div class="hflow-step">
+        <div class="hflow-box app-manual">
+          <div class="step-num">08</div>
+          <div class="step-name">Publish</div>
+          <div class="step-who">YT Mgr marks done</div>
+        </div>
+        <div class="data-capture">Captures: published timestamp</div>
+      </div>
+
+    </div>
+  </div>
+
+  <h3 style="margin-top: 32px;">Some examples of KPI</h3>
+  <p class="subtitle">Every action above generates a timestamp. Those timestamps become KPIs automatically.</p>
+
+  <div class="cascade">
+
+    <div class="cascade-row">
+      <div class="cascade-action">
+        <div class="ca-icon">W</div>
+        <div class="ca-text">Writer clicks "Create Script" in app</div>
+      </div>
+      <div class="cascade-arrow">&rarr;</div>
+      <div class="cascade-data">App captures timestamp automatically</div>
+      <div class="cascade-arrow2">&rarr;</div>
+      <div class="cascade-kpi">Script on-time % (timestamp vs due date = 1 or 0)</div>
+    </div>
+
+    <div class="cascade-row">
+      <div class="cascade-action">
+        <div class="ca-icon">E</div>
+        <div class="ca-text">Editor clicks "Submit Edit" in app</div>
+      </div>
+      <div class="cascade-arrow">&rarr;</div>
+      <div class="cascade-data">App captures timestamp + version</div>
+      <div class="cascade-arrow2">&rarr;</div>
+      <div class="cascade-kpi">Edit on-time % + revision count per editor</div>
+    </div>
+
+    <div class="cascade-row">
+      <div class="cascade-action">
+        <div class="ca-icon">C</div>
+        <div class="ca-text">Client uploads footage via dashboard</div>
+      </div>
+      <div class="cascade-arrow">&rarr;</div>
+      <div class="cascade-data">Webhook captures upload timestamp</div>
+      <div class="cascade-arrow2">&rarr;</div>
+      <div class="cascade-kpi">Client turnaround time (script sent &rarr; footage received)</div>
+    </div>
+
+    <div class="cascade-row">
+      <div class="cascade-action">
+        <div class="ca-icon">Y</div>
+        <div class="ca-text">YouTube Mgr marks "Published"</div>
+      </div>
+      <div class="cascade-arrow">&rarr;</div>
+      <div class="cascade-data">App captures publish date</div>
+      <div class="cascade-arrow2">&rarr;</div>
+      <div class="cascade-kpi">Videos launched % (published vs planned per month)</div>
+    </div>
+
+    <div class="cascade-row">
+      <div class="cascade-action">
+        <div class="ca-icon">S</div>
+        <div class="ca-text">Strategist logs call in app</div>
+      </div>
+      <div class="cascade-arrow">&rarr;</div>
+      <div class="cascade-data">App captures call date + client</div>
+      <div class="cascade-arrow2">&rarr;</div>
+      <div class="cascade-kpi">Calls this month % (actual vs target per strategist)</div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="page-divider"><hr></div>
+
+<!-- ============================================ -->
+<!-- SECTION 5: BEFORE / AFTER BY ROLE -->
+<!-- ============================================ -->
+<div class="page" id="before-after">
+  <div class="label">Section 5 &mdash; Before &amp; After</div>
+  <h2>Every workflow, step by step</h2>
+  <p class="subtitle">For every role, every key action: how many steps it takes today vs. in the app. No action gets harder. Most get dramatically simpler.</p>
+
+  <!-- Summary stats -->
+  <div class="ba-summary">
+    <div class="ba-stat">
+      <div class="ba-stat-num">-71%</div>
+      <div class="ba-stat-label">Average steps reduced</div>
+    </div>
+    <div class="ba-stat">
+      <div class="ba-stat-num">5</div>
+      <div class="ba-stat-label">Manual KPI entries eliminated</div>
+    </div>
+    <div class="ba-stat">
+      <div class="ba-stat-num">3</div>
+      <div class="ba-stat-label">Tools removed (Notion, GDrive folders, manual tracking)</div>
+    </div>
+  </div>
+
+  <!-- ===== ADMIN — ONBOARDING (Module 2) ===== -->
+  <div class="ba-role-header">
+    <div class="ba-role-icon">A</div>
+    <div class="ba-role-name">Admin (Clayton / Andrew)</div>
+  </div>
+
+  <div class="ba-card">
+    <div class="ba-card-header">
+      <span>Onboard a new client</span>
+      <span><span class="ba-step-count old">15+ min, 4 tools</span> &rarr; <span class="ba-step-count new">30 sec + 1 decision</span> <span class="ba-step-count saved">~97% faster</span></span>
+    </div>
+    <div class="ba-card-body">
+      <div class="ba-before">
+        <div class="ba-col-label">Today</div>
+        <ol class="ba-steps">
+          <li>Create Slack channel, name it, add members</li>
+          <li>Open Dropbox, duplicate template, rename</li>
+          <li>Create File Request link, share with client</li>
+          <li>Open GDrive, create client folder + subfolders</li>
+          <li>Open Notion, create client page</li>
+          <li>Remember to do all of this (no checklist)</li>
+          <li>"Whoever is available" does it</li>
+        </ol>
+        <span style="font-size: 11px; color: var(--red); display: block; margin-top: 8px;">Steps get missed. No detection. 4 different tools.</span>
+      </div>
+      <div class="ba-arrow-col">&rarr;</div>
+      <div class="ba-after">
+        <div class="ba-col-label">With the App</div>
+        <ol class="ba-steps">
+          <li>Create client in app (name, email, basics)</li>
+          <li>Slack + Dropbox + File Request auto-created in 15 sec</li>
+          <li>Clayton assigns pod (app shows capacity)</li>
+        </ol>
+        <div class="ba-kpi-note">Live progress modal shows each step completing. Every step timestamped. Failed steps show retry button. Eventually, nothing falls through the cracks.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== WRITER (Module 3: Kanban + Docs) ===== -->
+  <div class="ba-role-header">
+    <div class="ba-role-icon">W</div>
+    <div class="ba-role-name">Writer</div>
+  </div>
+
+  <div class="ba-card">
+    <div class="ba-card-header">
+      <span>Create a script for a new video</span>
+      <span><span class="ba-step-count old">7 steps</span> &rarr; <span class="ba-step-count new">2 steps</span> <span class="ba-step-count saved">-5</span></span>
+    </div>
+    <div class="ba-card-body">
+      <div class="ba-before">
+        <div class="ba-col-label">Today</div>
+        <ol class="ba-steps">
+          <li>Open Google Drive (different email)</li>
+          <li>Navigate to client folder</li>
+          <li>Open "Scripts" subfolder</li>
+          <li>Click "New Google Doc"</li>
+          <li>Name the document</li>
+          <li>Write the script</li>
+          <li>Go to Notion, paste the doc URL</li>
+        </ol>
+      </div>
+      <div class="ba-arrow-col">&rarr;</div>
+      <div class="ba-after">
+        <div class="ba-col-label">With the App</div>
+        <ol class="ba-steps">
+          <li>Click "Create Script" on project page</li>
+          <li>Google Doc opens &mdash; write the script</li>
+        </ol>
+        <div class="ba-kpi-note">Auto-captured: script started timestamp, doc link on project record. When writer marks "Script Complete" &rarr; delivery timestamp. Both feed script on-time KPI.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ba-card">
+    <div class="ba-card-header">
+      <span>Find a client's resources (brand voice guide, writing guidelines)</span>
+      <span><span class="ba-step-count old">5 steps</span> &rarr; <span class="ba-step-count new">1 step</span> <span class="ba-step-count saved">-4</span></span>
+    </div>
+    <div class="ba-card-body">
+      <div class="ba-before">
+        <div class="ba-col-label">Today</div>
+        <ol class="ba-steps">
+          <li>Open Google Drive (which email?)</li>
+          <li>Navigate to client folder</li>
+          <li>Open "Resources" subfolder</li>
+          <li>Find the right document</li>
+          <li>Open it</li>
+        </ol>
+      </div>
+      <div class="ba-arrow-col">&rarr;</div>
+      <div class="ba-after">
+        <div class="ba-col-label">With the App</div>
+        <ol class="ba-steps">
+          <li>Open client profile &rarr; Resources section &rarr; click link</li>
+        </ol>
+        <div class="ba-kpi-note">All resource docs in one place.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== EDITOR (Module 3: Kanban) ===== -->
+  <div class="ba-role-header">
+    <div class="ba-role-icon">E</div>
+    <div class="ba-role-name">Editor</div>
+  </div>
+
+  <div class="ba-card">
+    <div class="ba-card-header">
+      <span>Submit a completed edit</span>
+      <span><span class="ba-step-count old">6 steps</span> &rarr; <span class="ba-step-count new">4 steps</span> <span class="ba-step-count saved">-2</span></span>
+    </div>
+    <div class="ba-card-body">
+      <div class="ba-before">
+        <div class="ba-col-label">Today</div>
+        <ol class="ba-steps">
+          <li>Upload video to Dropbox (stays the same)</li>
+          <li>Open Notion "Edit Submission" page</li>
+          <li>Paste the Notion task link</li>
+          <li>Select version checkbox (V1/V2/V3)</li>
+          <li>Click Submit</li>
+          <li>Notion automation sends Slack notification</li>
+        </ol>
+      </div>
+      <div class="ba-arrow-col">&rarr;</div>
+      <div class="ba-after">
+        <div class="ba-col-label">With the App</div>
+        <ol class="ba-steps">
+          <li>Upload video to Dropbox (stays the same)</li>
+          <li>Click "Submit Edit" on project page</li>
+          <li>Paste Dropbox link, select version</li>
+          <li>Submit</li>
+        </ol>
+        <div class="ba-kpi-note">Auto-captured: edit submitted timestamp vs due date = edit on-time KPI. Sr. Editor + YouTube Manager auto-notified. No Notion task link to find.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== YOUTUBE MANAGER (Module 3: Kanban) ===== -->
+  <div class="ba-role-header">
+    <div class="ba-role-icon">Y</div>
+    <div class="ba-role-name">YouTube Manager</div>
+  </div>
+
+  <div class="ba-card">
+    <div class="ba-card-header">
+      <span>Send video to client for review</span>
+      <span><span class="ba-step-count old">3 steps</span> &rarr; <span class="ba-step-count new">1 step</span> <span class="ba-step-count saved">-2</span></span>
+    </div>
+    <div class="ba-card-body">
+      <div class="ba-before">
+        <div class="ba-col-label">Today</div>
+        <ol class="ba-steps">
+          <li>Find the Dropbox link for V2</li>
+          <li>Send link to client via Slack</li>
+          <li>Hope client finds it in the Slack channel</li>
+        </ol>
+      </div>
+      <div class="ba-arrow-col">&rarr;</div>
+      <div class="ba-after">
+        <div class="ba-col-label">With the App</div>
+        <ol class="ba-steps">
+          <li>Click "Send to Client" on project page</li>
+        </ol>
+        <div class="ba-kpi-note">Dropbox link already on project record (editor pasted it during submission). "Send to Client" makes it visible on client dashboard + sends email. Timestamp captured: "sent for review."</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ba-card">
+    <div class="ba-card-header">
+      <span>Mark video as published</span>
+      <span><span class="ba-step-count old">2 steps (often skipped)</span> &rarr; <span class="ba-step-count new">1 step</span> <span class="ba-step-count saved">KPI fixed</span></span>
+    </div>
+    <div class="ba-card-body">
+      <div class="ba-before">
+        <div class="ba-col-label">Today</div>
+        <ol class="ba-steps">
+          <li>Publish to YouTube</li>
+          <li>Go to Notion, tag task as "Posted" (often forgotten)</li>
+        </ol>
+        <span style="font-size: 11px; color: var(--red); display: block; margin-top: 8px;">Videos launched KPI shows 0% because step 2 is skipped.</span>
+      </div>
+      <div class="ba-arrow-col">&rarr;</div>
+      <div class="ba-after">
+        <div class="ba-col-label">With the App</div>
+        <ol class="ba-steps">
+          <li>Move project card to "Published" on Kanban</li>
+        </ol>
+        <div class="ba-kpi-note">The status change IS the KPI data point. No separate tagging step. Published timestamp auto-captured. Videos launched % is always accurate.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CLIENT (Module 4: Client Dashboard) ===== -->
+  <div class="ba-role-header">
+    <div class="ba-role-icon">C</div>
+    <div class="ba-role-name">Client</div>
+  </div>
+
+  <div class="ba-card">
+    <div class="ba-card-header">
+      <span>Upload raw footage</span>
+      <span><span class="ba-step-count old">3+ steps</span> &rarr; <span class="ba-step-count new">2 steps</span> <span class="ba-step-count saved">-1+</span></span>
+    </div>
+    <div class="ba-card-body">
+      <div class="ba-before">
+        <div class="ba-col-label">Today</div>
+        <ol class="ba-steps">
+          <li>Find upload link (Slack canvas? Old email? Ask YouTube manager?)</li>
+          <li>Open the Dropbox File Request page</li>
+          <li>Upload files</li>
+        </ol>
+        <span style="font-size: 11px; color: var(--red); display: block; margin-top: 8px;">Nobody is notified. Team discovers footage manually.</span>
+      </div>
+      <div class="ba-arrow-col">&rarr;</div>
+      <div class="ba-after">
+        <div class="ba-col-label">With the App</div>
+        <ol class="ba-steps">
+          <li>Open dashboard &rarr; click "Upload Footage"</li>
+          <li>Dropbox upload page opens &rarr; upload (same familiar UI)</li>
+        </ol>
+        <div class="ba-kpi-note">Upload link always visible on dashboard &mdash; no searching. Files go direct to Dropbox (never touch our server). Webhook detects upload &rarr; team auto-notified &rarr; timestamp captured.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ba-card">
+    <div class="ba-card-header">
+      <span>Review an edited video</span>
+      <span><span class="ba-step-count old">3 steps</span> &rarr; <span class="ba-step-count new">2 steps</span> <span class="ba-step-count saved">-1</span></span>
+    </div>
+    <div class="ba-card-body">
+      <div class="ba-before">
+        <div class="ba-col-label">Today</div>
+        <ol class="ba-steps">
+          <li>Wait for YouTube manager to send Dropbox link via Slack</li>
+          <li>Open the link</li>
+          <li>Watch &amp; leave timestamped comments</li>
+        </ol>
+        <span style="font-size: 11px; color: var(--red); display: block; margin-top: 8px;">No way to check status. Must ask team for updates.</span>
+      </div>
+      <div class="ba-arrow-col">&rarr;</div>
+      <div class="ba-after">
+        <div class="ba-col-label">With the App</div>
+        <ol class="ba-steps">
+          <li>Open dashboard &rarr; see "Video Ready for Review" &rarr; click link</li>
+          <li>Watch &amp; comment on Dropbox (same commenting experience)</li>
+        </ol>
+        <div class="ba-kpi-note">Review link appears automatically when video is ready. Project status visible at a glance.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== STRATEGIST (Module 5: Role Boards + KPI) ===== -->
+  <div class="ba-role-header">
+    <div class="ba-role-icon">S</div>
+    <div class="ba-role-name">Strategist</div>
+  </div>
+
+  <div class="ba-card">
+    <div class="ba-card-header">
+      <span>Log a client call</span>
+      <span><span class="ba-step-count old">? steps (skipped entirely)</span> &rarr; <span class="ba-step-count new">2 steps</span> <span class="ba-step-count saved">KPI fixed</span></span>
+    </div>
+    <div class="ba-card-body">
+      <div class="ba-before">
+        <div class="ba-col-label">Today</div>
+        <ol class="ba-steps">
+          <li>Log call somewhere in Notion (?)</li>
+          <li>Usually doesn't happen at all</li>
+        </ol>
+        <span style="font-size: 11px; color: var(--red); display: block; margin-top: 8px;">0% calls logged this month AND last month for some strategists.</span>
+      </div>
+      <div class="ba-arrow-col">&rarr;</div>
+      <div class="ba-after">
+        <div class="ba-col-label">With the App</div>
+        <ol class="ba-steps">
+          <li>Open client page &rarr; click "Log Call"</li>
+          <li>Add brief note (optional), submit</li>
+        </ol>
+        <div class="ba-kpi-note">Timestamp auto-captured. Calls this month % calculated automatically. Visible on KPI dashboard. No separate system to update.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ADMIN — KPI (Module 5: KPI Dashboards) ===== -->
+  <div class="ba-role-header">
+    <div class="ba-role-icon">A</div>
+    <div class="ba-role-name">Admin (Clayton / Andrew)</div>
+  </div>
+
+  <div class="ba-card">
+    <div class="ba-card-header">
+      <span>Check KPI dashboards</span>
+      <span><span class="ba-step-count old">Broken data</span> &rarr; <span class="ba-step-count new">Automatic</span> <span class="ba-step-count saved">Data is real</span></span>
+    </div>
+    <div class="ba-card-body">
+      <div class="ba-before">
+        <div class="ba-col-label">Today</div>
+        <ol class="ba-steps">
+          <li>Open Notion KPI dashboard</li>
+          <li>See 0% calls logged (nobody tracks it)</li>
+          <li>See 0% videos launched (not tagged as posted)</li>
+          <li>Relational database breaks visual displays</li>
+          <li>Paulo spends hours trying to fix Notion formulas</li>
+        </ol>
+      </div>
+      <div class="ba-arrow-col">&rarr;</div>
+      <div class="ba-after">
+        <div class="ba-col-label">With the App</div>
+        <ol class="ba-steps">
+          <li>Open KPI dashboard</li>
+          <li>Data is real &mdash; every timestamp was captured as work happened</li>
+        </ol>
+        <div class="ba-kpi-note">Data is captured from the team's existing workflow &mdash; no separate KPI entry step.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="page-divider"><hr></div>
+
+<!-- ============================================ -->
+<!-- SECTION 6: WHAT GOES, WHAT STAYS -->
+<!-- ============================================ -->
+<div class="page" id="replaces">
+  <div class="label">Section 6 &mdash; What Goes, What Stays</div>
+  <h2>What changes</h2>
+  <p class="subtitle">Here's exactly what gets replaced and what stays.</p>
+
+  <div style="border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin: 24px 0;">
+    <div class="replaces-grid">
+      <div class="replaces-header">Goes Away</div>
+      <div class="replaces-header"></div>
+      <div class="replaces-header">Replaced By</div>
+
+      <div class="replaces-item">
+        <div>
+          <div class="ri-name">Notion</div>
+          <div class="ri-detail">Client records, project boards, KPI dashboards, edit submission forms</div>
+        </div>
+      </div>
+      <div class="replaces-item">&rarr;</div>
+      <div class="replaces-item">
+        <div>
+          <div class="ri-name">The App</div>
+          <div class="ri-detail">Client management, Kanban pipeline, auto-KPIs, submit actions</div>
+        </div>
+      </div>
+
+      <div class="replaces-item">
+        <div>
+          <div class="ri-name">Google Drive (folder navigation)</div>
+          <div class="ri-detail">Navigating to client folders to find scripts and resources</div>
+        </div>
+      </div>
+      <div class="replaces-item">&rarr;</div>
+      <div class="replaces-item">
+        <div>
+          <div class="ri-name">The App (doc links)</div>
+          <div class="ri-detail">Scripts linked on project records. Resources on client profiles. Click to open Google Docs.</div>
+        </div>
+      </div>
+
+      <div class="replaces-item">
+        <div>
+          <div class="ri-name">Google Drive (folder creation)</div>
+          <div class="ri-detail">Creating Scripts + Resources folders per client during onboarding</div>
+        </div>
+      </div>
+      <div class="replaces-item">&rarr;</div>
+      <div class="replaces-item">
+        <div>
+          <div class="ri-name">Not needed</div>
+          <div class="ri-detail">Doc links live in the app. No folder to create. Writers paste Google Doc URLs directly.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <h3 style="margin-top: 32px;">What stays and why</h3>
+
+  <div style="border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin: 16px 0;">
+    <div style="display: grid; grid-template-columns: 200px 1fr 1fr; border-bottom: 1px solid var(--border);">
+      <div style="padding: 10px 16px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); background: var(--blue-bg); color: var(--blue);">Stays</div>
+      <div style="padding: 10px 16px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3);">What It Does</div>
+      <div style="padding: 10px 16px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3);">Why It Stays</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 200px 1fr 1fr; border-bottom: 1px solid var(--border-light); background: var(--bg-panel);">
+      <div style="padding: 14px 16px; font-size: 13px; font-weight: 600;">Dropbox</div>
+      <div style="padding: 14px 16px; font-size: 13px; color: var(--text-2);">Video file storage, client uploads (File Request), client video commenting, team downloads</div>
+      <div style="padding: 14px 16px; font-size: 13px; color: var(--text-2);">Handles 5-30 GB video files. Client commenting with timestamps. Already adopted by all clients.</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 200px 1fr 1fr; border-bottom: 1px solid var(--border-light); background: var(--bg-panel);">
+      <div style="padding: 14px 16px; font-size: 13px; font-weight: 600;">Google Docs</div>
+      <div style="padding: 14px 16px; font-size: 13px; color: var(--text-2);">Collaborative script editing, brand voice guides, resource documents</div>
+      <div style="padding: 14px 16px; font-size: 13px; color: var(--text-2);">Real-time collaborative editing. Writers and strategists edit simultaneously. The app links to Docs.</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 200px 1fr 1fr; background: var(--bg-panel);">
+      <div style="padding: 14px 16px; font-size: 13px; font-weight: 600;">Slack (notifications only)</div>
+      <div style="padding: 14px 16px; font-size: 13px; color: var(--text-2);">Receives notifications from the app. Client communication channels stay.</div>
+      <div style="padding: 14px 16px; font-size: 13px; color: var(--text-2);">The team lives in Slack. Notifications go where people already are.</div>
+    </div>
+  </div>
+
+  <h3 style="margin-top: 32px;">Dropbox storage &mdash; 24 of 30 TB used</h3>
+  <p class="subtitle" style="margin-bottom: 16px;">Dropbox is the right tool for video. No alternative matches all of what it does: single-file upload/download for 5-30 GB videos, timestamped commenting for reviews, File Request links for client uploads, and an API we can automate against. Google Drive breaks large downloads into 2 GB zips &mdash; not viable.</p>
+  <p class="subtitle" style="margin-bottom: 24px;">The only issue is storage space. You're on Dropbox Advanced (6 licenses &times; 5 TB = 30 TB pooled). Three ways to get more space:</p>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+    <div style="background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px;">
+      <h4 style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">Option A: Buy storage add-ons</h4>
+      <p style="font-size: 12px; color: var(--text-2); line-height: 1.6;">Dropbox Advanced lets you buy extra storage in 1 TB increments directly from Admin Console &mdash; no extra user seats needed. $10/month per 1 TB added.</p>
+      <p style="font-size: 11px; color: var(--accent); font-weight: 500; margin-top: 8px;">Admin Console &rarr; Storage &rarr; "Get more space"</p>
+    </div>
+    <div style="background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px;">
+      <h4 style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">Option B: Add licenses</h4>
+      <p style="font-size: 12px; color: var(--text-2); line-height: 1.6;">Each new license adds 5 TB to the pool at ~$24/user/month. Cheaper per TB than add-ons ($4.80/TB vs $10/TB), but you're paying for user seats you may not need.</p>
+    </div>
+    <div style="background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px;">
+      <h4 style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">Option C: Archive old projects</h4>
+      <p style="font-size: 12px; color: var(--text-2); line-height: 1.6;">Active work across 74 clients is ~2-3 TB. The other ~22 TB is completed projects. Move those to Backblaze B2 cold storage at $6/TB/month. Dropbox usage drops back to ~4 TB. The app can flag projects as archivable once published for 90+ days.</p>
+    </div>
+  </div>
+
+  <div style="background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 16px;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; border-bottom: 1px solid var(--border);">
+      <div style="padding: 10px 14px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3);"></div>
+      <div style="padding: 10px 14px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3);">Current</div>
+      <div style="padding: 10px 14px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3);">A: Add-ons</div>
+      <div style="padding: 10px 14px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3);">B: Licenses</div>
+      <div style="padding: 10px 14px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3);">C: Archive</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; border-bottom: 1px solid var(--border-light); background: var(--bg-panel);">
+      <div style="padding: 12px 14px; font-size: 12px; font-weight: 600;">Dropbox space</div>
+      <div style="padding: 12px 14px; font-size: 12px; color: var(--red);">24 / 30 TB (80%)</div>
+      <div style="padding: 12px 14px; font-size: 12px; color: var(--text-2);">24 / 50 TB</div>
+      <div style="padding: 12px 14px; font-size: 12px; color: var(--text-2);">24 / 50 TB</div>
+      <div style="padding: 12px 14px; font-size: 12px; color: var(--green);">~4 / 30 TB</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; border-bottom: 1px solid var(--border-light); background: var(--bg-panel);">
+      <div style="padding: 12px 14px; font-size: 12px; font-weight: 600;">Cost for +20 TB</div>
+      <div style="padding: 12px 14px; font-size: 12px; color: var(--text-2);">&mdash;</div>
+      <div style="padding: 12px 14px; font-size: 12px; color: var(--text-2);">$200/mo</div>
+      <div style="padding: 12px 14px; font-size: 12px; color: var(--green);">$96/mo (4 seats)</div>
+      <div style="padding: 12px 14px; font-size: 12px; color: var(--text-2);">$120/mo (B2)</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; border-bottom: 1px solid var(--border-light); background: var(--bg-panel);">
+      <div style="padding: 12px 14px; font-size: 12px; font-weight: 600;">Extra seats?</div>
+      <div style="padding: 12px 14px; font-size: 12px; color: var(--text-2);">&mdash;</div>
+      <div style="padding: 12px 14px; font-size: 12px; color: var(--green);">No</div>
+      <div style="padding: 12px 14px; font-size: 12px; color: var(--accent);">Yes (4 unused)</div>
+      <div style="padding: 12px 14px; font-size: 12px; color: var(--green);">No</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; background: var(--bg-panel);">
+      <div style="padding: 12px 14px; font-size: 12px; font-weight: 600;">Effort</div>
+      <div style="padding: 12px 14px; font-size: 12px; color: var(--text-2);">&mdash;</div>
+      <div style="padding: 12px 14px; font-size: 12px; color: var(--green);">Admin console click</div>
+      <div style="padding: 12px 14px; font-size: 12px; color: var(--green);">Admin console click</div>
+      <div style="padding: 12px 14px; font-size: 12px; color: var(--accent);">Build into app</div>
+    </div>
+  </div>
+
+  <div class="annotation">
+    <strong>Recommendation:</strong> Buy storage add-ons or licenses now to remove immediate pressure. Build archival into the app later &mdash; the app will already track project status and publish dates, so flagging archivable projects is straightforward. Long-term, archival brings Dropbox usage down and reduces monthly cost.
+  </div>
+
+  <div class="question-box">
+    <div class="q-icon">?</div>
+    <div class="q-text">Which approach do you prefer for the short-term fix? Add-ons (simpler, $10/TB) or licenses (cheaper per TB, but unused seats)?</div>
+  </div>
+</div>
+
+<div class="page-divider"><hr></div>
+
+<!-- ============================================ -->
+<!-- SECTION 7: BUILD ORDER -->
+<!-- ============================================ -->
+<div class="page" id="build-order">
+  <div class="label">Section 7 &mdash; Build Order</div>
+  <h2>Why this order</h2>
+  <p class="subtitle">Each piece unlocks the next. Nothing is built out of sequence.</p>
+
+  <div class="reason-card">
+    <div class="reason-num">1</div>
+    <div class="reason-content">
+      <h4>Auth + Client Management <span style="font-size: 11px; color: var(--green); font-weight: 500; margin-left: 8px;">DONE</span></h4>
+      <p>Login, roles, client records, team assignments. 80 real clients and 35 team members migrated from Notion.</p>
+      <div class="because">Replaces: Notion client database. Without this, the system doesn't know WHO your clients and team members are. Everything else builds on it.</div>
+    </div>
+  </div>
+
+  <div class="reason-card">
+    <div class="reason-num">2</div>
+    <div class="reason-content">
+      <h4>Onboarding Automation + Client Dashboard <span style="font-size: 11px; color: var(--accent); font-weight: 500; margin-left: 8px;">IN PROGRESS</span></h4>
+      <p>Create a client &rarr; Slack channel + Dropbox folder + File Request link created automatically. Client gets a magic link to their dashboard &mdash; upload button, project status, review links, brand documents.</p>
+      <div class="because">Replaces: manual 4-tool onboarding setup. Without this, no clients flow into the system. The client dashboard is part of the onboarding experience &mdash; once a client is created, they need somewhere to land. Step 1 gave us the client records; this step gives clients their entry point.</div>
+    </div>
+  </div>
+
+  <div class="reason-card">
+    <div class="reason-num">3</div>
+    <div class="reason-content">
+      <h4>Production Pipeline (Kanban) + Doc Links</h4>
+      <p>Project cards with status transitions, version tracking (V1/V2/V3), edit submission, review workflow. "Create Script" button auto-generates Google Docs. Resource links on client profiles. GDrive folders gone.</p>
+      <div class="because">Replaces: Notion project boards, GDrive folder navigation, edit submission forms. Without this, no work is tracked and no timestamps are captured. Step 2 brought clients in; this step tracks what the team does for each client. Every status change generates a data point &mdash; KPI data starts generating itself here.</div>
+    </div>
+  </div>
+
+  <div class="reason-card">
+    <div class="reason-num">4</div>
+    <div class="reason-content">
+      <h4>Role Boards + Admin + KPI Dashboards</h4>
+      <p>Per-role filtered Kanban views. Admin tools. KPI dashboards showing script on-time %, edit on-time %, videos launched %, calls logged %.</p>
+      <div class="because">Replaces: Notion KPI dashboards (currently showing 0%). Steps 2 and 3 captured every timestamp. This step just reads that data &mdash; no manual KPI entry, no broken formulas. Building this last means the dashboards have real data from day one.</div>
+    </div>
+  </div>
+
+</div>
+
+
+<div class="footer">
+  Known Local &mdash; April 2026
+</div>
+
+<script>
+  const sections = document.querySelectorAll('.page[id]');
+  const navLinks = document.querySelectorAll('nav a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 120) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  });
+</script>
+
+</body>
+</html>

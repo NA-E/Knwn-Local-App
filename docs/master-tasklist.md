@@ -52,26 +52,26 @@
 > Full review: `docs/schema-review.md` (2026-04-06)
 
 ### Critical
-- [ ] **C-1:** Drop duplicate `updated_at` triggers (custom from 004 + moddatetime from 008 both fire) — Migration 010
+- [x] **C-1:** Drop duplicate `updated_at` triggers — Migration 015 (2026-04-10)
 - [!] **C-2:** Populate `supervised_by` for real team members — **BLOCKED: needs mapping from Paulo/Clayton**
-- [ ] **C-3:** Add `ON DELETE SET NULL` to `projects.writer_id` and `projects.editor_id` FKs — Migration 010
+- [x] **C-3:** Add `ON DELETE SET NULL` to `projects.writer_id` and `projects.editor_id` FKs — Migration 015
 - [ ] **C-4:** Document soft-delete convention (team members should never be hard-deleted)
 
 ### Important
-- [ ] **I-1:** Document or tighten `projects_update` RLS policy (any user can update any column)
+- [x] **I-1:** `projects_update` RLS tightened — role-based update policies in Migration 010
 - [ ] **I-2:** Document no-delete policy for clients (intentional soft-delete only)
 - [ ] **I-3:** Verify `client_contacts.is_primary`/`is_assistant` NOT NULL in live DB (dump may be inaccurate)
 - [ ] **I-4:** Verify `videos_per_week` precision `NUMERIC(4,1)` in live DB
 - [ ] **I-5:** (Optional) Add explicit index on `onboarding_steps.client_id` for consistency
-- [ ] **I-6:** Add partial unique index preventing multiple primary pods per member — Migration 010
+- [x] **I-6:** Add partial unique index preventing multiple primary pods per member — Migration 015
 - [!] **I-7:** Clarify writer/senior_writer roles with Paulo/Clayton — **BLOCKED: needs human input**
 
 ### Suggestions (do during Module 2)
-- [ ] **S-1:** Add composite index `(client_id, status)` on projects for Kanban queries
-- [ ] **S-2:** CHECK constraint on `task_number` format (`^KN-\d{5}$`)
+- [x] **S-1:** Add composite index `(client_id, status)` on projects for Kanban queries — Migration 015
+- [x] **S-2:** CHECK constraint on `task_number` format (`^KN-\d{5}$`) — Migration 015
 - [ ] **S-3:** Reset `project_task_seq` after any project data import
 - [ ] **S-4:** Document `senior_writer` in `assignment_role` as display-only
-- [ ] **S-5:** Pod name length constraint
+- [x] **S-5:** Pod name length constraint — Migration 015
 - [ ] **S-6:** Column comments for `assignment_role` vs `role` distinction
 - [ ] **S-7:** Document `onboarding_steps` update-via-service-role pattern
 
@@ -91,13 +91,15 @@
 - [x] Supabase project transferred to new "Known Local" org (isolated from other apps) — 2026-04-07
 
 ## Pre-Module 2: Outstanding Items
-- [ ] Migration 010: Schema fixes (C-1, C-3, I-6, S-1, S-2) — can do immediately
+- [x] Migration 010-015: Schema fixes + Module 2 enhancements applied (all 15 migrations live)
 - [!] Get `supervised_by` mapping from Paulo/Clayton (C-2) — blocks Senior Writer/Editor boards
 - [!] Clarify writer/senior_writer role question with Paulo/Clayton (I-7) — blocks Writer board
 - [ ] Get Dropbox API credentials (app key, secret, refresh token)
 - [ ] Get Google Drive service account + share Clients folder
 - [ ] Browser test full onboarding flow (9 test phases in `docs/onboarding-test-plan.md`)
-- [ ] Commit all changes (Modules 0+1 + MCP server + onboarding + migrations 006-009 + data scripts)
+- [ ] Reset admin@knownlocal.com password in Supabase Dashboard (login fails on production)
+- [ ] Manual test: Google OAuth sign-in on production (click "Sign in with Google" at Railway URL)
+- [ ] Commit all changes
 
 ## Module 2: Production Pipeline — NOT STARTED
 > No detailed plan yet. Spec: `SPEC.md` lines 610-619
@@ -138,9 +140,23 @@
 - [ ] Validate: spot-check 10 clients, 10 projects, all pod assignments, all team members
 - [ ] QA with Paulo — verify client data, project statuses, team assignments
 - [ ] Bug fixes from QA
-- [ ] Deploy to Vercel production
+- [x] Deploy to Railway production — 2026-04-10
 - [ ] Set up custom domain (if needed)
 - [ ] Team walkthrough — record Loom or live session
+
+## Deployment: Railway — COMPLETE
+> Deployed 2026-04-10. URL: `https://knwn-local-app-production.up.railway.app`
+
+- [x] Railway project created (creative-comfort → Knwn-Local-App)
+- [x] Switched builder from Railpack to Nixpacks
+- [x] Cleaned git history (removed node_modules from commits)
+- [x] Fixed Node.js version (added engines field + .nvmrc for Node 20)
+- [x] Fixed container networking (bind to 0.0.0.0)
+- [x] Fixed port mismatch (added PORT=3000 env var)
+- [x] Set environment variables (Supabase, Slack, onboarding)
+- [x] App live and serving login page — 2026-04-10
+- [x] Google OAuth redirect URI updated for production — 2026-04-10
+- [x] Supabase redirect URL updated for Railway domain — 2026-04-10
 
 ## Post-Launch: Security Hardening
 - [ ] Restrict Google OAuth sign-up to pre-existing team members only (remove auto-create branch in app layout, redirect unknown emails to "access denied" page)
@@ -148,4 +164,4 @@
 
 ---
 
-*Last updated: 2026-04-07*
+*Last updated: 2026-04-10*
