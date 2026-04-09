@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { draggable } from '@atlaskit/pragmatic-drag-and-drop/element/adapter'
 import { PenLine, Film, Calendar } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -72,6 +73,8 @@ function getRelevantDueDate(project: ProjectWithRelations): { label: string; dat
 export function ProjectCard({ project, isDragging: isDraggingProp }: ProjectCardProps) {
   const ref = useRef<HTMLDivElement>(null)
   const [isDraggingLocal, setIsDraggingLocal] = useState(false)
+  const wasDragging = useRef(false)
+  const router = useRouter()
 
   const isDragging = isDraggingProp ?? isDraggingLocal
 
@@ -86,10 +89,23 @@ export function ProjectCard({ project, isDragging: isDraggingProp }: ProjectCard
         projectStatus: project.status,
         taskNumber: project.task_number,
       }),
-      onDragStart: () => setIsDraggingLocal(true),
-      onDrop: () => setIsDraggingLocal(false),
+      onDragStart: () => {
+        setIsDraggingLocal(true)
+        wasDragging.current = true
+      },
+      onDrop: () => {
+        setIsDraggingLocal(false)
+        // Reset after a tick so onClick can check it
+        requestAnimationFrame(() => { wasDragging.current = false })
+      },
     })
   }, [project.id, project.status, project.task_number])
+
+  const handleClick = () => {
+    if (!wasDragging.current) {
+      router.push(`/projects/${project.id}`)
+    }
+  }
 
   const dueInfo = getRelevantDueDate(project)
   const designLabel = DESIGN_STATUS_LABELS[project.design_status]
@@ -97,10 +113,11 @@ export function ProjectCard({ project, isDragging: isDraggingProp }: ProjectCard
   return (
     <div
       ref={ref}
+      onClick={handleClick}
       className={cn(
-        'w-full cursor-grab rounded-lg border bg-card p-3.5 transition-all duration-150',
+        'w-full cursor-pointer rounded-lg border bg-card p-3.5 transition-all duration-150',
         isDragging
-          ? 'rotate-[1.5deg] border-dashed border-brand-accent opacity-55 shadow-[0_8px_24px_rgba(26,25,22,0.18)]'
+          ? 'cursor-grabbing rotate-[1.5deg] border-dashed border-brand-accent opacity-55 shadow-[0_8px_24px_rgba(26,25,22,0.18)]'
           : 'border-border shadow-[0_1px_3px_rgba(26,25,22,0.06),0_1px_2px_rgba(26,25,22,0.04)] hover:border-brand-accent hover:shadow-[0_2px_8px_rgba(200,120,42,0.10)]'
       )}
     >

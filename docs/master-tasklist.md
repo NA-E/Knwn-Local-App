@@ -1,12 +1,52 @@
 # Master Task List — Known Local App
 
-> **Single source of truth for all project work.** Every new task, plan, review, or action item gets added here. Reference detailed docs where they exist rather than duplicating content.
+> **Single source of truth for all project work.** Bugs, tasks, user instructions — everything goes here. Reference detailed docs where they exist rather than duplicating content.
 
 ## How to Use
 - Mark tasks: `[x]` done, `[ ]` not started, `[~]` in progress, `[!]` blocked
 - Link to detailed plans/specs/reviews where they exist
 - Add new tasks to the appropriate section as they arise
 - Date-stamp completed items
+
+---
+
+## Active Work
+
+> Current bugs, tasks, and instructions. Fix/complete these before starting new modules.
+
+### Bugs — Open
+
+- [x] **BUG-P1**: Pipeline project cards — added click-to-navigate with drag guard (2026-04-10)
+- [ ] **BUG-P2**: Google OAuth sign-in untested on production — needs manual human test.
+- [ ] **BUG-P3**: Client portal magic link sign-in untested on production.
+- [ ] **BUG-C1**: Non-admin role access not tested (only admin account available). Sidebar section hiding, server action blocks, RLS enforcement unverified on production.
+- [ ] **BUG-C2**: Drag-and-drop transition validation untested on production.
+- [ ] **BUG-C3**: Pagination on client list untested (need >25 results to verify Previous/Next).
+- [x] **BUG-38**: `client-team-section.tsx` — already fixed (has .catch() and loading state)
+- [x] **BUG-41**: `team-member-form.tsx` — already fixed (key prop forces remount on pod change)
+
+### Bugs — Blocked
+
+- [!] **C-2**: Populate `supervised_by` for real team members — needs mapping from Paulo/Clayton.
+- [!] **I-7**: Clarify writer/senior_writer roles — needs human input from Paulo/Clayton.
+
+### Tasks — From User Instructions (2026-04-10)
+
+- [x] Fix BUG-P1: Make project cards clickable (navigate to project detail on click, keep drag working)
+- [ ] Test client portal magic link sign-in on production (BUG-P3)
+- [ ] Test Google OAuth on production — manual human test (BUG-P2)
+- [ ] Fix all remaining open bugs above
+- [ ] Verify drag-and-drop cross-row works on production (BUG-C2)
+
+### Recently Fixed (2026-04-10)
+
+- [x] Removed "Add Client" from sidebar nav
+- [x] Removed Vid/wk column from client list table
+- [x] Removed KN-#### task number from kanban project cards
+- [x] Removed card count badges from kanban column headers
+- [x] Stacked row kanban layout — grouped by phase, collapsible, cross-row drag
+- [x] Fixed scroll issue (removed overflow-x wrapper from pipeline/my-board pages)
+- [x] Updated manual testing checklist for new layout + client portal
 
 ---
 
@@ -101,19 +141,19 @@
 - [ ] Manual test: Google OAuth sign-in on production (click "Sign in with Google" at Railway URL)
 - [ ] Commit all changes
 
-## Module 2: Production Pipeline — NOT STARTED
-> No detailed plan yet. Spec: `SPEC.md` lines 610-619
+## Module 2: Production Pipeline — IN PROGRESS
+> Spec: `SPEC.md` lines 610-619. Plan: `docs/superpowers/specs/`
 
-- [ ] Write Module 2 implementation plan
-- [ ] Build Project CRUD — auto task number, title, client FK, status, writer, editor, dates
-- [ ] Implement status state machine — validate transitions in server actions
-- [ ] Build reusable Kanban board component — accepts config: visible statuses, project filter function
-- [ ] Build Full Pipeline Kanban — all statuses as columns, drag-and-drop, project cards
-- [ ] Build Project Detail page — status action buttons, assignments, dates, notes, design status
-- [ ] Add pipeline filters — pod, client, status group, team member, date range
+- [x] Build Project CRUD — auto task number, title, client FK, status, writer, editor, dates
+- [x] Implement status state machine — validate transitions in server actions
+- [x] Build reusable Kanban board component — stacked rows grouped by phase, collapsible
+- [x] Build Full Pipeline Kanban — all statuses, drag-and-drop, project cards
+- [x] Build Project Detail page — status action buttons, assignments, dates, notes, design status
+- [x] Add pipeline filters — pod, client, status group, team member
+- [x] Add activity log — write to `project_status_history` on every status change
+- [x] Add design parallel track — `design_status` field, badge on cards, toggle on detail page
 - [ ] Add bulk status update — multi-select projects, move to next valid status
-- [ ] Add design parallel track — `design_status` field, badge on cards, toggle on detail page
-- [ ] Add activity log — write to `project_status_history` on every status change
+- [x] Make project cards clickable (BUG-P1)
 
 ## Module 3: Team Boards — NOT STARTED
 > No detailed plan yet. Spec: `SPEC.md` lines 621-633
