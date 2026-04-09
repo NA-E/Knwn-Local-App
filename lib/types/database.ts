@@ -11,7 +11,7 @@ export type ProjectStatus =
   | 'script_ready_to_send' | 'script_sent_to_client' | 'client_uploaded'
   | 'editing' | 'ready_for_internal_review' | 'internal_adjustments_needed'
   | 'edit_ready_to_send' | 'edit_sent_to_client' | 'client_adjustments_needed'
-  | 'ready_to_post' | 'posted_scheduled'
+  | 'ready_to_post' | 'posted_scheduled' | 'cancelled'
 
 export type DesignStatus = 'not_started' | 'in_progress' | 'completed'
 export type ScriptFormat = 'word_for_word' | 'outline'
@@ -69,6 +69,8 @@ export interface Client {
   script_format: ScriptFormat | null
   communication_method: CommMethod | null
   special_instructions: string | null
+  portal_token: string | null
+  portal_token_expires_at: string | null
   created_at: string
   updated_at: string
 }
@@ -110,8 +112,15 @@ export interface Project {
   writer_id: string | null
   editor_id: string | null
   script_v1_due: string | null
+  edit_due: string | null
+  publish_due: string | null
   actual_post_date: string | null
+  script_url: string | null
+  edit_url: string | null
+  thumbnail_url: string | null
+  edit_version: number
   design_status: DesignStatus
+  last_status_change_at: string
   notes: string | null
   created_at: string
   updated_at: string
@@ -123,7 +132,17 @@ export interface ProjectStatusHistory {
   from_status: ProjectStatus | null
   to_status: ProjectStatus
   changed_by: string
+  notes: string | null
   changed_at: string
+}
+
+/** Project with joined relation names — used by Kanban board and detail pages */
+export interface ProjectWithRelations extends Project {
+  client_name: string
+  writer_name: string | null
+  editor_name: string | null
+  pod_id: string | null
+  pod_name: string | null
 }
 
 // Onboarding types

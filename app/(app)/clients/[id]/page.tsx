@@ -7,6 +7,7 @@ import { ClientChannelsSection } from '@/components/clients/client-channels-sect
 import { ClientContactsSection } from '@/components/clients/client-contacts-section'
 import { ClientTeamSection } from '@/components/clients/client-team-section'
 import { OnboardingStatusSection } from '@/components/clients/onboarding-status-section'
+import { PortalLinkSection } from '@/components/clients/portal-link-section'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import type { OnboardingStep } from '@/lib/types'
@@ -64,6 +65,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         <ClientChannelsSection clientId={id} channels={channels ?? []} />
         <ClientContactsSection clientId={id} contacts={contacts ?? []} />
         <OnboardingStatusSection clientId={id} steps={(onboardingSteps ?? []) as OnboardingStep[]} />
+        <PortalLinkSection clientId={id} portalToken={client.portal_token ?? null} />
       </div>
     </div>
   )

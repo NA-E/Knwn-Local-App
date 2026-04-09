@@ -31,10 +31,20 @@ Ten roles in the system. Every user has exactly one role.
 ---
 
 ## Auth Implementation
-- Supabase Auth with email/password login (no social auth for V1)
+
+### Team Auth
+- Supabase Auth with email/password + Google OAuth
 - `role` column on `team_members` table determines access
 - Row Level Security (RLS) policies enforce visibility per role
 - No self-registration — Admin creates accounts
+- **Security:** Google OAuth auto-link must match `team_members.email`. Unknown Google emails must NOT auto-create accounts (current auto-create-as-editor behavior is a security hole — fix before launch).
+
+### Client Auth (Client Dashboard)
+- Magic link authentication — invite-only, no signup
+- When a client is created, the app generates a unique signed URL (JWT or UUID token)
+- Link is stored on the client record and sent via Slack welcome message
+- Clients do NOT have `team_members` rows — they authenticate via a separate `client_tokens` table or Supabase anonymous/custom auth
+- RLS policies for client access: read-only on their own projects, client record, and team assignments
 
 ---
 
@@ -106,7 +116,8 @@ CREATE TYPE project_status AS ENUM (
   'edit_sent_to_client',
   'client_adjustments_needed',
   'ready_to_post',
-  'posted_scheduled'
+  'posted_scheduled',
+  'cancelled'
 );
 
 -- Assignment role type — named slots on a client record, populated during client onboarding.
@@ -212,13 +223,14 @@ CREATE TABLE client_contacts (
 
 -- Client Assignments: normalized role mapping
 -- Replaces Notion's 6-7 separate relation columns
+-- UNIQUE on (client_id, assignment_role) enforces single-occupancy: one strategist, one manager, etc. per client.
 CREATE TABLE client_assignments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   client_id UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
   team_member_id UUID NOT NULL REFERENCES team_members(id) ON DELETE CASCADE,
   assignment_role assignment_role NOT NULL,
   created_at TIMESTAMPTZ DEFAULT now(),
-  UNIQUE(client_id, team_member_id, assignment_role)
+  UNIQUE(client_id, assignment_role)
 );
 
 -- Projects: one record = one video/content piece
@@ -230,9 +242,22 @@ CREATE TABLE projects (
   status project_status NOT NULL DEFAULT 'idea',
   writer_id UUID REFERENCES team_members(id),
   editor_id UUID REFERENCES team_members(id),
+  -- Dates
   script_v1_due DATE,
+  edit_due DATE,
+  publish_due DATE,
   actual_post_date DATE,
+  -- Links — these are the work product references
+  script_url TEXT,                          -- Google Doc link for the script
+  edit_url TEXT,                            -- Dropbox link to current edit version
+  thumbnail_url TEXT,                       -- Dropbox/Drive link to thumbnail
+  -- Version tracking
+  edit_version SMALLINT NOT NULL DEFAULT 0, -- 0=none, 1=V1(internal), 2=V2(client), 3=V3(final)
+  -- Parallel tracks
   design_status design_status NOT NULL DEFAULT 'not_started',
+  -- Timestamps for KPI derivation (auto-populated by server actions on status transitions)
+  last_status_change_at TIMESTAMPTZ DEFAULT now(),
+  -- General
   notes TEXT,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
@@ -257,12 +282,14 @@ CREATE TRIGGER set_task_number
   EXECUTE FUNCTION generate_task_number();
 
 -- Project Status History: audit log for all status changes
+-- Also serves as KPI data source: changed_at for scriptwriting→review_script = "script submitted" timestamp
 CREATE TABLE project_status_history (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
   from_status project_status,
   to_status project_status NOT NULL,
   changed_by UUID NOT NULL REFERENCES team_members(id),
+  notes TEXT,                               -- Feedback/reason for transition (e.g., why script was rejected)
   changed_at TIMESTAMPTZ DEFAULT now()
 );
 ```
@@ -283,6 +310,7 @@ CREATE INDEX idx_team_member_pods_pod ON team_member_pods(pod_id);
 CREATE INDEX idx_team_members_supervised_by ON team_members(supervised_by);
 CREATE INDEX idx_project_status_history_project ON project_status_history(project_id);
 CREATE INDEX idx_project_status_history_changed_at ON project_status_history(changed_at);
+CREATE INDEX idx_projects_last_status_change ON projects(last_status_change_at);
 ```
 
 ---
@@ -296,6 +324,7 @@ PRE-PRODUCTION:  brief, scriptwriting, review_script, fix_script, script_ready_t
 PRODUCTION:      client_uploaded, editing, ready_for_internal_review, internal_adjustments_needed, edit_ready_to_send, edit_sent_to_client, client_adjustments_needed
 POST-PRODUCTION: ready_to_post
 COMPLETE:        posted_scheduled
+CANCELLED:       cancelled
 ```
 
 ### Transition Ownership
@@ -324,6 +353,9 @@ Each transition has a designated role owner. Enforce in both application layer a
 | `edit_sent_to_client → ready_to_post` | **Manager** (client approved, no changes), Jr Strategist, Admin |
 | `client_adjustments_needed → editing` | Editor, Jr Strategist, Admin |
 | `ready_to_post → posted_scheduled` | Manager, Jr Strategist, Admin |
+| `posted_scheduled → ready_to_post` | Admin — **undo incorrect publish marking** |
+| `* → on_hold` | Strategist, Jr Strategist, Admin — **pause from any active status** (except `posted_scheduled`, `cancelled`) |
+| `* → cancelled` | Strategist, Jr Strategist, Admin — **abandon project from any status** |
 
 ### Valid Transitions
 Each status can only move to specific next statuses. Enforce in the application layer.
@@ -345,7 +377,12 @@ edit_ready_to_send → edit_sent_to_client
 edit_sent_to_client → client_adjustments_needed, ready_to_post
 client_adjustments_needed → editing
 ready_to_post → posted_scheduled
+posted_scheduled → ready_to_post          (Admin only — undo)
+any_active_status → on_hold               (Strategist, Jr Strategist, Admin — pause)
+any_status → cancelled                    (Strategist, Jr Strategist, Admin — abandon)
 ```
+
+**Note:** `on_hold` retains the same resume transitions: `on_hold → idea`, `on_hold → brief`. When a project is paused from mid-pipeline, it resumes from `idea` or `brief` (re-enters the pipeline).
 
 ---
 
@@ -419,10 +456,10 @@ Each role sees a filtered Kanban board showing only the statuses relevant to the
 - **Special:** Show `design_status` badge prominently. Filter by designer to see individual workloads.
 
 ### Admin Board
-- **Columns:** All statuses
+- **Columns:** All statuses (including cancelled — shown as a collapsed/filterable column)
 - **Filter:** No filter — all projects
 - **Actions:** Full CRUD. Can move any status. Can reassign writers/editors.
-- **Special:** Filter controls for pod, client, team member, date range, status group.
+- **Special:** Filter controls for pod, client, team member, date range, status group. Show "days in status" on cards (derived from `last_status_change_at`). Highlight projects stuck > 3 days in amber, > 7 days in red.
 
 ---
 
@@ -448,7 +485,7 @@ Settings (Admin only)
 
 #### Dashboard
 - Role-aware landing page
-- **Admin:** Total clients (by status), total active projects (by status group), projects needing attention (stuck > 3 days)
+- **Admin:** Total clients (by status), total active projects (by status group), projects needing attention (stuck > 3 days based on `last_status_change_at`, excluding `posted_scheduled`, `cancelled`, `on_hold`)
 - **Strategist:** Their client count, projects by status for their pod, any projects stuck
 - **All other roles:** Redirect to My Board
 
@@ -485,16 +522,24 @@ Settings (Admin only)
 - Drag and drop for allowed transitions only
 
 #### Project Detail Page
-- **Header:** Task ID, Title, Status badge, Design Status badge
-- **Status Controls:** Next valid status buttons (not a dropdown — explicit action buttons like "Send to Review", "Approve", "Needs Fix")
+- **Header:** Task ID, Title, Status badge, Design Status badge, Edit Version badge (V1/V2/V3)
+- **Status Controls:** Next valid status buttons (not a dropdown — explicit action buttons like "Send to Review", "Approve", "Needs Fix"). On transitions that require input:
+  - `editing → ready_for_internal_review`: prompt for Dropbox link (`edit_url`) and version (`edit_version`). Required before transition completes.
+  - `review_script → fix_script`: prompt for feedback note (stored in `project_status_history.notes`). Required.
+  - `ready_for_internal_review → internal_adjustments_needed`: prompt for feedback note. Required.
 - **Assignment:**
   - Writer picker — nullable. Assigned by Strategist/Jr Strategist/Admin **when moving brief → scriptwriting**. Null at creation and until that point. Round-robin is a manual process in V1 (automation out of scope).
   - Editor picker — nullable. Assignable by Strategist, Jr Strategist, Admin, **or the editor themselves**. Must be set before project reaches `client_uploaded`.
-- **Dates:** Script V1 Due, Actual Post Date
+- **Links Section:**
+  - Script link (`script_url`) — Google Doc URL. Editable by Writer, Strategist, Jr Strategist, Admin. When first populated, server action captures timestamp for KPI.
+  - Edit link (`edit_url`) — Dropbox URL to current edit version. Editable by Editor. Updated on each edit submission.
+  - Thumbnail link (`thumbnail_url`) — Dropbox/Drive URL. Editable by Designer.
+  - All links open in new tab.
+- **Dates:** Script V1 Due, Edit Due, Publish Due, Actual Post Date (auto-populated when status → `posted_scheduled`)
 - **Client Info:** Client name (linked), Pod
 - **Design:** Design status toggle (Not Started / In Progress / Completed)
 - **Notes:** Free text field for handoff context
-- **Activity Log:** Renders from `project_status_history` table — timestamp, from_status, to_status, changed_by name
+- **Activity Log:** Renders from `project_status_history` table — timestamp, from_status, to_status, changed_by name, notes (if present). Newest first. Paginated if > 20 entries.
 
 #### Project Creation
 - **Who can create:** Admin, Strategist, Jr Strategist only.
@@ -517,6 +562,16 @@ Settings (Admin only)
 - Create new team member account (generates Supabase auth user)
 - Edit role, status, pod assignments
 - Deactivate accounts
+- **Off-boarding:** When deactivating a team member, show warning listing their active client assignments and projects. Require reassignment of `client_assignments` before deactivation (or flag as needing reassignment). Mark `writer_id` / `editor_id` as needing reassignment on active projects.
+
+#### Client Dashboard (Client-Facing)
+- **Auth:** Magic link — unique signed URL per client, stored on client record, sent via Slack welcome message. No signup, no password. Invite-only.
+- **Route:** `/client/[token]` — separate from team app routes
+- **Upload Link:** Dropbox File Request URL (`clients.dropbox_upload_url`) displayed prominently. Always visible. One-click to Dropbox upload.
+- **Project Status:** Read-only list of the client's projects showing: title, current status (friendly labels, not internal enum names), edit version if applicable.
+- **Review Links:** When a project has `edit_url` and status is `edit_sent_to_client`, show the Dropbox review link.
+- **Resources:** Links to brand documents, onboarding resources, FAQ. (Content managed by team, displayed read-only to client.)
+- **Explicitly NOT in V1:** Calendar, channel performance analytics, messaging, billing. These are Phase 2+.
 
 ---
 
@@ -541,6 +596,7 @@ PRE-PRODUCTION:  Blue
 PRODUCTION:      Yellow/Amber
 POST-PRODUCTION: Green
 COMPLETE:        Purple
+CANCELLED:       Red
 ```
 
 ### Design Status Badge
@@ -575,6 +631,10 @@ Migration script reads from a structured Notion export (CSV or JSON) and inserts
 - **Null/empty fields:** Many Notion fields are sparse (Posting Schedule, Communication Method, Special Instructions). Import as NULL — don't skip the record.
 - **Task number sequence:** After migration, set `project_task_seq` to `MAX(existing task numbers) + 1`.
 - **Supervision mapping:** After importing team members, populate `supervised_by` for all writers and editors. Requires Paulo or Clayton to provide the explicit list of which writers report to which senior writer, and which editors report to which senior editor. This data must be confirmed before migration runs — it is required for Senior Writer and Senior Editor board filters to work correctly.
+- **Team member count discrepancy:** Notion export yielded 35 members. Clayton confirmed (2026-04-07) actual count is ~60-70. Missing members are likely writers, senior writers, and departed/inactive staff. Get full roster from Clayton/Paulo before launch. Senior writers confirmed: Rafael and Vivian.
+- **Internal/non-client entries in client data:** Clayton flagged (2026-04-07) that "Breaking and Building Leaders," "Known Local," and "Ella" are internal YouTube channels or email-only clients, NOT real agency clients. Review all 80 clients with Clayton — flag or exclude non-YouTube-client entries. Consider adding a `client_type` tag or filtering them from active views.
+- **Project migration:** Migration 009 imported zero projects from Notion. Existing KnwnTasks need to be migrated or the team starts from scratch on Module 2 launch. Either run a project migration from Notion export or accept clean-slate for projects.
+- **`supervised_by` is currently NULL for all team members.** This BLOCKS Senior Writer and Senior Editor boards (they return zero projects). Must be populated before Module 3 go-live.
 
 ---
 
@@ -608,15 +668,22 @@ Build in this exact order. Each module should be committed before starting the n
 - Build Client Detail page — unified view with all sub-entities and linked projects
 
 ### Module 2: Production Pipeline
-- Build Project CRUD — auto task number, title, client (FK), status, writer, editor, dates
-- Implement status state machine — validate transitions in server actions
+- Build Project CRUD — auto task number, title, client (FK), status, writer, editor, dates, links (script_url, edit_url, thumbnail_url), edit_version
+- Implement status state machine — validate transitions in server actions. Include:
+  - Role-based transition ownership enforcement
+  - Preconditions: `writer_id` required for `brief → scriptwriting`, `editor_id` required before `client_uploaded`, `design_status = completed` required before `edit_sent_to_client`
+  - Transition notes: prompt for feedback on rejection transitions (`fix_script`, `internal_adjustments_needed`)
+  - Edit submission: prompt for `edit_url` + `edit_version` on `editing → ready_for_internal_review`
+  - Auto-populate `last_status_change_at` on every transition
+  - Auto-populate `actual_post_date` on `→ posted_scheduled`
 - **Build reusable Kanban board component first** — accepts config: visible statuses, project filter function. Used for Full Pipeline AND all role boards.
-- Build Full Pipeline Kanban using the reusable component — all statuses as columns, drag-and-drop, project cards
-- Build Project Detail page — status action buttons, assignments, dates, notes, design status
+- Build Full Pipeline Kanban using the reusable component — all statuses as columns, drag-and-drop with validation (highlight valid drop targets on drag, reject invalid drops with toast)
+- Build Project Detail page — status action buttons, assignments, dates, links section, notes, design status, edit version, activity log
 - Add pipeline filters — pod, client, status group, team member, date range
-- Add bulk status update — multi-select projects, move to next valid status
 - Add design parallel track — `design_status` field, badge on cards, toggle on detail page
-- Add activity log — write to `project_status_history` on every status change (server action)
+- Add activity log — write to `project_status_history` on every status change (server action), include `notes` field for transition feedback
+- **Targeted Slack notifications** — on critical transitions, send Slack DM to the relevant team member (see Targeted Slack Notifications section)
+- **Tighten RLS** — `projects_update` policy must restrict which columns non-admin roles can update. At minimum: writers can only update `script_url` and `notes`; editors can only update `edit_url`, `edit_version`, `thumbnail_url`, `notes`; designers can only update `design_status`, `thumbnail_url`. Status changes go through server actions, not direct column updates.
 
 ### Module 3: Team Boards
 - Build role detection → board config mapping (reusable Kanban component already exists from Module 2)
@@ -632,9 +699,27 @@ Build in this exact order. Each module should be committed before starting the n
 - Implement Admin board (same as Full Pipeline with extra controls)
 - Build My Board page — auto-renders correct board based on logged-in user's role
 
-### Module 4: Migration & Polish
-- Build migration script — reads Notion export, inserts into Supabase following migration order above
-- Run migration with real data
+### Module 3.5: Client Dashboard
+- Build magic link auth — generate unique token per client, store on client record
+- Build client-facing route (`/client/[token]`) — separate layout from team app
+- Build upload link display (Dropbox File Request URL)
+- Build read-only project status list (friendly status labels)
+- Build review links display (edit_url when status = edit_sent_to_client)
+- Build resources section (links to brand docs, onboarding resources)
+
+### Module 4: Data Cleanup, Migration & Polish
+- **Data cleanup with Clayton/Paulo:**
+  - Review 80 clients — flag/exclude internal channels (Breaking and Building Leaders, Known Local, Ella)
+  - Get complete team roster (~60-70 members) — add missing writers, senior writers, departed/inactive members
+  - Populate `supervised_by` for all writers and editors
+  - Verify pod assignments and client assignments
+- Run Migration 010 — add new schema columns (script_url, edit_url, edit_version, thumbnail_url, edit_due, publish_due, last_status_change_at, notes on project_status_history)
+- **Department review calls (15-min each):**
+  - Senior writers (Rafael + Vivian) + top 1-2 writers — validate writing workflow
+  - Senior editors + editor — validate editing workflow
+  - Senior designer + designer — validate design workflow
+  - YouTube managers — validate handoff workflow
+  - Paulo coordinates scheduling
 - Validate: spot-check 10 clients, 10 projects, all pod assignments, all team members
 - QA with Paulo — have him verify client data, project statuses, team assignments
 - Bug fixes from QA
@@ -646,16 +731,32 @@ Build in this exact order. Each module should be committed before starting the n
 
 ## Out of Scope for V1
 These are explicitly **NOT** part of this build. Do not implement any of these:
-- KPI calculations or dashboards (company, department, individual)
+- KPI calculations or dashboards (company, department, individual) — but timestamp data MUST be captured in Modules 2-3 via `project_status_history` and project fields so KPIs can be built in Phase 2
 - MPR system (monthly performance reviews)
 - Health score (manual or calculated)
 - AI script review
-- Client portal
-- Automated Slack/Dropbox handoffs
+- ~~Client portal~~ — **MOVED TO V1 SCOPE** (Clayton approved 2026-04-07). See Client Dashboard page spec above.
 - Posting automation
 - Round-robin writer assignment automation
 - Calendar integration for strategist meetings
 - ELLA pod special handling
 - YouTube Videos, Design Assets, Approval Emails as separate tables
-- Notification system (Slack, email, in-app)
+- Full notification system (email, in-app) — but **targeted Slack DMs for critical transitions ARE in scope** (see below)
 - Real-time collaboration / live updates
+- Archival process / cold storage (confirmed as Phase 2 — Clayton endorsed the concept)
+- Google Doc auto-creation for scripts (stretch goal — `script_url` field for manual paste is V1, auto-creation is Phase 2)
+- Strategist call logging (Phase 2 — but blocks the most important KPI: calls %)
+
+### Targeted Slack Notifications (V1 Scope)
+Clayton explicitly said senior editors "definitely need to be notified." These 4 critical-path notifications use the existing Slack service layer from onboarding automation:
+1. `editing → ready_for_internal_review` → Slack DM to the client's assigned senior editor
+2. `review_script → fix_script` → Slack DM to the project's `writer_id`
+3. `ready_for_internal_review → internal_adjustments_needed` → Slack DM to the project's `editor_id`
+4. `internal_adjustments_needed → ready_for_internal_review` (edit fixed) → Slack DM to the client's assigned senior editor
+
+### Onboarding Automation (V1 Scope)
+Moved from "Automated Slack/Dropbox handoffs" out-of-scope. The onboarding automation spec (`docs/superpowers/specs/2026-04-03-client-onboarding-automation.md`) is V1 scope. Key requirements:
+- **Slack channel creation:** Auto-create, auto-add Clayton + Andrew (universal). After pod/team assignment, auto-add strategist + manager + jr_strategist via dynamic pod-based lookup (NOT hardcoded env var).
+- **Dropbox folder:** Create client folder + 4 subfolders (A-roll, B-roll, Edited Videos, Projects and Assets) + File Request link targeting A-roll.
+- **GDrive folder:** Create client folder + 2 subfolders (Scripts, Resources).
+- **Welcome message:** Auto-send via Slack after team assignment: "Slack is for communication. Here's your app login: [magic link]. Everything you need is in the app."

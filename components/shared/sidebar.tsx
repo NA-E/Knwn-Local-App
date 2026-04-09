@@ -51,8 +51,8 @@ export function Sidebar({ role, userName }: SidebarProps) {
 
         <div className="pt-3">
           <div className="px-3 mb-1 text-[9.5px] font-semibold uppercase tracking-[0.12em] text-white/25">Projects</div>
-          {navItem('/pipeline', 'Pipeline')}
-          {navItem('/board', 'My Board')}
+          {navItem('/projects/pipeline', 'Pipeline')}
+          {navItem('/projects/my-board', 'My Board')}
         </div>
 
         {isAdmin && (
