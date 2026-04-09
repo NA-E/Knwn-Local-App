@@ -1,6 +1,6 @@
 # Manual Testing Checklist
 
-> Bug tracking: see `docs/bugs.md`
+> Bug tracking: see `docs/master-tasklist.md` → Active Work section
 
 ## Auth & Login
 - [ ] Email/password login works
@@ -99,12 +99,13 @@
 - [ ] Click group header collapses/expands that row
 - [ ] Collapsed group shows project count in header
 - [ ] Expanded group shows all cards in that phase
-- [ ] Project cards show task number, title, client, writer, editor, design status
+- [ ] Project cards show title, client, writer, editor, design status (no task number on cards)
 - [ ] Cards show days in status and relevant due date icon
 - [ ] Drag and drop moves cards between statuses within the same row
 - [ ] Drag and drop moves cards across phase rows (cross-group)
 - [ ] Status transition validated (invalid moves rejected with error toast)
-- [ ] Click card navigates to project detail
+- [ ] Click card navigates to project detail (click, not drag)
+- [ ] Drag does NOT trigger navigation (drag guard works)
 - [ ] Filter: Pod dropdown works
 - [ ] Filter: Client dropdown works
 - [ ] Filter: Status Group dropdown works
