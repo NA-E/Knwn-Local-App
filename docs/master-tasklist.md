@@ -9,10 +9,16 @@
 
 ---
 
-## Blocked — Waiting on People
+## Blocked — Waiting on Paulo
 
-- [!] **C-2**: Populate `supervised_by` for real team members — needs mapping from Paulo/Clayton
-- [!] **I-7**: Clarify writer/senior_writer roles — needs human input from Paulo/Clayton
+> Full question list: `data-verification/questions-for-paulo.txt`
+
+- [!] **C-2**: Populate `supervised_by` for all writers and editors — needs mapping from Paulo
+- [!] **P-1**: 4 missing team member names (arthur.rubens3, giancamposm, karinadayone, milena.ortizhdz)
+- [!] **P-2**: Laura Carreno missing role and email
+- [!] **P-3**: 4 DB-only members (Austin Marks, Clayton Mclemore, Noor, Subhan) — verify if active, get real emails
+- [!] **P-4**: Import offboarded/contract_paused team members? (20 in Notion export)
+- [!] **P-5**: Import non-active clients? (47 inactive, 10 disengaged, 2 pending)
 
 ## Open Bugs
 
@@ -44,6 +50,14 @@
 > All role boards implemented. My Board page at `/projects/my-board`.
 
 Moved to archive: `docs/archive/completed-2026-04-10.md`
+
+## Data Migration — Completed (2026-04-10)
+
+- [x] Notion team members audit: matched 82 Notion rows → 55 DB members (20 new added, 9 held for Paulo)
+- [x] Migrations 019-020: virtual_assistant role, phone column, expanded status enum, 20 new team members
+- [x] Notion clients audit: 81 active/onboarding parsed, 1 new (Tucker Cummings)
+- [x] Migrations 021-022: client_health enum, brand_voice_guide_url, area_guide_url, approval_emails — 71 clients updated
+- [x] UI updated: client detail, client form, team form, team table all reflect new fields
 
 ## Module 4: Migration & Polish — Remaining
 

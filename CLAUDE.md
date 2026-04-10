@@ -155,10 +155,16 @@ Module 0 → 1 → 2 → 3 → 4. Commit after each module. See SPEC.md for deta
 
 ### Data Migration
 - Notion exports: `client database from notion/` (2 CSVs), `team members from notion/` (2 CSVs)
-- Generator script: `scripts/generate_migration.py` — reads both Notion exports, normalizes names/pods/roles, generates SQL
+- Generator scripts: `scripts/generate_migration.py` (009 original), `scripts/generate_022_client_updates.py` (client fields)
 - Review script: `scripts/review_migration_data.py` — prints 5 tables for data verification
-- 22/35 team members have real emails from Notion, 13 have `@knownlocal.com` placeholders
-- Name normalization: Mae=Mae Ariate, Anderson "Cirion" Ruan=Anderson Ruan, Juan Audiovisual=Juan Bravo, igor marques→Igor Marques
+- **CSV BOM gotcha:** Notion exports have UTF-8 BOM (`\ufeff`) on first column — use `encoding='utf-8-sig'` in Python
+- Verification folder: `data-verification/` (gitignored) — `team_members_verification.csv`, `clients_migration_data.txt`, `questions-for-paulo.txt`
+- **Migration 009:** 80 clients (74 active + 6 onboarding), 35 team members, 306 assignments, 77 channels, 40 contacts
+- **Migration 019:** Schema: `virtual_assistant` role, `phone` column, expanded `team_member_status` enum (onboarding, contract_paused, offboarded)
+- **Migration 020:** Data: 20 new team members (total now 55), 16 phone updates, ~30 pod assignments
+- **Migration 021:** Schema: `client_health` enum, 4 new columns on clients (health, brand_voice_guide_url, area_guide_url, approval_emails)
+- **Migration 022:** Data: 71 client updates (health, URLs, approval emails), Tucker Cummings insert, Ryan Meeks status updates
+- **Waiting on Paulo:** 4 missing names, 1 missing role, 4 DB-only member verification, supervised_by mapping, offboarded/paused members, non-active clients — see `data-verification/questions-for-paulo.txt`
 
 ### Railway Deployment
 - Project: `creative-comfort` → Service: `Knwn-Local-App`
