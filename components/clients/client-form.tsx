@@ -121,8 +121,6 @@ export function ClientForm({ client, pods }: ClientFormProps) {
 
       {field('website', 'Website URL', 'url')}
       {field('youtube_channel_url', 'YouTube Channel URL', 'url')}
-      {field('dropbox_upload_url', 'Dropbox Upload URL', 'url')}
-      {field('broll_library_url', 'B-Roll Library URL', 'url')}
       {field('slack_channel_url', 'Slack Channel URL', 'url')}
       {field('special_instructions', 'Special Instructions', 'text', { textarea: true })}
 
