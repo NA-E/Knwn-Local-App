@@ -5,7 +5,6 @@ import type { ProjectStatus, DesignStatus } from '@/lib/types'
 
 interface ProjectRow {
   id: string
-  task_number: string
   title: string
   status: ProjectStatus
   design_status: DesignStatus
@@ -48,7 +47,7 @@ export function ClientProjectsSection({ projects }: Props) {
           <table className="w-full">
             <thead>
               <tr className="border-b border-border bg-background">
-                {['Task ID', 'Title', 'Status', 'Writer', 'Editor', 'Design'].map((h) => (
+                {['Title', 'Status', 'Writer', 'Editor', 'Design'].map((h) => (
                   <th key={h} className="text-left px-4 py-2.5 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-muted-foreground whitespace-nowrap">{h}</th>
                 ))}
               </tr>
@@ -56,11 +55,6 @@ export function ClientProjectsSection({ projects }: Props) {
             <tbody>
               {projects.map((p) => (
                 <tr key={p.id} className="border-b border-border last:border-b-0 hover:bg-muted transition-colors">
-                  <td className="px-4 py-3">
-                    <Link href={`/projects/${p.id}`} className="text-[12px] font-mono text-muted-foreground hover:underline">
-                      {p.task_number}
-                    </Link>
-                  </td>
                   <td className="px-4 py-3 text-[13px] font-medium">
                     <Link href={`/projects/${p.id}`} className="hover:underline">{p.title}</Link>
                   </td>

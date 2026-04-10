@@ -82,10 +82,6 @@ export function ProjectDetailHeader({ project, onTitleUpdate }: ProjectDetailHea
 
           <div className="w-px h-5 bg-border shrink-0" />
 
-          <span className="font-mono text-[11px] font-normal text-brand-text-2 shrink-0">
-            {project.task_number}
-          </span>
-
           {isEditing ? (
             <input
               ref={inputRef}

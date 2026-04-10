@@ -36,7 +36,7 @@ export function StuckProjectsTable({ projects }: StuckProjectsTableProps) {
       <table className="w-full">
         <thead>
           <tr className="border-b border-border bg-background">
-            {['Task ID', 'Title', 'Client', 'Status', 'Days Stuck', 'Writer', 'Editor'].map(
+            {['Title', 'Client', 'Status', 'Days Stuck', 'Writer', 'Editor'].map(
               (h) => (
                 <th
                   key={h}
@@ -60,9 +60,6 @@ export function StuckProjectsTable({ projects }: StuckProjectsTableProps) {
                 className="border-b border-border last:border-b-0 hover:bg-[#FAFAF7] transition-colors cursor-pointer"
                 onClick={() => router.push(`/projects/${p.id}`)}
               >
-                <td className="px-4 py-3 text-[11px] font-mono text-brand-text-3">
-                  {p.task_number}
-                </td>
                 <td className="px-4 py-3 text-[13px] font-medium text-brand-text-1 max-w-[240px] truncate">
                   {p.title}
                 </td>
