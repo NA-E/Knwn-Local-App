@@ -32,9 +32,14 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
 
   const teamMembers = await getTeamMembers({ status: 'active' })
 
+  const { data: clientAssignments } = await supabase
+    .from('client_assignments')
+    .select('*, team_members ( id, first_name, last_name, role )')
+    .eq('client_id', project.client_id)
+
   return (
     <div className="-mx-10 -mt-8">
-      <ProjectDetailClient project={project} userRole={userRole} teamMembers={teamMembers} />
+      <ProjectDetailClient project={project} userRole={userRole} teamMembers={teamMembers} clientAssignments={clientAssignments ?? []} />
     </div>
   )
 }

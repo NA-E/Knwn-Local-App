@@ -2,11 +2,12 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Calendar, PenLine, Film, User, Palette, Hash } from 'lucide-react'
+import { Calendar, PenLine, Film, User, Palette, Hash, Building2 } from 'lucide-react'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
-import type { ProjectWithRelations, ProjectStatus, TeamRole, TeamMember, DesignStatus } from '@/lib/types'
+import type { ProjectWithRelations, ProjectStatus, TeamRole, TeamMember, DesignStatus, AssignmentRole, ClientAssignment } from '@/lib/types'
 import { STATUS_TRANSITIONS } from '@/lib/constants/status'
+import { ASSIGNMENT_ROLE_LABELS } from '@/lib/constants/roles'
 import { ProjectLinks } from './project-links'
 import { StatusActions } from './status-actions'
 import { updateProject, type UpdateProjectInput } from '@/lib/actions/projects'
@@ -16,7 +17,12 @@ interface ProjectSidebarProps {
   project: ProjectWithRelations
   userRole: TeamRole
   teamMembers: TeamMember[]
+  clientAssignments: (ClientAssignment & { team_members: { id: string; first_name: string; last_name: string; role: string } })[]
 }
+
+const ALL_ASSIGNMENT_ROLES: AssignmentRole[] = [
+  'strategist', 'manager', 'senior_writer', 'senior_editor', 'editor', 'designer', 'senior_designer',
+]
 
 function InfoRow({ icon: Icon, label, value }: {
   icon: React.ComponentType<{ className?: string; strokeWidth?: number }>
@@ -96,7 +102,7 @@ const DESIGN_DOT_COLOR: Record<DesignStatus, string> = {
   completed: 'bg-[#6BBF8E]',
 }
 
-export function ProjectSidebar({ project, userRole, teamMembers }: ProjectSidebarProps) {
+export function ProjectSidebar({ project, userRole, teamMembers, clientAssignments }: ProjectSidebarProps) {
   const [notes, setNotes] = useState(project.notes ?? '')
   const [savingNotes, setSavingNotes] = useState(false)
   const [scriptDue, setScriptDue] = useState<string | null>(project.script_v1_due ?? null)
@@ -349,6 +355,44 @@ export function ProjectSidebar({ project, userRole, teamMembers }: ProjectSideba
             value={actualPostDate}
             onChange={(v) => handleDateChange('actual_post_date', v)}
           />
+        </div>
+      </div>
+
+      {/* Pod & Team */}
+      <div className="bg-card border border-border rounded-[8px] p-4">
+        <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-brand-text-3 mb-3">
+          Pod & Team
+        </div>
+
+        {/* Pod display */}
+        <div className="flex items-start gap-2 py-1.5 border-b border-border mb-2 pb-2">
+          <Building2 className="size-3.5 text-brand-text-3 mt-0.5 shrink-0" strokeWidth={1.5} />
+          <div className="min-w-0">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.10em] text-brand-text-3">Pod</div>
+            <div className="text-[13px] text-brand-text-1">
+              {project.pod_name ? (
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#EDEAE2] text-[#78756C]">
+                  {project.pod_name}
+                </span>
+              ) : '—'}
+            </div>
+          </div>
+        </div>
+
+        {/* Team assignments */}
+        <div className="space-y-0.5">
+          {ALL_ASSIGNMENT_ROLES.map((role) => {
+            const assignment = clientAssignments.find(a => a.assignment_role === role)
+            const member = assignment?.team_members ?? null
+            return (
+              <div key={role} className="flex justify-between items-center text-[12.5px] py-1 border-b border-[#EDEAE2] last:border-b-0">
+                <span className="text-brand-text-3 text-[11px]">{ASSIGNMENT_ROLE_LABELS[role]}</span>
+                <span className={`text-[12px] ${member ? 'text-brand-text-1 font-medium' : 'text-brand-text-3 italic'}`}>
+                  {member ? `${member.first_name} ${member.last_name}` : '—'}
+                </span>
+              </div>
+            )
+          })}
         </div>
       </div>
 
