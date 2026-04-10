@@ -11,6 +11,7 @@ export const ROLE_LABELS: Record<TeamRole, string> = {
   editor: 'Editor',
   writer: 'Writer',
   designer: 'Designer',
+  virtual_assistant: 'Virtual Assistant',
 }
 
 export const ASSIGNMENT_ROLE_LABELS: Record<AssignmentRole, string> = {

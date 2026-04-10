@@ -1,7 +1,7 @@
 export type TeamRole =
   | 'admin' | 'strategist' | 'jr_strategist' | 'manager'
   | 'senior_editor' | 'senior_writer' | 'senior_designer'
-  | 'editor' | 'writer' | 'designer'
+  | 'editor' | 'writer' | 'designer' | 'virtual_assistant'
 
 export type ClientStatus =
   | 'template' | 'onboarding' | 'active' | 'disengaged' | 'pending' | 'inactive'
@@ -16,7 +16,7 @@ export type ProjectStatus =
 export type DesignStatus = 'not_started' | 'in_progress' | 'completed'
 export type ScriptFormat = 'word_for_word' | 'outline'
 export type CommMethod = 'slack' | 'email' | 'other'
-export type TeamMemberStatus = 'active' | 'inactive'
+export type TeamMemberStatus = 'active' | 'inactive' | 'onboarding' | 'contract_paused' | 'offboarded'
 
 export type AssignmentRole =
   | 'strategist' | 'manager' | 'editor' | 'senior_editor'
@@ -37,6 +37,7 @@ export interface TeamMember {
   email: string
   role: TeamRole
   status: TeamMemberStatus
+  phone: string | null
   supervised_by: string | null
   created_at: string
   updated_at: string

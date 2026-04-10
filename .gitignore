@@ -39,6 +39,8 @@ next-env.d.ts
 client database from notion/
 team members from notion/
 team members from notion.zip
+data export/
+data-verification/
 
 # schema dumps
 schema_dump.sql

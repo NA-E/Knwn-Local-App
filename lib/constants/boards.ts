@@ -30,6 +30,7 @@ export const BOARD_COLUMNS: Record<TeamRole, ProjectStatus[]> = {
     'edit_ready_to_send', 'edit_sent_to_client', 'client_adjustments_needed',
     'ready_to_post', 'posted_scheduled', 'cancelled',
   ],
+  virtual_assistant: [], // no board — VA role does not have pipeline access
 }
 
 /**
@@ -56,6 +57,7 @@ export const BOARD_FILTERS: Record<TeamRole, BoardFilterType> = {
   strategist: { kind: 'assignment', role: 'strategist' },
   jr_strategist: { kind: 'assignment', role: 'strategist' }, // jr_strategist uses strategist assignment slot
   admin: { kind: 'all' },
+  virtual_assistant: { kind: 'all' }, // placeholder — VA unlikely to use board
 }
 
 /** Friendly label for each role's board header */
@@ -70,4 +72,5 @@ export const BOARD_LABELS: Record<TeamRole, string> = {
   strategist: 'Strategist',
   jr_strategist: 'Jr Strategist',
   admin: 'Admin',
+  virtual_assistant: 'Virtual Assistant',
 }
