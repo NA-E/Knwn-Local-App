@@ -46,8 +46,8 @@
 
 - [x] **UI-1**: Remove Strategist column from client list table (2026-04-10)
 - [x] **UI-2**: Add a date column (contract start date) to client list (2026-04-10)
-- [ ] **UI-3**: Add column sorting (ascending/descending) for all columns in client list
-- [ ] **UI-4**: Fix column squeezing when filtering by pod — last 3 columns get compressed when market names are long
+- [x] **UI-3**: Add column sorting (ascending/descending) for all columns in client list (2026-04-10)
+- [x] **UI-4**: Fix column squeezing — fixed widths on Pod/Date/Status, truncate Market (2026-04-10)
 - [x] **UI-5**: Make pod names pill-style buttons (instead of plain badges) (2026-04-10)
 ### UI Improvements — Client Detail (lost subagent commits, re-implement)
 
@@ -72,11 +72,11 @@
 
 ### UI Improvements — Team Page (from manual testing 2026-04-10)
 
-- [ ] **UI-21**: Add search and filter functionality to team list (like client list — search by name, filter by role, pod, status)
+- [x] **UI-21**: Add search and filter functionality to team list (2026-04-10)
 
 ### UI Improvements — Pods Page (from manual testing 2026-04-10)
 
-- [ ] **UI-22**: Redesign pods page as master-detail list layout (list on left, click to open details on right — show team members and their roles)
+- [x] **UI-22**: Redesign pods page as master-detail layout with team members + roles (2026-04-10)
 
 ### UI Improvements — Project Create/Detail (from manual testing 2026-04-10)
 
@@ -92,7 +92,7 @@
 
 - [x] **UI-31**: Improve "design must be completed" error message with actionable guidance (2026-04-10)
 - [x] **UI-32**: Make ALL project detail fields editable — design_status, writer/editor dropdowns, edit_version, due dates, project links (2026-04-10)
-- [ ] **UI-33**: Add `actual_post_date` field to project detail UI and `UpdateProjectInput` server action — exists in schema but completely missing from both UI and backend.
+- [x] **UI-33**: Add `actual_post_date` field to project detail UI and server action (2026-04-10)
 
 ### Security — Server Action Role Checks (from manual testing 2026-04-10)
 
