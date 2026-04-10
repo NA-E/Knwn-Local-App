@@ -80,6 +80,7 @@ export async function createTeamMember(formData: FormData) {
       first_name,
       last_name,
       email,
+      phone: (formData.get('phone') as string) || null,
       role: role as TeamRole,
       supervised_by: (formData.get('supervised_by') as string) || null,
     })
@@ -138,6 +139,7 @@ export async function updateTeamMember(id: string, formData: FormData) {
       first_name,
       last_name,
       email,
+      phone: (formData.get('phone') as string) || null,
       role: role as TeamRole,
       supervised_by: (formData.get('supervised_by') as string) || null,
       status,

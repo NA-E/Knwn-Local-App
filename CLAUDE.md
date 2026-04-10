@@ -140,10 +140,10 @@ Module 0 → 1 → 2 → 3 → 4. Commit after each module. See SPEC.md for deta
 - Organization: **Known Local** org (transferred from NA-E's Org on 2026-04-07 to isolate from other apps, Free plan / Nano compute)
 - Region: East US (North Virginia)
 - Admin user: `admin@knownlocal.com` (linked to team_members table)
-- 18 migrations (001_schema through 018_documentation_comments)
+- 22 migrations (001_schema through 022_client_data_update)
 - 009_notion_client_data.sql: Real data from Notion — 80 clients (74 active + 6 onboarding), 35 team members, 306 assignments, 77 channels, 40 contacts. Replaced all test/seed data.
 - Realtime enabled on `onboarding_steps` table (via ALTER PUBLICATION in 007)
-- Supabase CLI migration tracking synced (all 18 migrations)
+- Supabase CLI migration tracking synced (all 22 migrations)
 - **`supabase db push` gotcha:** It wraps each migration file in its own transaction — do NOT include `BEGIN`/`COMMIT` in migration SQL files (causes nested transaction issues)
 
 ### Meeting Transcripts & Process Maps

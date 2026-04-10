@@ -100,6 +100,10 @@ export async function createClientAction(formData: FormData) {
     script_format: formData.get('script_format') || null,
     communication_method: formData.get('communication_method') || null,
     special_instructions: formData.get('special_instructions') || null,
+    health: formData.get('health') || null,
+    brand_voice_guide_url: formData.get('brand_voice_guide_url') || null,
+    area_guide_url: formData.get('area_guide_url') || null,
+    approval_emails: formData.get('approval_emails') || null,
   }
 
   const { data, error } = await supabase.from('clients').insert(fields).select().single()
@@ -159,6 +163,10 @@ export async function updateClientAction(id: string, formData: FormData) {
     script_format: formData.get('script_format') || null,
     communication_method: formData.get('communication_method') || null,
     special_instructions: formData.get('special_instructions') || null,
+    health: formData.get('health') || null,
+    brand_voice_guide_url: formData.get('brand_voice_guide_url') || null,
+    area_guide_url: formData.get('area_guide_url') || null,
+    approval_emails: formData.get('approval_emails') || null,
   }
 
   const { error } = await supabase.from('clients').update(fields).eq('id', id)

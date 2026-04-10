@@ -180,6 +180,16 @@ export function ClientForm({ client, pods, podTeamDefaults, teamMembers, initial
         <div className="bg-card border border-border rounded-[10px] p-5">
           <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A59D] mb-3">Client Info</div>
           <div className="space-y-3">
+            <div>
+              <Label htmlFor="health" className="text-xs font-medium text-muted-foreground">Health</Label>
+              <select id="health" name="health" defaultValue={client?.health ?? ''}
+                className="mt-1.5 w-full px-3 py-2 border border-border rounded-md text-sm bg-card">
+                <option value="">—</option>
+                <option value="on_track">On Track</option>
+                <option value="at_risk">At Risk</option>
+                <option value="off_track">Off Track</option>
+              </select>
+            </div>
             {field('package', 'Package')}
             {field('contract_start_date', 'Contract Start', 'date')}
             {field('posting_schedule', 'Posting Schedule')}
@@ -202,6 +212,7 @@ export function ClientForm({ client, pods, podTeamDefaults, teamMembers, initial
                 <option value="other">Other</option>
               </select>
             </div>
+            {field('approval_emails', 'Approval Emails')}
             {field('special_instructions', 'Special Notes', 'text', { textarea: true })}
           </div>
         </div>
@@ -219,6 +230,8 @@ export function ClientForm({ client, pods, podTeamDefaults, teamMembers, initial
           <div className="bg-card border border-border rounded-[10px] p-5">
             <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A59D] mb-3">Links</div>
             <div className="space-y-3">
+              {field('brand_voice_guide_url', 'Brand Voice Guide', 'url')}
+              {field('area_guide_url', 'Area Guide', 'url')}
               {field('website', 'Website', 'url')}
               {field('youtube_channel_url', 'YouTube Channel', 'url')}
               {field('slack_channel_url', 'Slack Channel', 'url')}

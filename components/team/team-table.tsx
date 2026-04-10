@@ -91,6 +91,9 @@ export function TeamTable({ members, pods }: TeamTableProps) {
           <option value="">All Statuses</option>
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
+          <option value="onboarding">Onboarding</option>
+          <option value="contract_paused">Contract Paused</option>
+          <option value="offboarded">Offboarded</option>
         </select>
       </div>
 

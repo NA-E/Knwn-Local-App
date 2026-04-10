@@ -57,6 +57,11 @@ export function TeamMemberForm({ member, pods, supervisors }: TeamMemberFormProp
       </div>
 
       <div>
+        <Label htmlFor="phone">Phone</Label>
+        <Input id="phone" name="phone" type="tel" defaultValue={member?.phone ?? ''} className="mt-1.5" />
+      </div>
+
+      <div>
         <Label htmlFor="role">Role</Label>
         <select id="role" name="role" defaultValue={member?.role ?? 'writer'} required
           className="mt-1.5 w-full px-3 py-2 border border-border rounded-md text-sm bg-card">
@@ -73,6 +78,9 @@ export function TeamMemberForm({ member, pods, supervisors }: TeamMemberFormProp
             className="mt-1.5 w-full px-3 py-2 border border-border rounded-md text-sm bg-card">
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
+            <option value="onboarding">Onboarding</option>
+            <option value="contract_paused">Contract Paused</option>
+            <option value="offboarded">Offboarded</option>
           </select>
         </div>
       )}
