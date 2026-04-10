@@ -40,8 +40,9 @@
 - [ ] Back link to /clients works
 - [ ] Client name, status badge, pod badge, market display correctly
 - [ ] Edit button navigates to edit page
-- [ ] **Client Info section**: Market, Website, Timezone, Package, Contract Start, Posting Schedule, Script Format, Communication, Dropbox Folder, Slack Channel — all show correct data
-- [ ] Special Notes display when present
+- [ ] **Client Info section**: Health badge (color-coded), Package, Contract Start, Posting Schedule, Script Format, Communication, Approval Emails, Special Notes — all show correct data
+- [ ] **Links section**: Brand Voice Guide, Area Guide, Dropbox, Slack Channel, Website — "Open" links work
+- [ ] Health badge shows correct color: green (On Track), amber (At Risk), red (Off Track), dash if unset
 - [ ] **Team section**: All assignment roles shown, click to change works
 - [ ] **YouTube Channels section**: Channel name, URL link, videos/wk shown
 - [ ] Add/Edit/Remove channel works
@@ -52,7 +53,7 @@
 - [ ] **Onboarding Status section**: Shows step statuses for onboarding clients
 
 ## Client Create (/clients/new)
-- [ ] All form fields render
+- [ ] All form fields render (including Health dropdown, Approval Emails, Brand Voice Guide URL, Area Guide URL)
 - [ ] Pod cards show with client counts and capacity bars
 - [ ] Selecting a pod auto-assigns Strategist + Manager
 - [ ] Role dropdowns filter to pod members
@@ -61,7 +62,8 @@
 - [ ] Onboarding modal appears with realtime step updates
 
 ## Client Edit (/clients/[id]/edit)
-- [ ] All form fields pre-populated with existing data
+- [ ] All form fields pre-populated with existing data (health, approval emails, brand voice guide URL, area guide URL)
+- [ ] Health dropdown shows current value
 - [ ] Pod cards show with current pod selected (blue border)
 - [ ] Existing team assignments pre-populated in dropdowns
 - [ ] Changing pod re-fetches members and auto-assigns
@@ -70,8 +72,9 @@
 
 ## Team Management (/team) — Admin Only
 - [ ] Team list shows all members with role, pod, status
-- [ ] Add team member form works (admin only)
-- [ ] Edit team member works (admin only)
+- [ ] Status filter includes: Active, Inactive, Onboarding, Contract Paused, Offboarded
+- [ ] Add team member form works (admin only) — includes phone field
+- [ ] Edit team member works (admin only) — phone field pre-populated, all 5 statuses in dropdown
 - [ ] Non-admin blocked by server action even if URL accessed directly
 
 ## Pods Management (/pods) — Admin Only
