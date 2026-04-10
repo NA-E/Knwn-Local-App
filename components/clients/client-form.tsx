@@ -92,7 +92,7 @@ export function ClientForm({ client, pods }: ClientFormProps) {
 
       <div className="grid grid-cols-2 gap-4">
         {field('package', 'Package')}
-        {field('contract_start_date', 'Contract Start Date', 'date')}
+        {field('contract_start_date', 'Contract Start', 'date')}
       </div>
 
       {field('posting_schedule', 'Posting Schedule')}
@@ -119,10 +119,10 @@ export function ClientForm({ client, pods }: ClientFormProps) {
         </div>
       </div>
 
-      {field('website', 'Website URL', 'url')}
-      {field('youtube_channel_url', 'YouTube Channel URL', 'url')}
-      {field('slack_channel_url', 'Slack Channel URL', 'url')}
-      {field('special_instructions', 'Special Instructions', 'text', { textarea: true })}
+      {field('website', 'Website', 'url')}
+      {field('youtube_channel_url', 'YouTube Channel', 'url')}
+      {field('slack_channel_url', 'Slack Channel', 'url')}
+      {field('special_instructions', 'Special Notes', 'text', { textarea: true })}
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 
