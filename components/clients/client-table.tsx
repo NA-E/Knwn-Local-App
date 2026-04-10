@@ -28,7 +28,7 @@ export function ClientTable({ clients }: ClientTableProps) {
       <table className="w-full">
         <thead>
           <tr className="border-b border-border bg-background">
-            {['Client', 'Market', 'Pod', 'Status'].map((h) => (
+            {['Client', 'Market', 'Pod', 'Contract Start', 'Status'].map((h) => (
               <th key={h} className="text-left px-4 py-2.5 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-muted-foreground whitespace-nowrap">{h}</th>
             ))}
           </tr>
@@ -47,6 +47,11 @@ export function ClientTable({ clients }: ClientTableProps) {
                     {c.pods.name}
                   </span>
                 ) : '—'}
+              </td>
+              <td className="px-4 py-3 text-[13px] text-muted-foreground">
+                {c.contract_start_date
+                  ? new Date(c.contract_start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                  : '—'}
               </td>
               <td className="px-4 py-3">
                 <Badge className={`text-[11px] font-medium ${statusBadgeClass(c.status)}`}>{c.status}</Badge>
