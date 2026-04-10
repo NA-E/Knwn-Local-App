@@ -8,18 +8,28 @@ import { Label } from '@/components/ui/label'
 import { createClientAction, updateClientAction } from '@/lib/actions/clients'
 import { CLIENT_STATUS_LABELS } from '@/lib/constants/status'
 import { OnboardingModal } from '@/components/clients/onboarding-modal'
-import type { Pod } from '@/lib/types'
+import { upsertAssignment } from '@/lib/actions/client-assignments'
+import { ASSIGNMENT_ROLE_LABELS, ASSIGNMENT_ROLE_ELIGIBLE_TEAM_ROLES } from '@/lib/constants/roles'
+import type { AssignmentRole, TeamRole } from '@/lib/types'
 
 interface ClientFormProps {
   client?: any
-  pods: Pod[]
+  pods: { id: string; name: string }[]
+  podTeamDefaults?: Record<string, { strategistId: string | null; managerId: string | null }>
+  teamMembers?: { id: string; first_name: string; last_name: string; role: string }[]
+  initialAssignments?: Record<string, string>
 }
 
-export function ClientForm({ client, pods }: ClientFormProps) {
+const FORM_ASSIGNMENT_ROLES: AssignmentRole[] = [
+  'strategist', 'manager', 'senior_editor', 'editor', 'designer', 'senior_designer', 'senior_writer',
+]
+
+export function ClientForm({ client, pods, podTeamDefaults, teamMembers, initialAssignments }: ClientFormProps) {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [onboardingClientId, setOnboardingClientId] = useState<string | null>(null)
   const [onboardingClientName, setOnboardingClientName] = useState<string | null>(null)
+  const [assignments, setAssignments] = useState<Record<string, string>>(initialAssignments ?? {})
   const isEdit = !!client
 
   async function handleSubmit(formData: FormData) {
@@ -27,10 +37,34 @@ export function ClientForm({ client, pods }: ClientFormProps) {
     if (isEdit) {
       const result = await updateClientAction(client.id, formData)
       if (result?.error) { setError(result.error); return }
+
+      // Save team assignments
+      const assignmentErrors: string[] = []
+      for (const [role, memberId] of Object.entries(assignments)) {
+        const res = await upsertAssignment(client.id, role as AssignmentRole, memberId || null)
+        if (res.error) assignmentErrors.push(`${role}: ${res.error}`)
+      }
+      if (assignmentErrors.length) {
+        setError(`Client saved but team assignment errors: ${assignmentErrors.join(', ')}`)
+        return
+      }
+
       router.push(`/clients/${client.id}`)
     } else {
       const result = await createClientAction(formData)
       if (result?.error) { setError(result.error); return }
+
+      // Save team assignments
+      const assignmentErrors: string[] = []
+      for (const [role, memberId] of Object.entries(assignments)) {
+        if (memberId) {
+          const res = await upsertAssignment(result.id!, role as AssignmentRole, memberId)
+          if (res.error) assignmentErrors.push(`${role}: ${res.error}`)
+        }
+      }
+      if (assignmentErrors.length) {
+        setError(`Client created but team assignment errors: ${assignmentErrors.join(', ')}`)
+      }
 
       // Open onboarding modal and fire off onboarding
       const clientName = (formData.get('name') as string) ?? ''
@@ -70,6 +104,25 @@ export function ClientForm({ client, pods }: ClientFormProps) {
           <div>
             <Label htmlFor="pod_id" className="text-xs font-medium text-muted-foreground">Pod</Label>
             <select id="pod_id" name="pod_id" defaultValue={client?.pod_id ?? ''}
+              onChange={(e) => {
+                const podId = e.target.value
+                if (podId && podTeamDefaults?.[podId]) {
+                  const defaults = podTeamDefaults[podId]
+                  setAssignments(prev => ({
+                    ...prev,
+                    ...(defaults.strategistId ? { strategist: defaults.strategistId } : {}),
+                    ...(defaults.managerId ? { manager: defaults.managerId } : {}),
+                  }))
+                } else {
+                  // Clear auto-populated strategist/manager when pod is removed
+                  setAssignments(prev => {
+                    const next = { ...prev }
+                    delete next.strategist
+                    delete next.manager
+                    return next
+                  })
+                }
+              }}
               className="mt-1.5 w-full px-3 py-2 border border-border rounded-md text-sm bg-card">
               <option value="">No pod</option>
               {pods.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -139,6 +192,35 @@ export function ClientForm({ client, pods }: ClientFormProps) {
           </div>
         </div>
       </div>
+
+      {/* Team Assignment section */}
+      {teamMembers && teamMembers.length > 0 && (
+        <div className="bg-card border border-border rounded-[10px] p-5">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A59D] mb-3">Team</div>
+          <div className="grid grid-cols-2 gap-3">
+            {FORM_ASSIGNMENT_ROLES.map((role) => {
+              const eligible = teamMembers.filter(tm =>
+                ASSIGNMENT_ROLE_ELIGIBLE_TEAM_ROLES[role].includes(tm.role as TeamRole)
+              )
+              return (
+                <div key={role}>
+                  <Label className="text-xs font-medium text-muted-foreground">{ASSIGNMENT_ROLE_LABELS[role]}</Label>
+                  <select
+                    value={assignments[role] ?? ''}
+                    onChange={(e) => setAssignments(prev => ({ ...prev, [role]: e.target.value }))}
+                    className="mt-1 w-full px-3 py-2 border border-border rounded-md text-sm bg-card"
+                  >
+                    <option value="">— Unassigned —</option>
+                    {eligible.map(tm => (
+                      <option key={tm.id} value={tm.id}>{tm.first_name} {tm.last_name}</option>
+                    ))}
+                  </select>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 
