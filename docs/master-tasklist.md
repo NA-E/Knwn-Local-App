@@ -56,14 +56,14 @@
 - [x] **UI-8**: Remove B-Roll Library link (2026-04-10)
 - [x] **UI-9**: Dropbox link should open client's specific Dropbox folder — already functional via dropbox_upload_url (2026-04-10)
 - [x] **UI-10**: Add File Upload Link under client portal section, renamed to "Client Access" (2026-04-10)
-- [ ] **UI-11**: Client edit view should mirror the read-only detail view (same fields/layout)
-- [ ] **UI-12**: Team assignment — pod selection should auto-add strategist and manager
+- [x] **UI-11**: Client edit form restructured to 2-column card layout mirroring detail view (2026-04-10)
+- [x] **UI-12**: Team assignment — pod selection auto-adds strategist and manager (2026-04-10)
 - [x] **UI-16**: Remove click-to-reassign on team section in client detail (2026-04-10)
 
 ### UI Improvements — Client Create/Edit (from manual testing 2026-04-10)
 
-- [ ] **UI-17**: Client create form — add pod cards with client counts and capacity bars (instead of plain dropdown)
-- [ ] **UI-18**: Client create form — add team assignment section (strategist, manager, etc.) with auto-assign on pod select
+- [x] **UI-17**: Client create form — pod cards with client counts and capacity bars (2026-04-10)
+- [x] **UI-18**: Client create form — team assignment section with 7 role dropdowns + auto-assign on pod select (2026-04-10)
 - [x] **UI-19**: Client create/edit forms — remove Dropbox Upload URL and B-Roll Library URL fields (2026-04-10)
 - [x] **UI-13**: Field names must be consistent between read-only and edit views — 5 client form labels aligned (2026-04-10)
 - [x] **UI-20**: Generate portal links for all existing clients — Migration 016 applied (2026-04-10)
@@ -80,10 +80,10 @@
 
 ### UI Improvements — Project Create/Detail (from manual testing 2026-04-10)
 
-- [ ] **UI-25**: Project create form — add pod selection that auto-populates manager, strategist, and other roles
-- [ ] **UI-26**: Projects should inherit the full team from the client's assignments on creation (strategist, manager, designer, senior editor, senior writer, etc.). Show all inherited roles on both project create and project detail — not just writer/editor.
+- [x] **UI-25**: Project create form — shows pod + inherited team from client assignments (2026-04-10)
+- [x] **UI-26**: Project create shows inherited team from client assignments, auto-populates editor (2026-04-10)
 - [x] **UI-27**: Remove KN-##### task number from everywhere (2026-04-10)
-- [ ] **UI-30**: Project detail sidebar — add pod display and full team section showing all roles from the client's assignments
+- [x] **UI-30**: Project detail sidebar — pod pill + full team section with all assignment roles (2026-04-10)
 - [x] **UI-28**: Validation errors on project create — mounted Sonner Toaster (2026-04-10)
 - [x] **UI-29**: Make Script Due, Edit Due, and Publish Due dates editable (2026-04-10)
 - [x] **BUG-W1**: Writer dropdown on project create — broadened role filter to writer/senior_writer/admin (matches detail sidebar). Data issue remains (no role='writer' in Notion migration; blocked on I-7) (2026-04-10)
@@ -166,25 +166,25 @@
 - [x] **C-1:** Drop duplicate `updated_at` triggers — Migration 015 (2026-04-10)
 - [!] **C-2:** Populate `supervised_by` for real team members — **BLOCKED: needs mapping from Paulo/Clayton**
 - [x] **C-3:** Add `ON DELETE SET NULL` to `projects.writer_id` and `projects.editor_id` FKs — Migration 015
-- [ ] **C-4:** Document soft-delete convention (team members should never be hard-deleted)
+- [x] **C-4:** Document soft-delete convention — SQL COMMENT on team_members table, Migration 018 (2026-04-10)
 
 ### Important
 - [x] **I-1:** `projects_update` RLS tightened — role-based update policies in Migration 010
-- [ ] **I-2:** Document no-delete policy for clients (intentional soft-delete only)
-- [ ] **I-3:** Verify `client_contacts.is_primary`/`is_assistant` NOT NULL in live DB (dump may be inaccurate)
-- [ ] **I-4:** Verify `videos_per_week` precision `NUMERIC(4,1)` in live DB
-- [ ] **I-5:** (Optional) Add explicit index on `onboarding_steps.client_id` for consistency
+- [x] **I-2:** Document no-delete policy — SQL COMMENT on clients table, Migration 018 (2026-04-10)
+- [x] **I-3:** Re-asserted NOT NULL on client_contacts booleans — Migration 017 (2026-04-10)
+- [x] **I-4:** Re-asserted NUMERIC(4,1) on videos_per_week — Migration 017 (2026-04-10)
+- [x] **I-5:** Added index on onboarding_steps.client_id — Migration 017 (2026-04-10)
 - [x] **I-6:** Add partial unique index preventing multiple primary pods per member — Migration 015
 - [!] **I-7:** Clarify writer/senior_writer roles with Paulo/Clayton — **BLOCKED: needs human input**
 
 ### Suggestions (do during Module 2)
 - [x] **S-1:** Add composite index `(client_id, status)` on projects for Kanban queries — Migration 015
 - [x] **S-2:** CHECK constraint on `task_number` format (`^KN-\d{5}$`) — Migration 015
-- [ ] **S-3:** Reset `project_task_seq` after any project data import
-- [ ] **S-4:** Document `senior_writer` in `assignment_role` as display-only
+- [x] **S-3:** Reset project_task_seq to max existing value — Migration 017 (2026-04-10)
+- [x] **S-4:** Document senior_writer as display-only — SQL COMMENT, Migration 018 (2026-04-10)
 - [x] **S-5:** Pod name length constraint — Migration 015
-- [ ] **S-6:** Column comments for `assignment_role` vs `role` distinction
-- [ ] **S-7:** Document `onboarding_steps` update-via-service-role pattern
+- [x] **S-6:** Column comments for assignment_role vs role distinction — Migration 018 (2026-04-10)
+- [x] **S-7:** Document onboarding_steps service-role pattern — Migration 018 (2026-04-10)
 
 ## Auth: Google OAuth — COMPLETE
 > Code implemented 2026-04-06. Config + testing completed 2026-04-07.
@@ -275,4 +275,4 @@
 
 ---
 
-*Last updated: 2026-04-10*
+*Last updated: 2026-04-10 (session 2: UI-9–13, UI-17/18/20/25/26/30, BUG-W1, I-2–5, C-4, S-3/4/6/7)*
