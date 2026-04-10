@@ -9,18 +9,12 @@ import type { ProjectWithRelations, ProjectStatus, TeamRole } from '@/lib/types'
 import { STATUS_TRANSITIONS } from '@/lib/constants/status'
 import { ProjectLinks } from './project-links'
 import { StatusActions } from './status-actions'
-import { updateProject } from '@/lib/actions/projects'
+import { updateProject, type UpdateProjectInput } from '@/lib/actions/projects'
 import { transitionProjectStatus, type TransitionMetadata } from '@/lib/actions/project-transitions'
 
 interface ProjectSidebarProps {
   project: ProjectWithRelations
   userRole: TeamRole
-}
-
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return '\u2014'
-  const d = new Date(dateStr + 'T00:00:00')
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
 function InfoRow({ icon: Icon, label, value }: {
@@ -43,9 +37,58 @@ function InfoRow({ icon: Icon, label, value }: {
   )
 }
 
+function DateRow({ icon: Icon, label, value, onChange }: {
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>
+  label: string
+  value: string | null
+  onChange: (isoDate: string | null) => Promise<void>
+}) {
+  const [saving, setSaving] = useState(false)
+
+  async function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = e.target.value // 'YYYY-MM-DD' or '' when cleared
+    setSaving(true)
+    await onChange(val || null)
+    setSaving(false)
+  }
+
+  const displayValue = value
+    ? new Date(value + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    : null
+
+  return (
+    <div className="flex items-start gap-2 py-1.5">
+      <Icon className="size-3.5 text-brand-text-3 mt-0.5 shrink-0" strokeWidth={1.5} />
+      <div className="min-w-0 flex-1">
+        <div className="text-[10px] font-semibold uppercase tracking-[0.10em] text-brand-text-3">
+          {label}
+        </div>
+        <div className="relative flex items-center">
+          {/* visible formatted date or placeholder */}
+          <span className={`text-[13px] ${displayValue ? 'text-brand-text-1' : 'text-brand-text-3'} pointer-events-none select-none`}>
+            {saving ? 'Saving…' : (displayValue ?? 'Set date')}
+          </span>
+          {/* invisible native date input overlaid for interaction */}
+          <input
+            type="date"
+            value={value ?? ''}
+            onChange={handleChange}
+            disabled={saving}
+            className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-default"
+            aria-label={label}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function ProjectSidebar({ project, userRole }: ProjectSidebarProps) {
   const [notes, setNotes] = useState(project.notes ?? '')
   const [savingNotes, setSavingNotes] = useState(false)
+  const [scriptDue, setScriptDue] = useState<string | null>(project.script_v1_due ?? null)
+  const [editDue, setEditDue] = useState<string | null>(project.edit_due ?? null)
+  const [publishDue, setPublishDue] = useState<string | null>(project.publish_due ?? null)
 
   const currentStatus = project.status as ProjectStatus
   const allTransitions = STATUS_TRANSITIONS[currentStatus] ?? []
@@ -68,6 +111,18 @@ export function ProjectSidebar({ project, userRole }: ProjectSidebarProps) {
       toast.success('Status updated')
     }
     return { error: result.error }
+  }
+
+  async function handleDateChange(field: 'script_v1_due' | 'edit_due' | 'publish_due', value: string | null) {
+    const result = await updateProject(project.id, { [field]: value } as UpdateProjectInput)
+    if (result.error) {
+      toast.error(result.error)
+    } else {
+      if (field === 'script_v1_due') setScriptDue(value)
+      if (field === 'edit_due') setEditDue(value)
+      if (field === 'publish_due') setPublishDue(value)
+      toast.success('Date updated')
+    }
   }
 
   async function handleSaveNotes() {
@@ -98,9 +153,24 @@ export function ProjectSidebar({ project, userRole }: ProjectSidebarProps) {
           <InfoRow icon={User} label="Client" value={project.client_name} />
           <InfoRow icon={PenLine} label="Writer" value={project.writer_name} />
           <InfoRow icon={Film} label="Editor" value={project.editor_name} />
-          <InfoRow icon={Calendar} label="Script Due" value={formatDate(project.script_v1_due)} />
-          <InfoRow icon={Calendar} label="Edit Due" value={formatDate(project.edit_due)} />
-          <InfoRow icon={Calendar} label="Publish Due" value={formatDate(project.publish_due)} />
+          <DateRow
+            icon={Calendar}
+            label="Script Due"
+            value={scriptDue}
+            onChange={(v) => handleDateChange('script_v1_due', v)}
+          />
+          <DateRow
+            icon={Calendar}
+            label="Edit Due"
+            value={editDue}
+            onChange={(v) => handleDateChange('edit_due', v)}
+          />
+          <DateRow
+            icon={Calendar}
+            label="Publish Due"
+            value={publishDue}
+            onChange={(v) => handleDateChange('publish_due', v)}
+          />
         </div>
       </div>
 
