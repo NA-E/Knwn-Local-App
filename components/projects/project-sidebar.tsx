@@ -102,6 +102,7 @@ export function ProjectSidebar({ project, userRole, teamMembers }: ProjectSideba
   const [scriptDue, setScriptDue] = useState<string | null>(project.script_v1_due ?? null)
   const [editDue, setEditDue] = useState<string | null>(project.edit_due ?? null)
   const [publishDue, setPublishDue] = useState<string | null>(project.publish_due ?? null)
+  const [actualPostDate, setActualPostDate] = useState<string | null>(project.actual_post_date ?? null)
   const [designStatus, setDesignStatus] = useState<DesignStatus>(project.design_status)
   const [writerId, setWriterId] = useState<string | null>(project.writer_id ?? null)
   const [editorId, setEditorId] = useState<string | null>(project.editor_id ?? null)
@@ -130,7 +131,7 @@ export function ProjectSidebar({ project, userRole, teamMembers }: ProjectSideba
     return { error: result.error }
   }
 
-  async function handleDateChange(field: 'script_v1_due' | 'edit_due' | 'publish_due', value: string | null) {
+  async function handleDateChange(field: 'script_v1_due' | 'edit_due' | 'publish_due' | 'actual_post_date', value: string | null) {
     const result = await updateProject(project.id, { [field]: value } as UpdateProjectInput)
     if (result.error) {
       toast.error(result.error)
@@ -138,6 +139,7 @@ export function ProjectSidebar({ project, userRole, teamMembers }: ProjectSideba
       if (field === 'script_v1_due') setScriptDue(value)
       if (field === 'edit_due') setEditDue(value)
       if (field === 'publish_due') setPublishDue(value)
+      if (field === 'actual_post_date') setActualPostDate(value)
       toast.success('Date updated')
     }
   }
@@ -340,6 +342,12 @@ export function ProjectSidebar({ project, userRole, teamMembers }: ProjectSideba
             label="Publish Due"
             value={publishDue}
             onChange={(v) => handleDateChange('publish_due', v)}
+          />
+          <DateRow
+            icon={Calendar}
+            label="Post Date"
+            value={actualPostDate}
+            onChange={(v) => handleDateChange('actual_post_date', v)}
           />
         </div>
       </div>

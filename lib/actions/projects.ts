@@ -140,6 +140,7 @@ export interface UpdateProjectInput {
   script_v1_due?: string | null
   edit_due?: string | null
   publish_due?: string | null
+  actual_post_date?: string | null
   script_url?: string | null
   edit_url?: string | null
   thumbnail_url?: string | null
