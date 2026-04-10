@@ -10,12 +10,6 @@ interface ClientTableProps {
 
 export function ClientTable({ clients }: ClientTableProps) {
   const router = useRouter()
-  function getStrategist(client: any) {
-    const assignment = client.client_assignments?.find((a: any) => a.assignment_role === 'strategist')
-    if (!assignment?.team_members) return '—'
-    return `${assignment.team_members.first_name} ${assignment.team_members.last_name}`
-  }
-
   function getVideosPerWeek(client: any) {
     if (!client.client_channels?.length) return '—'
     return client.client_channels.reduce((sum: number, ch: any) => sum + Number(ch.videos_per_week), 0)
@@ -34,7 +28,7 @@ export function ClientTable({ clients }: ClientTableProps) {
       <table className="w-full">
         <thead>
           <tr className="border-b border-border bg-background">
-            {['Client', 'Market', 'Pod', 'Status', 'Strategist'].map((h) => (
+            {['Client', 'Market', 'Pod', 'Status'].map((h) => (
               <th key={h} className="text-left px-4 py-2.5 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-muted-foreground whitespace-nowrap">{h}</th>
             ))}
           </tr>
@@ -57,7 +51,6 @@ export function ClientTable({ clients }: ClientTableProps) {
               <td className="px-4 py-3">
                 <Badge className={`text-[11px] font-medium ${statusBadgeClass(c.status)}`}>{c.status}</Badge>
               </td>
-              <td className="px-4 py-3 text-[13px] text-muted-foreground">{getStrategist(c)}</td>
             </tr>
           ))}
         </tbody>
