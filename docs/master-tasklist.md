@@ -18,10 +18,10 @@
 
 - [ ] **BUG-C1**: Non-admin role access not tested (only admin account available). Sidebar section hiding, server action blocks, RLS enforcement unverified on production.
 
-## Questions — Need Answer
+## Questions — Resolved
 
-- [ ] **Q-1**: Dashboard "Projects by Stage" bar chart — what is it communicating? Might belong in KPI dashboard (phase 2).
-- [ ] **Q-2**: If we show percentages on the chart, percentages of what? Probably belongs in KPI/stage-phase analytics.
+- [x] **Q-1**: Dashboard bar chart shows pipeline bottleneck detection — stronger colors + tooltip added (2026-04-10)
+- [x] **Q-2**: Chart shows counts not percentages — no ambiguity. Percentages deferred to KPI dashboard (phase 2) (2026-04-10)
 
 ## Pre-Module 2: Outstanding Items
 
