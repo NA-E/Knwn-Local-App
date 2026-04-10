@@ -44,31 +44,31 @@
 
 ### UI Improvements — Client List (from manual testing 2026-04-10)
 
-- [ ] **UI-1**: Remove Strategist column from client list table
-- [ ] **UI-2**: Add a date column (e.g. client onboarding/contract start date) to client list
+- [x] **UI-1**: Remove Strategist column from client list table (2026-04-10)
+- [x] **UI-2**: Add a date column (contract start date) to client list (2026-04-10)
 - [ ] **UI-3**: Add column sorting (ascending/descending) for all columns in client list
-- [ ] **UI-4**: Fix column squeezing when filtering by pod — last 3 columns (POD, STATUS, STRATEGIST) get compressed when market names are long
-- [ ] **UI-5**: Make pod names pill-style buttons (instead of plain badges)
+- [ ] **UI-4**: Fix column squeezing when filtering by pod — last 3 columns get compressed when market names are long
+- [x] **UI-5**: Make pod names pill-style buttons (instead of plain badges) (2026-04-10)
 ### UI Improvements — Client Detail (lost subagent commits, re-implement)
 
-- [ ] **UI-6**: Rename "Channels" → "YouTube Channels", move YouTube link into that section
-- [ ] **UI-7**: Format Special Notes with whitespace/multiline support (currently renders inline)
-- [ ] **UI-8**: Remove B-Roll Library link
+- [x] **UI-6**: Rename "Channels" → "YouTube Channels", move YouTube link into that section (2026-04-10)
+- [x] **UI-7**: Format Special Notes with whitespace/multiline support (2026-04-10)
+- [x] **UI-8**: Remove B-Roll Library link (2026-04-10)
 - [ ] **UI-9**: Dropbox link should open client's specific Dropbox folder (keep it functional)
 - [ ] **UI-10**: Add File Upload Link under client portal section, rename that section appropriately
 - [ ] **UI-11**: Client edit view should mirror the read-only detail view (same fields/layout)
 - [ ] **UI-12**: Team assignment — pod selection should auto-add strategist and manager
-- [ ] **UI-16**: Remove click-to-reassign on team section in client detail (bad UX). Team changes should only happen through the edit page.
+- [x] **UI-16**: Remove click-to-reassign on team section in client detail (2026-04-10)
 
 ### UI Improvements — Client Create/Edit (from manual testing 2026-04-10)
 
 - [ ] **UI-17**: Client create form — add pod cards with client counts and capacity bars (instead of plain dropdown)
 - [ ] **UI-18**: Client create form — add team assignment section (strategist, manager, etc.) with auto-assign on pod select
-- [ ] **UI-19**: Client create/edit forms — remove Dropbox Upload URL and B-Roll Library URL fields
+- [x] **UI-19**: Client create/edit forms — remove Dropbox Upload URL and B-Roll Library URL fields (2026-04-10)
 - [ ] **UI-13**: Field names must be consistent between read-only and edit views across the whole app
 - [ ] **UI-20**: Generate portal links for all existing clients (not generated during Notion migration)
-- [ ] **UI-14**: Remove "Regenerate link" from portal section — make portal links permanent (no expiry)
-- [ ] **UI-15**: Contacts section formatting — email is the primary display; if name exists, show it above email
+- [x] **UI-14**: Remove "Regenerate link" from portal section — make portal links permanent (2026-04-10)
+- [x] **UI-15**: Contacts section formatting — email primary, name above, assistant badge (2026-04-10)
 
 ### UI Improvements — Team Page (from manual testing 2026-04-10)
 
@@ -82,27 +82,27 @@
 
 - [ ] **UI-25**: Project create form — add pod selection that auto-populates manager, strategist, and other roles
 - [ ] **UI-26**: Projects should inherit the full team from the client's assignments on creation (strategist, manager, designer, senior editor, senior writer, etc.). Show all inherited roles on both project create and project detail — not just writer/editor.
-- [ ] **UI-27**: Remove KN-##### task number from everywhere (project detail header, activity log, any remaining places)
+- [x] **UI-27**: Remove KN-##### task number from everywhere (2026-04-10)
 - [ ] **UI-30**: Project detail sidebar — add pod display and full team section showing all roles from the client's assignments
-- [ ] **UI-28**: Validation errors on project create should show visible feedback (toast or inline error) — currently fails silently
-- [ ] **UI-29**: Make Script Due, Edit Due, and Publish Due dates editable (inline date picker on project detail sidebar and/or fields on project create form)
+- [x] **UI-28**: Validation errors on project create — mounted Sonner Toaster (2026-04-10)
+- [x] **UI-29**: Make Script Due, Edit Due, and Publish Due dates editable (2026-04-10)
 - [ ] **BUG-W1**: Writer dropdown on project create is empty — no team members with `role = 'writer'` exist in DB. Verify if this is a data/migration issue or role mapping problem.
 
 ### UI Improvements — Pipeline (from manual testing 2026-04-10)
 
-- [ ] **UI-31**: Improve "design must be completed" error message — tell user HOW to fix it (e.g. "Go to project detail and mark Design Status as Completed first")
-- [ ] **UI-32**: Make ALL project detail fields editable — currently only title and notes can be edited. The following fields have backend support (`updateProject`) but no edit UI: `script_v1_due`, `edit_due`, `publish_due`, `script_url`, `edit_url`, `thumbnail_url`, `edit_version`, `design_status`, `writer_id`, `editor_id`. Add inline edit controls (date pickers, dropdowns, text inputs) for each.
+- [x] **UI-31**: Improve "design must be completed" error message with actionable guidance (2026-04-10)
+- [x] **UI-32**: Make ALL project detail fields editable — design_status, writer/editor dropdowns, edit_version, due dates, project links (2026-04-10)
 - [ ] **UI-33**: Add `actual_post_date` field to project detail UI and `UpdateProjectInput` server action — exists in schema but completely missing from both UI and backend.
 
 ### Security — Server Action Role Checks (from manual testing 2026-04-10)
 
-- [ ] **SEC-1**: `lib/actions/team-members.ts` — create/update missing admin role check. Any authenticated user can create/update team members.
-- [ ] **SEC-2**: `lib/actions/pods.ts` — create/update missing admin role check. Any authenticated user can create/update pods.
-- [ ] **SEC-3**: `lib/actions/clients.ts` — create/update missing role check. Should require admin/strategist/jr_strategist.
+- [x] **SEC-1**: `lib/actions/team-members.ts` — added admin role check (2026-04-10)
+- [x] **SEC-2**: `lib/actions/pods.ts` — added admin role check (2026-04-10)
+- [x] **SEC-3**: `lib/actions/clients.ts` — added admin/strategist/jr_strategist role check (2026-04-10)
 
 ### Layout / Scroll Bug (from manual testing 2026-04-10)
 
-- [ ] **BUG-L1**: Viewport clipping — `h-full` on html/body/main constrains content to exactly viewport height. Pages with content taller than the viewport cannot scroll to show all content. Affects: client detail (portal section hidden), project detail (links + notes hidden), client edit form, team list. Root cause is the layout CSS in `app/(app)/layout.tsx` or `globals.css`.
+- [x] **BUG-L1**: Viewport clipping — removed h-full from html/body, pages now scroll naturally (2026-04-10)
 
 ### Questions — Need Answer
 
