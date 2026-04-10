@@ -28,9 +28,11 @@ export function ClientTable({ clients }: ClientTableProps) {
       <table className="w-full">
         <thead>
           <tr className="border-b border-border bg-background">
-            {['Client', 'Market', 'Pod', 'Contract Start', 'Status'].map((h) => (
-              <th key={h} className="text-left px-4 py-2.5 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-muted-foreground whitespace-nowrap">{h}</th>
-            ))}
+            <th className="text-left px-4 py-2.5 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-muted-foreground whitespace-nowrap">Client</th>
+            <th className="text-left px-4 py-2.5 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-muted-foreground whitespace-nowrap max-w-[200px]">Market</th>
+            <th className="text-left px-4 py-2.5 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-muted-foreground whitespace-nowrap w-[80px]">Pod</th>
+            <th className="text-left px-4 py-2.5 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-muted-foreground whitespace-nowrap w-[130px]">Contract Start</th>
+            <th className="text-left px-4 py-2.5 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-muted-foreground whitespace-nowrap w-[100px]">Status</th>
           </tr>
         </thead>
         <tbody>
@@ -40,20 +42,20 @@ export function ClientTable({ clients }: ClientTableProps) {
               <td className="px-4 py-3 text-[13px] font-medium">
                 <Link href={`/clients/${c.id}`} className="hover:underline">{c.name}</Link>
               </td>
-              <td className="px-4 py-3 text-[13px] text-muted-foreground">{c.market ?? '—'}</td>
-              <td className="px-4 py-3 text-[13px]">
+              <td className="px-4 py-3 text-[13px] text-muted-foreground max-w-[200px] truncate">{c.market ?? '—'}</td>
+              <td className="px-4 py-3 text-[13px] w-[80px]">
                 {c.pods?.name ? (
                   <span className="inline-block px-3 py-0.5 rounded-full text-[11px] font-medium bg-[#EDEAE2] text-[#78756C]">
                     {c.pods.name}
                   </span>
                 ) : '—'}
               </td>
-              <td className="px-4 py-3 text-[13px] text-muted-foreground">
+              <td className="px-4 py-3 text-[13px] text-muted-foreground w-[130px]">
                 {c.contract_start_date
                   ? new Date(c.contract_start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
                   : '—'}
               </td>
-              <td className="px-4 py-3">
+              <td className="px-4 py-3 w-[100px]">
                 <Badge className={`text-[11px] font-medium ${statusBadgeClass(c.status)}`}>{c.status}</Badge>
               </td>
             </tr>
