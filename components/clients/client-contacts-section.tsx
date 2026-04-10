@@ -79,17 +79,30 @@ export function ClientContactsSection({ clientId, contacts }: Props) {
       ) : (
         <div className="space-y-2">
           {contacts.map((c) => (
-            <div key={c.id} className="flex justify-between items-center text-[12.5px] py-1">
-              <div className="flex items-center gap-2">
-                <span>{c.contact_name ?? 'Unnamed'}</span>
-                {c.is_primary && (
-                  <span className="text-[10px] bg-brand-accent-bg text-brand-accent px-1.5 py-0.5 rounded">Primary</span>
+            <div key={c.id} className="flex justify-between items-start py-1">
+              <div className="flex flex-col gap-0.5">
+                {c.contact_name && (
+                  <span className="text-[11.5px] text-muted-foreground leading-tight">{c.contact_name}</span>
+                )}
+                <div className="flex items-center gap-2">
+                  <a
+                    href={`mailto:${c.email}`}
+                    className="text-[12.5px] text-foreground hover:underline leading-tight"
+                  >
+                    {c.email}
+                  </a>
+                  {c.is_primary && (
+                    <span className="text-[10px] bg-brand-accent-bg text-brand-accent px-1.5 py-0.5 rounded">Primary</span>
+                  )}
+                  {c.is_assistant && (
+                    <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded">Assistant</span>
+                  )}
+                </div>
+                {c.phone && (
+                  <span className="text-[11.5px] text-muted-foreground leading-tight">{c.phone}</span>
                 )}
               </div>
-              <div className="flex items-center gap-3">
-                <span className="text-muted-foreground text-[11.5px]">{c.email}</span>
-                <button onClick={() => setEditContact(c)} className="text-[#A8A59D] hover:text-foreground text-[11px]">Edit</button>
-              </div>
+              <button onClick={() => setEditContact(c)} className="text-[#A8A59D] hover:text-foreground text-[11px] shrink-0 ml-3 mt-0.5">Edit</button>
             </div>
           ))}
         </div>
