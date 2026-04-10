@@ -25,17 +25,6 @@ Please fill in their real first and last names.
    What is her email?
 
 
-3. DB MEMBERS NOT IN NOTION (4 people)
-----------------------------------------
-These exist in our database but do NOT appear in the Notion export.
-Are they real/still active? What are their real emails?
-
-   a) Austin Marks    — role: strategist, email: austin.marks@knownlocal.com (placeholder)
-   b) Clayton Mclemore — role: strategist, email: clayton.mclemore@knownlocal.com (placeholder)
-   c) Noor            — role: designer,    email: noor@knownlocal.com (placeholder)
-   d) Subhan          — role: designer,    email: subhan@knownlocal.com (placeholder)
-
-
 4. VIRTUAL ASSISTANT ROLE
 --------------------------
    Efiphanie Abuyabor — listed as "Virtual Assistant" in Notion, status: Onboarding.
