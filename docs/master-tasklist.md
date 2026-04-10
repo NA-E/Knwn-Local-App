@@ -270,8 +270,8 @@
 - [x] Supabase redirect URL updated for Railway domain — 2026-04-10
 
 ## Post-Launch: Security Hardening
-- [ ] Restrict Google OAuth sign-up to pre-existing team members only (remove auto-create branch in app layout, redirect unknown emails to "access denied" page)
-- [ ] Consider domain restriction (e.g. only `@knownlocal.com`) as alternative/additional guard
+- [x] Restrict Google OAuth sign-up to pre-existing team members only — auto-create removed, /access-denied page added (2026-04-10)
+- [ ] Consider domain restriction (e.g. only `@knownlocal.com`) as additional guard
 
 ---
 
