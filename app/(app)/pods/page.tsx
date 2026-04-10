@@ -1,10 +1,29 @@
-import { getPods } from '@/lib/actions/pods'
+import { getPodsWithMembers } from '@/lib/actions/pods'
 import { PageHeader } from '@/components/shared/page-header'
 import { PodFormDialog } from '@/components/pods/pod-form-dialog'
+import { PodsLayout, type PodWithMembers } from '@/components/pods/pods-layout'
 import { Button } from '@/components/ui/button'
 
 export default async function PodsPage() {
-  const pods = await getPods()
+  const rawPods = await getPodsWithMembers()
+
+  const pods: PodWithMembers[] = (rawPods ?? []).map((pod: any) => ({
+    id: pod.id,
+    name: pod.name,
+    members: (pod.team_member_pods ?? [])
+      .filter((tmp: any) => tmp.team_members != null)
+      .map((tmp: any) => ({
+        id: tmp.team_members.id,
+        first_name: tmp.team_members.first_name,
+        last_name: tmp.team_members.last_name,
+        role: tmp.team_members.role,
+        status: tmp.team_members.status,
+        is_primary: tmp.is_primary,
+      }))
+      .sort((a: any, b: any) =>
+        `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`)
+      ),
+  }))
 
   return (
     <div>
@@ -16,17 +35,7 @@ export default async function PodsPage() {
         }
       />
 
-      <div className="grid grid-cols-2 gap-4">
-        {pods.map((pod) => (
-          <div key={pod.id} className="bg-card border border-border rounded-lg p-5 flex items-center justify-between">
-            <span className="font-medium text-sm">{pod.name}</span>
-            <PodFormDialog
-              pod={pod}
-              trigger={<Button variant="outline" size="sm">Edit</Button>}
-            />
-          </div>
-        ))}
-      </div>
+      <PodsLayout pods={pods} />
     </div>
   )
 }

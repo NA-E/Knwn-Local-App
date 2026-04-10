@@ -13,6 +13,31 @@ export async function getPods() {
   return data
 }
 
+export async function getPodsWithMembers() {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('pods')
+    .select(`
+      id,
+      name,
+      created_at,
+      updated_at,
+      team_member_pods (
+        is_primary,
+        team_members (
+          id,
+          first_name,
+          last_name,
+          role,
+          status
+        )
+      )
+    `)
+    .order('name')
+  if (error) throw error
+  return data
+}
+
 export async function createPod(formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
