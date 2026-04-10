@@ -1,6 +1,7 @@
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getProject } from '@/lib/actions/projects'
+import { getTeamMembers } from '@/lib/actions/team-members'
 import type { TeamRole } from '@/lib/types'
 import { ProjectDetailClient } from './project-detail-client'
 
@@ -29,9 +30,11 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
     notFound()
   }
 
+  const teamMembers = await getTeamMembers({ status: 'active' })
+
   return (
     <div className="-mx-10 -mt-8">
-      <ProjectDetailClient project={project} userRole={userRole} />
+      <ProjectDetailClient project={project} userRole={userRole} teamMembers={teamMembers} />
     </div>
   )
 }

@@ -2,10 +2,10 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Calendar, PenLine, Film, User } from 'lucide-react'
+import { Calendar, PenLine, Film, User, Palette, Hash } from 'lucide-react'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
-import type { ProjectWithRelations, ProjectStatus, TeamRole } from '@/lib/types'
+import type { ProjectWithRelations, ProjectStatus, TeamRole, TeamMember, DesignStatus } from '@/lib/types'
 import { STATUS_TRANSITIONS } from '@/lib/constants/status'
 import { ProjectLinks } from './project-links'
 import { StatusActions } from './status-actions'
@@ -15,6 +15,7 @@ import { transitionProjectStatus, type TransitionMetadata } from '@/lib/actions/
 interface ProjectSidebarProps {
   project: ProjectWithRelations
   userRole: TeamRole
+  teamMembers: TeamMember[]
 }
 
 function InfoRow({ icon: Icon, label, value }: {
@@ -83,12 +84,28 @@ function DateRow({ icon: Icon, label, value, onChange }: {
   )
 }
 
-export function ProjectSidebar({ project, userRole }: ProjectSidebarProps) {
+const DESIGN_STATUS_OPTIONS: { value: DesignStatus; label: string }[] = [
+  { value: 'not_started', label: 'Not Started' },
+  { value: 'in_progress', label: 'In Progress' },
+  { value: 'completed', label: 'Completed' },
+]
+
+const DESIGN_DOT_COLOR: Record<DesignStatus, string> = {
+  not_started: 'bg-[#D2CFC6]',
+  in_progress: 'bg-brand-accent',
+  completed: 'bg-[#6BBF8E]',
+}
+
+export function ProjectSidebar({ project, userRole, teamMembers }: ProjectSidebarProps) {
   const [notes, setNotes] = useState(project.notes ?? '')
   const [savingNotes, setSavingNotes] = useState(false)
   const [scriptDue, setScriptDue] = useState<string | null>(project.script_v1_due ?? null)
   const [editDue, setEditDue] = useState<string | null>(project.edit_due ?? null)
   const [publishDue, setPublishDue] = useState<string | null>(project.publish_due ?? null)
+  const [designStatus, setDesignStatus] = useState<DesignStatus>(project.design_status)
+  const [writerId, setWriterId] = useState<string | null>(project.writer_id ?? null)
+  const [editorId, setEditorId] = useState<string | null>(project.editor_id ?? null)
+  const [editVersion, setEditVersion] = useState<number>(project.edit_version ?? 0)
 
   const currentStatus = project.status as ProjectStatus
   const allTransitions = STATUS_TRANSITIONS[currentStatus] ?? []
@@ -136,6 +153,68 @@ export function ProjectSidebar({ project, userRole }: ProjectSidebarProps) {
     }
   }
 
+  async function handleDesignStatusChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const value = e.target.value as DesignStatus
+    const prev = designStatus
+    setDesignStatus(value)
+    const result = await updateProject(project.id, { design_status: value })
+    if (result.error) {
+      toast.error(result.error)
+      setDesignStatus(prev)
+    } else {
+      toast.success('Design status updated')
+    }
+  }
+
+  async function handleWriterChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const value = e.target.value || null
+    const prev = writerId
+    setWriterId(value)
+    const result = await updateProject(project.id, { writer_id: value })
+    if (result.error) {
+      toast.error(result.error)
+      setWriterId(prev)
+    } else {
+      toast.success('Writer updated')
+    }
+  }
+
+  async function handleEditorChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const value = e.target.value || null
+    const prev = editorId
+    setEditorId(value)
+    const result = await updateProject(project.id, { editor_id: value })
+    if (result.error) {
+      toast.error(result.error)
+      setEditorId(prev)
+    } else {
+      toast.success('Editor updated')
+    }
+  }
+
+  async function handleEditVersionBlur(e: React.FocusEvent<HTMLInputElement>) {
+    const raw = parseInt(e.target.value, 10)
+    const value = isNaN(raw) || raw < 0 ? 0 : raw
+    if (value === project.edit_version) return
+    setEditVersion(value)
+    const result = await updateProject(project.id, { edit_version: value })
+    if (result.error) {
+      toast.error(result.error)
+      setEditVersion(project.edit_version)
+    } else {
+      toast.success('Edit version updated')
+    }
+  }
+
+  function handleEditVersionKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter') {
+      e.currentTarget.blur()
+    }
+  }
+
+  const selectClass =
+    'w-full text-[13px] text-brand-text-1 bg-transparent border border-border rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-brand-accent cursor-pointer'
+
   return (
     <div className="space-y-4 w-[320px] shrink-0">
       <StatusActions
@@ -150,9 +229,100 @@ export function ProjectSidebar({ project, userRole }: ProjectSidebarProps) {
           Details
         </div>
         <div className="space-y-0.5">
+          {/* Client — read only */}
           <InfoRow icon={User} label="Client" value={project.client_name} />
-          <InfoRow icon={PenLine} label="Writer" value={project.writer_name} />
-          <InfoRow icon={Film} label="Editor" value={project.editor_name} />
+
+          {/* Writer — editable dropdown */}
+          <div className="flex items-start gap-2 py-1.5">
+            <PenLine className="size-3.5 text-brand-text-3 mt-[18px] shrink-0" strokeWidth={1.5} />
+            <div className="min-w-0 flex-1">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.10em] text-brand-text-3 mb-1">
+                Writer
+              </div>
+              <select
+                value={writerId ?? ''}
+                onChange={handleWriterChange}
+                className={selectClass}
+                aria-label="Writer"
+              >
+                <option value="">— Unassigned —</option>
+                {teamMembers.filter(m => ['writer', 'senior_writer', 'admin'].includes(m.role)).map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.first_name} {m.last_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Editor — editable dropdown */}
+          <div className="flex items-start gap-2 py-1.5">
+            <Film className="size-3.5 text-brand-text-3 mt-[18px] shrink-0" strokeWidth={1.5} />
+            <div className="min-w-0 flex-1">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.10em] text-brand-text-3 mb-1">
+                Editor
+              </div>
+              <select
+                value={editorId ?? ''}
+                onChange={handleEditorChange}
+                className={selectClass}
+                aria-label="Editor"
+              >
+                <option value="">— Unassigned —</option>
+                {teamMembers.filter(m => ['editor', 'senior_editor', 'admin'].includes(m.role)).map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.first_name} {m.last_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Design Status — editable dropdown */}
+          <div className="flex items-start gap-2 py-1.5">
+            <Palette className="size-3.5 text-brand-text-3 mt-[18px] shrink-0" strokeWidth={1.5} />
+            <div className="min-w-0 flex-1">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.10em] text-brand-text-3 mb-1">
+                Design
+              </div>
+              <div className="relative flex items-center gap-1.5">
+                <span className={`inline-block size-[7px] shrink-0 rounded-full ${DESIGN_DOT_COLOR[designStatus]}`} />
+                <select
+                  value={designStatus}
+                  onChange={handleDesignStatusChange}
+                  className="flex-1 text-[13px] text-brand-text-1 bg-transparent border border-border rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-brand-accent cursor-pointer"
+                  aria-label="Design status"
+                >
+                  {DESIGN_STATUS_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Edit Version — small number input */}
+          <div className="flex items-start gap-2 py-1.5">
+            <Hash className="size-3.5 text-brand-text-3 mt-[18px] shrink-0" strokeWidth={1.5} />
+            <div className="min-w-0 flex-1">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.10em] text-brand-text-3 mb-1">
+                Edit Version
+              </div>
+              <input
+                type="number"
+                min={0}
+                value={editVersion}
+                onChange={(e) => setEditVersion(parseInt(e.target.value, 10) || 0)}
+                onBlur={handleEditVersionBlur}
+                onKeyDown={handleEditVersionKeyDown}
+                className="w-20 text-[13px] text-brand-text-1 bg-transparent border border-border rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-brand-accent"
+                aria-label="Edit version"
+              />
+            </div>
+          </div>
+
           <DateRow
             icon={Calendar}
             label="Script Due"

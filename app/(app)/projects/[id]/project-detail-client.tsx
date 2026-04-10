@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import type { ProjectWithRelations, TeamRole } from '@/lib/types'
+import type { ProjectWithRelations, TeamRole, TeamMember } from '@/lib/types'
 import { ProjectDetailHeader } from '@/components/projects/project-detail-header'
 import { ProjectSidebar } from '@/components/projects/project-sidebar'
 import { ActivityLog } from '@/components/projects/activity-log'
@@ -11,9 +11,10 @@ import { updateProject } from '@/lib/actions/projects'
 interface ProjectDetailClientProps {
   project: ProjectWithRelations
   userRole: TeamRole
+  teamMembers: TeamMember[]
 }
 
-export function ProjectDetailClient({ project, userRole }: ProjectDetailClientProps) {
+export function ProjectDetailClient({ project, userRole, teamMembers }: ProjectDetailClientProps) {
   const router = useRouter()
 
   async function handleTitleUpdate(title: string) {
@@ -37,7 +38,7 @@ export function ProjectDetailClient({ project, userRole }: ProjectDetailClientPr
         </div>
 
         {/* Right sidebar */}
-        <ProjectSidebar project={project} userRole={userRole} />
+        <ProjectSidebar project={project} userRole={userRole} teamMembers={teamMembers} />
       </div>
     </>
   )
