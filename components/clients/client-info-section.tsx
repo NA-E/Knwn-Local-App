@@ -1,5 +1,5 @@
 export function ClientInfoSection({ client }: { client: any }) {
-  function row(label: string, value: string | null, opts?: { link?: boolean }) {
+  function row(label: string, value: string | null, opts?: { link?: boolean; pre?: boolean }) {
     return (
       <div className="flex justify-between items-baseline py-1 text-[12.5px]">
         <span className="text-muted-foreground">{label}</span>
@@ -7,7 +7,7 @@ export function ClientInfoSection({ client }: { client: any }) {
           <a href={value} target="_blank" rel="noopener noreferrer"
             className="text-brand-accent hover:underline text-[12px]">Open ↗</a>
         ) : (
-          <span>{value ?? '—'}</span>
+          <span className={opts?.pre ? 'whitespace-pre-wrap text-right' : undefined}>{value ?? '—'}</span>
         )}
       </div>
     )
@@ -21,7 +21,7 @@ export function ClientInfoSection({ client }: { client: any }) {
       {row('Posting Schedule', client.posting_schedule)}
       {row('Script Format', client.script_format)}
       {row('Communication', client.communication_method)}
-      {row('Special Notes', client.special_instructions)}
+      {row('Special Notes', client.special_instructions, { pre: true })}
       <div className="border-t border-[#EDEAE2] mt-3 pt-3">
         {row('Dropbox', client.dropbox_upload_url, { link: true })}
         {row('B-Roll Library', client.broll_library_url, { link: true })}
