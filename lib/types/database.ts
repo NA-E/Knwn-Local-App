@@ -16,6 +16,7 @@ export type ProjectStatus =
 export type DesignStatus = 'not_started' | 'in_progress' | 'completed'
 export type ScriptFormat = 'word_for_word' | 'outline'
 export type CommMethod = 'slack' | 'email' | 'other'
+export type ClientHealth = 'on_track' | 'at_risk' | 'off_track'
 export type TeamMemberStatus = 'active' | 'inactive' | 'onboarding' | 'contract_paused' | 'offboarded'
 
 export type AssignmentRole =
@@ -71,6 +72,10 @@ export interface Client {
   communication_method: CommMethod | null
   special_instructions: string | null
   portal_token: string | null
+  health: ClientHealth | null
+  brand_voice_guide_url: string | null
+  area_guide_url: string | null
+  approval_emails: string | null
   portal_token_expires_at: string | null
   created_at: string
   updated_at: string
