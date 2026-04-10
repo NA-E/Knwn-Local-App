@@ -91,13 +91,6 @@ export function PortalLinkSection({ clientId, portalToken }: PortalLinkSectionPr
           <p className="text-[11px] text-muted-foreground">
             Share this link with the client. Anyone with the link can view projects.
           </p>
-          <button
-            onClick={handleGenerate}
-            disabled={generating}
-            className="text-[12px] text-muted-foreground hover:text-foreground underline transition-colors disabled:opacity-50"
-          >
-            {generating ? 'Regenerating...' : 'Regenerate link'}
-          </button>
         </div>
       ) : (
         <div>
