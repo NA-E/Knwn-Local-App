@@ -9,14 +9,17 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
 import { createProject } from '@/lib/actions/projects'
+import { ASSIGNMENT_ROLE_LABELS } from '@/lib/constants/roles'
+import type { AssignmentRole } from '@/lib/types'
 
 interface ProjectCreateFormProps {
   clients: { id: string; name: string }[]
   writers: { id: string; first_name: string; last_name: string }[]
   editors: { id: string; first_name: string; last_name: string }[]
+  assignmentsByClient: Record<string, { assignment_role: string; team_member_name: string; team_member_id: string }[]>
 }
 
-export function ProjectCreateForm({ clients, writers, editors }: ProjectCreateFormProps) {
+export function ProjectCreateForm({ clients, writers, editors, assignmentsByClient }: ProjectCreateFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [title, setTitle] = useState('')
@@ -76,7 +79,16 @@ export function ProjectCreateForm({ clients, writers, editors }: ProjectCreateFo
         </Label>
         <select
           value={clientId}
-          onChange={(e) => setClientId(e.target.value)}
+          onChange={(e) => {
+            const newClientId = e.target.value
+            setClientId(newClientId)
+            // Reset and auto-populate editor from client assignments
+            setEditorId('')
+            if (newClientId && assignmentsByClient[newClientId]) {
+              const editorAssignment = assignmentsByClient[newClientId].find(a => a.assignment_role === 'editor')
+              if (editorAssignment) setEditorId(editorAssignment.team_member_id)
+            }
+          }}
           className="w-full px-3 py-2 border border-border rounded-md text-[13px] bg-card text-brand-text-1"
         >
           <option value="">Select a client...</option>
@@ -85,6 +97,22 @@ export function ProjectCreateForm({ clients, writers, editors }: ProjectCreateFo
           ))}
         </select>
       </div>
+
+      {clientId && assignmentsByClient[clientId]?.length > 0 && (
+        <div className="bg-[#FAFAF7] border border-border rounded-[8px] p-3">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.10em] text-muted-foreground mb-2">
+            Inherited Team
+          </div>
+          <div className="space-y-1">
+            {assignmentsByClient[clientId].map((a, i) => (
+              <div key={i} className="flex justify-between text-[12px]">
+                <span className="text-muted-foreground">{ASSIGNMENT_ROLE_LABELS[a.assignment_role as AssignmentRole] ?? a.assignment_role}</span>
+                <span className="font-medium text-brand-text-1">{a.team_member_name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-4">
         <div>
