@@ -62,7 +62,7 @@ export function ClientChannelsSection({ clientId, channels }: Props) {
   return (
     <div className="bg-card border border-border rounded-[10px] p-5">
       <div className="flex justify-between items-center mb-3">
-        <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A59D]">Channels</div>
+        <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A59D]">YouTube Channels</div>
         <Dialog open={showAdd} onOpenChange={setShowAdd}>
           <DialogTrigger render={<button className="text-[12px] text-brand-accent hover:underline">+ Add</button>} />
           <DialogContent>
