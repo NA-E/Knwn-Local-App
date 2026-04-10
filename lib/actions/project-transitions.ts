@@ -99,7 +99,7 @@ function checkPreconditions(
   // edit_ready_to_send → edit_sent_to_client: design_status must be completed
   if (toStatus === 'edit_sent_to_client') {
     if (project.design_status !== 'completed') {
-      return { ok: false, error: 'Design must be completed before the edit can be sent to the client.' }
+      return { ok: false, error: 'Design must be completed before the edit can be sent to the client. Open the project detail page and set Design Status to "Completed" first.' }
     }
   }
 
