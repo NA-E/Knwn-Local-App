@@ -1,0 +1,30 @@
+﻿Name,Email,Phone,Notion Role,Our DB Role,Pod(s),Status,Already In DB?,Action,Notes
+Andrés Felipe,andres.felipe@vvsnet.us,,Video Editor (Long & Short Form),editor,"POD 2, POD 4",Active,NO,ADD,
+Anna Karpova,,,Short-form Video Editor,editor,"POD 2, POD 1",Active,NO,ADD,
+Arthur Rubens3,arthur.rubens3@gmail.com,,Ghostwriter,writer,"POD 3, POD 2, POD 1",Active,NO,ADD,NEEDS REAL NAME
+Beatriz Salmaso,salmasobeatriz@gmail.com,,"Email Marketing Manager, Social Media Manager",manager,POD 2,Active,NO,ADD,
+Behçet Beyazçiçek,behcetbeyazcicek@gmail.com,,Email Marketing Manager,manager,ELLA,Onboarding,NO,ADD,
+Dani Moreno,daniela.morenog@hotmail.com,+57 3005282208,Social Media Manager,manager,POD 1,Active,NO,ADD,
+Efiphanie Abuyabor,,,Virtual Assistant,virtual_assistant,,Onboarding,NO,ADD,
+Gabriela Aoki,aokigabriela@gmail.com,+5512997061995,Ghostwriter,writer,"POD 2, POD 1, POD 3",Active,NO,ADD,
+Giancamposm,giancamposm@gmail.com,+5521965689073,Ghostwriter,writer,"POD 1, POD 3, POD 2",Active,NO,ADD,NEEDS REAL NAME
+Giuliana Z,,,Video Editor (Long & Short Form),editor,,Active,NO,ADD,
+Hannah Lockhart,hannah@ellaemail.com,,Email Marketing Manager,manager,ELLA,Onboarding,NO,ADD,
+Jessica Gonzatto,jessicagonzattoo@yahoo.com.br,+55 54 991492319,Ghostwriter,writer,"POD 1, POD 2, POD 3",Active,NO,ADD,
+Jonatan Vargas,jovarav@gmail.com,,Long-form Video Editor,editor,POD 1,Onboarding,NO,ADD,
+Karinadayone,karinadayone@gmail.com,,YouTube Manager,manager,POD 4,Active,NO,ADD,NEEDS REAL NAME
+Laís Fretin,lais@ellaemail.com,,Email Marketing Manager,manager,ELLA,Onboarding,NO,ADD,
+Lívia Russi,,,Ghostwriter,writer,"POD 2, POD 3, POD 1",Active,NO,ADD,
+Mahir Ahmed,,,Short-form Video Editor,editor,,Active,NO,ADD,
+Milena Ortizhdz,milena.ortizhdz@gmail.com,+573004734650,Ghostwriter,writer,,Active,NO,ADD,NEEDS REAL NAME
+Nikolai Teimurazov,,,Short-form Video Editor,editor,"POD 1, POD 2",Active,NO,ADD,
+Omar Arif,omar@ellaemail.com,,Email Marketing Manager,manager,ELLA,Onboarding,NO,ADD,
+Paulo Folly,paulo.folly@gmail.com,+5541995033788,YouTube Manager,manager,POD 1,Active,NO,ADD,
+Rafael Stiborski,rafaelstiborski@gmail.com,,Senior Writer,senior_writer,"POD 2, POD 3, POD 1",Active,NO,ADD,
+Salazar,rafaelsalazar@outlook.com,,Long-form Video Editor,editor,POD 1,Onboarding,NO,ADD,
+Vivian Vardasca,vivihamp@outlook.com,+55 11 980908515,Senior Writer,senior_writer,"POD 1, POD 2, POD 3",Active,NO,ADD,
+Laura Carreño,,,,???,POD 2,Onboarding,NO,ADD - NEEDS ROLE,
+Austin Marks,austin.marks@knownlocal.com,,(not in Notion),strategist,,active,YES,VERIFY - not in Notion export,placeholder email
+Clayton Mclemore,clayton.mclemore@knownlocal.com,,(not in Notion),strategist,,active,YES,VERIFY - not in Notion export,placeholder email
+Noor,noor@knownlocal.com,,(not in Notion),designer,,active,YES,VERIFY - not in Notion export,placeholder email
+Subhan,subhan@knownlocal.com,,(not in Notion),designer,,active,YES,VERIFY - not in Notion export,placeholder email
