@@ -71,6 +71,15 @@ export async function createClientAction(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized', id: null }
 
+  const { data: currentMember } = await supabase
+    .from('team_members')
+    .select('role')
+    .eq('auth_user_id', user.id)
+    .single()
+  if (!currentMember || !['admin', 'strategist', 'jr_strategist'].includes(currentMember.role)) {
+    return { error: 'Only admins, strategists, and jr. strategists can create clients.', id: null }
+  }
+
   const name = formData.get('name') as string
   if (!name?.trim()) return { error: 'Client name is required.', id: null }
 
@@ -123,6 +132,15 @@ export async function updateClientAction(id: string, formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
+
+  const { data: currentMember } = await supabase
+    .from('team_members')
+    .select('role')
+    .eq('auth_user_id', user.id)
+    .single()
+  if (!currentMember || !['admin', 'strategist', 'jr_strategist'].includes(currentMember.role)) {
+    return { error: 'Only admins, strategists, and jr. strategists can update clients.' }
+  }
 
   const fields: Record<string, any> = {
     name: formData.get('name'),
