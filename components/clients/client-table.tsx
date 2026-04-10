@@ -43,7 +43,7 @@ export function ClientTable({ clients }: ClientTableProps) {
               <td className="px-4 py-3 text-[13px] text-muted-foreground">{c.market ?? '—'}</td>
               <td className="px-4 py-3 text-[13px]">
                 {c.pods?.name ? (
-                  <span className="inline-block px-2 py-0.5 rounded text-[11px] font-medium bg-secondary text-muted-foreground">
+                  <span className="inline-block px-3 py-0.5 rounded-full text-[11px] font-medium bg-[#EDEAE2] text-[#78756C]">
                     {c.pods.name}
                   </span>
                 ) : '—'}
