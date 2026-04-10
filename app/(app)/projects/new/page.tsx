@@ -8,7 +8,7 @@ export default async function NewProjectPage() {
   const [{ data: clients }, { data: writers }, { data: editors }, { data: allAssignments }] = await Promise.all([
     supabase
       .from('clients')
-      .select('id, name')
+      .select('id, name, pods ( name )')
       .in('status', ['active', 'onboarding'])
       .order('name'),
     supabase
@@ -31,7 +31,7 @@ export default async function NewProjectPage() {
   const assignmentsByClient: Record<string, { assignment_role: string; team_member_name: string; team_member_id: string }[]> = {}
   for (const a of (allAssignments ?? [])) {
     if (!a.team_members) continue
-    const tm = a.team_members as { id: string; first_name: string; last_name: string }
+    const tm = a.team_members as unknown as { id: string; first_name: string; last_name: string }
     const entry = {
       assignment_role: a.assignment_role,
       team_member_name: `${tm.first_name} ${tm.last_name}`,
@@ -50,7 +50,7 @@ export default async function NewProjectPage() {
       <h1 className="text-[19px] font-semibold tracking-tight mb-6">New Project</h1>
 
       <ProjectCreateForm
-        clients={(clients ?? []).map(c => ({ id: c.id, name: c.name }))}
+        clients={(clients ?? []).map(c => ({ id: c.id, name: c.name, podName: (c.pods as unknown as { name: string } | null)?.name ?? null }))}
         writers={writers ?? []}
         editors={editors ?? []}
         assignmentsByClient={assignmentsByClient}

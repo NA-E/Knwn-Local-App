@@ -13,7 +13,7 @@ import { ASSIGNMENT_ROLE_LABELS } from '@/lib/constants/roles'
 import type { AssignmentRole } from '@/lib/types'
 
 interface ProjectCreateFormProps {
-  clients: { id: string; name: string }[]
+  clients: { id: string; name: string; podName: string | null }[]
   writers: { id: string; first_name: string; last_name: string }[]
   editors: { id: string; first_name: string; last_name: string }[]
   assignmentsByClient: Record<string, { assignment_role: string; team_member_name: string; team_member_id: string }[]>
@@ -98,13 +98,29 @@ export function ProjectCreateForm({ clients, writers, editors, assignmentsByClie
         </select>
       </div>
 
-      {clientId && assignmentsByClient[clientId]?.length > 0 && (
+      {clientId && (() => {
+        const selectedClient = clients.find(c => c.id === clientId)
+        return (
         <div className="bg-[#FAFAF7] border border-border rounded-[8px] p-3">
           <div className="text-[10px] font-semibold uppercase tracking-[0.10em] text-muted-foreground mb-2">
-            Inherited Team
+            Inherited from Client
           </div>
           <div className="space-y-1">
-            {assignmentsByClient[clientId].map((a, i) => (
+            {/* Pod row */}
+            <div className="flex justify-between text-[12px]">
+              <span className="text-muted-foreground">Pod</span>
+              <span>
+                {selectedClient?.podName ? (
+                  <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#EDEAE2] text-[#78756C]">
+                    {selectedClient.podName}
+                  </span>
+                ) : (
+                  <span className="text-muted-foreground italic">No pod</span>
+                )}
+              </span>
+            </div>
+            {/* Team assignments */}
+            {(assignmentsByClient[clientId] ?? []).map((a, i) => (
               <div key={i} className="flex justify-between text-[12px]">
                 <span className="text-muted-foreground">{ASSIGNMENT_ROLE_LABELS[a.assignment_role as AssignmentRole] ?? a.assignment_role}</span>
                 <span className="font-medium text-brand-text-1">{a.team_member_name}</span>
@@ -112,7 +128,8 @@ export function ProjectCreateForm({ clients, writers, editors, assignmentsByClie
             ))}
           </div>
         </div>
-      )}
+        )
+      })()}
 
       <div className="grid grid-cols-2 gap-4">
         <div>
