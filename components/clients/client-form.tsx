@@ -62,67 +62,83 @@ export function ClientForm({ client, pods }: ClientFormProps) {
   }
 
   return (
-    <form action={handleSubmit} className="max-w-xl space-y-4">
-      {field('name', 'Client Name *')}
-
+    <form action={handleSubmit} className="max-w-2xl space-y-5">
+      {/* Header fields — always visible at top */}
       <div className="grid grid-cols-2 gap-4">
-        {field('market', 'Market')}
-        {field('timezone', 'Timezone')}
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="pod_id" className="text-xs font-medium text-muted-foreground">Pod</Label>
-          <select id="pod_id" name="pod_id" defaultValue={client?.pod_id ?? ''}
-            className="mt-1.5 w-full px-3 py-2 border border-border rounded-md text-sm bg-card">
-            <option value="">No pod</option>
-            {pods.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-          </select>
-        </div>
-        <div>
-          <Label htmlFor="status" className="text-xs font-medium text-muted-foreground">Status</Label>
-          <select id="status" name="status" defaultValue={client?.status ?? 'onboarding'}
-            className="mt-1.5 w-full px-3 py-2 border border-border rounded-md text-sm bg-card">
-            {Object.entries(CLIENT_STATUS_LABELS).map(([v, l]) => (
-              <option key={v} value={v}>{l}</option>
-            ))}
-          </select>
+        {field('name', 'Client Name *')}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="pod_id" className="text-xs font-medium text-muted-foreground">Pod</Label>
+            <select id="pod_id" name="pod_id" defaultValue={client?.pod_id ?? ''}
+              className="mt-1.5 w-full px-3 py-2 border border-border rounded-md text-sm bg-card">
+              <option value="">No pod</option>
+              {pods.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+            </select>
+          </div>
+          <div>
+            <Label htmlFor="status" className="text-xs font-medium text-muted-foreground">Status</Label>
+            <select id="status" name="status" defaultValue={client?.status ?? 'onboarding'}
+              className="mt-1.5 w-full px-3 py-2 border border-border rounded-md text-sm bg-card">
+              {Object.entries(CLIENT_STATUS_LABELS).map(([v, l]) => (
+                <option key={v} value={v}>{l}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        {field('package', 'Package')}
-        {field('contract_start_date', 'Contract Start', 'date')}
-      </div>
-
-      {field('posting_schedule', 'Posting Schedule')}
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="script_format" className="text-xs font-medium text-muted-foreground">Script Format</Label>
-          <select id="script_format" name="script_format" defaultValue={client?.script_format ?? ''}
-            className="mt-1.5 w-full px-3 py-2 border border-border rounded-md text-sm bg-card">
-            <option value="">—</option>
-            <option value="word_for_word">Word for Word</option>
-            <option value="outline">Outline</option>
-          </select>
+      {/* 2-column card layout mirroring detail view */}
+      <div className="grid grid-cols-2 gap-5">
+        {/* Client Info card — mirrors ClientInfoSection */}
+        <div className="bg-card border border-border rounded-[10px] p-5">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A59D] mb-3">Client Info</div>
+          <div className="space-y-3">
+            {field('package', 'Package')}
+            {field('contract_start_date', 'Contract Start', 'date')}
+            {field('posting_schedule', 'Posting Schedule')}
+            <div>
+              <Label htmlFor="script_format" className="text-xs font-medium text-muted-foreground">Script Format</Label>
+              <select id="script_format" name="script_format" defaultValue={client?.script_format ?? ''}
+                className="mt-1.5 w-full px-3 py-2 border border-border rounded-md text-sm bg-card">
+                <option value="">—</option>
+                <option value="word_for_word">Word for Word</option>
+                <option value="outline">Outline</option>
+              </select>
+            </div>
+            <div>
+              <Label htmlFor="communication_method" className="text-xs font-medium text-muted-foreground">Communication</Label>
+              <select id="communication_method" name="communication_method" defaultValue={client?.communication_method ?? ''}
+                className="mt-1.5 w-full px-3 py-2 border border-border rounded-md text-sm bg-card">
+                <option value="">—</option>
+                <option value="slack">Slack</option>
+                <option value="email">Email</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            {field('special_instructions', 'Special Notes', 'text', { textarea: true })}
+          </div>
         </div>
-        <div>
-          <Label htmlFor="communication_method" className="text-xs font-medium text-muted-foreground">Communication</Label>
-          <select id="communication_method" name="communication_method" defaultValue={client?.communication_method ?? ''}
-            className="mt-1.5 w-full px-3 py-2 border border-border rounded-md text-sm bg-card">
-            <option value="">—</option>
-            <option value="slack">Slack</option>
-            <option value="email">Email</option>
-            <option value="other">Other</option>
-          </select>
+
+        {/* Details card — market, timezone, links */}
+        <div className="space-y-5">
+          <div className="bg-card border border-border rounded-[10px] p-5">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A59D] mb-3">Details</div>
+            <div className="space-y-3">
+              {field('market', 'Market')}
+              {field('timezone', 'Timezone')}
+            </div>
+          </div>
+
+          <div className="bg-card border border-border rounded-[10px] p-5">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A59D] mb-3">Links</div>
+            <div className="space-y-3">
+              {field('website', 'Website', 'url')}
+              {field('youtube_channel_url', 'YouTube Channel', 'url')}
+              {field('slack_channel_url', 'Slack Channel', 'url')}
+            </div>
+          </div>
         </div>
       </div>
-
-      {field('website', 'Website', 'url')}
-      {field('youtube_channel_url', 'YouTube Channel', 'url')}
-      {field('slack_channel_url', 'Slack Channel', 'url')}
-      {field('special_instructions', 'Special Notes', 'text', { textarea: true })}
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 
