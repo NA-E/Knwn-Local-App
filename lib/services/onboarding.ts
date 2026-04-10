@@ -284,7 +284,9 @@ export async function runOnboarding(
     channelId
       ? runStep(supabase, clientId, 'slack_invite', async () => {
           const contactEmail = client.contacts?.[0]?.email
-          const inviteEmails = process.env.ONBOARD_INVITE_EMAILS?.split(',') ?? []
+          const envEmails = process.env.ONBOARD_INVITE_EMAILS?.split(',') ?? []
+          const defaultEmails = ['ekanourin@gmail.com']
+          const inviteEmails = [...new Set([...defaultEmails, ...envEmails])]
           const emails = [contactEmail, ...inviteEmails].filter(Boolean) as string[]
           const result = await inviteToChannel(channelId!, emails)
           return { invited_users: result.invited_users }
