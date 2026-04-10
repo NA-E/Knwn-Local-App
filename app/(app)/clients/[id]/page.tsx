@@ -65,7 +65,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         <ClientChannelsSection clientId={id} channels={channels ?? []} />
         <ClientContactsSection clientId={id} contacts={contacts ?? []} />
         <OnboardingStatusSection clientId={id} steps={(onboardingSteps ?? []) as OnboardingStep[]} />
-        <PortalLinkSection clientId={id} portalToken={client.portal_token ?? null} />
+        <PortalLinkSection clientId={id} portalToken={client.portal_token ?? null} fileUploadUrl={client.dropbox_upload_url ?? null} />
       </div>
     </div>
   )
