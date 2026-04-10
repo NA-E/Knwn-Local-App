@@ -57,6 +57,15 @@ export async function createTeamMember(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
 
+  const { data: currentMember } = await supabase
+    .from('team_members')
+    .select('role')
+    .eq('auth_user_id', user.id)
+    .single()
+  if (!currentMember || currentMember.role !== 'admin') {
+    return { error: 'Only admins can create team members.' }
+  }
+
   const first_name = formData.get('first_name') as string
   const last_name = formData.get('last_name') as string
   const email = formData.get('email') as string
@@ -100,6 +109,15 @@ export async function updateTeamMember(id: string, formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
+
+  const { data: currentMember } = await supabase
+    .from('team_members')
+    .select('role')
+    .eq('auth_user_id', user.id)
+    .single()
+  if (!currentMember || currentMember.role !== 'admin') {
+    return { error: 'Only admins can update team members.' }
+  }
 
   const first_name = formData.get('first_name') as string
   const last_name = formData.get('last_name') as string
