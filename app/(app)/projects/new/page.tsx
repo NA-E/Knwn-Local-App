@@ -14,13 +14,13 @@ export default async function NewProjectPage() {
     supabase
       .from('team_members')
       .select('id, first_name, last_name')
-      .eq('role', 'writer')
+      .in('role', ['writer', 'senior_writer', 'admin'])
       .eq('status', 'active')
       .order('first_name'),
     supabase
       .from('team_members')
       .select('id, first_name, last_name')
-      .eq('role', 'editor')
+      .in('role', ['editor', 'senior_editor', 'admin'])
       .eq('status', 'active')
       .order('first_name'),
   ])
