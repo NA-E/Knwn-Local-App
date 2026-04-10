@@ -54,8 +54,8 @@
 - [x] **UI-6**: Rename "Channels" → "YouTube Channels", move YouTube link into that section (2026-04-10)
 - [x] **UI-7**: Format Special Notes with whitespace/multiline support (2026-04-10)
 - [x] **UI-8**: Remove B-Roll Library link (2026-04-10)
-- [ ] **UI-9**: Dropbox link should open client's specific Dropbox folder (keep it functional)
-- [ ] **UI-10**: Add File Upload Link under client portal section, rename that section appropriately
+- [x] **UI-9**: Dropbox link should open client's specific Dropbox folder — already functional via dropbox_upload_url (2026-04-10)
+- [x] **UI-10**: Add File Upload Link under client portal section, renamed to "Client Access" (2026-04-10)
 - [ ] **UI-11**: Client edit view should mirror the read-only detail view (same fields/layout)
 - [ ] **UI-12**: Team assignment — pod selection should auto-add strategist and manager
 - [x] **UI-16**: Remove click-to-reassign on team section in client detail (2026-04-10)
@@ -65,8 +65,8 @@
 - [ ] **UI-17**: Client create form — add pod cards with client counts and capacity bars (instead of plain dropdown)
 - [ ] **UI-18**: Client create form — add team assignment section (strategist, manager, etc.) with auto-assign on pod select
 - [x] **UI-19**: Client create/edit forms — remove Dropbox Upload URL and B-Roll Library URL fields (2026-04-10)
-- [ ] **UI-13**: Field names must be consistent between read-only and edit views across the whole app
-- [ ] **UI-20**: Generate portal links for all existing clients (not generated during Notion migration)
+- [x] **UI-13**: Field names must be consistent between read-only and edit views — 5 client form labels aligned (2026-04-10)
+- [x] **UI-20**: Generate portal links for all existing clients — Migration 016 applied (2026-04-10)
 - [x] **UI-14**: Remove "Regenerate link" from portal section — make portal links permanent (2026-04-10)
 - [x] **UI-15**: Contacts section formatting — email primary, name above, assistant badge (2026-04-10)
 
@@ -86,7 +86,7 @@
 - [ ] **UI-30**: Project detail sidebar — add pod display and full team section showing all roles from the client's assignments
 - [x] **UI-28**: Validation errors on project create — mounted Sonner Toaster (2026-04-10)
 - [x] **UI-29**: Make Script Due, Edit Due, and Publish Due dates editable (2026-04-10)
-- [ ] **BUG-W1**: Writer dropdown on project create is empty — no team members with `role = 'writer'` exist in DB. Verify if this is a data/migration issue or role mapping problem.
+- [x] **BUG-W1**: Writer dropdown on project create — broadened role filter to writer/senior_writer/admin (matches detail sidebar). Data issue remains (no role='writer' in Notion migration; blocked on I-7) (2026-04-10)
 
 ### UI Improvements — Pipeline (from manual testing 2026-04-10)
 
