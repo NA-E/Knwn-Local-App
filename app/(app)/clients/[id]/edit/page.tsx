@@ -38,7 +38,16 @@ export default async function EditClientPage({ params }: { params: Promise<{ id:
     podTeamDefaults[pod.id] = { strategistId, managerId }
   }
 
-  const pods = podsWithMembers.map(p => ({ id: p.id, name: p.name }))
+  const { data: clientCounts } = await supabase
+    .from('clients')
+    .select('pod_id')
+    .in('status', ['active', 'onboarding'])
+
+  const podClientCounts: Record<string, number> = {}
+  for (const c of (clientCounts ?? [])) {
+    if (c.pod_id) podClientCounts[c.pod_id] = (podClientCounts[c.pod_id] ?? 0) + 1
+  }
+  const pods = podsWithMembers.map(p => ({ id: p.id, name: p.name, clientCount: podClientCounts[p.id] ?? 0 }))
 
   // Build initial assignments map
   const initialAssignments: Record<string, string> = {}

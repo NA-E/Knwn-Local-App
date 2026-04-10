@@ -14,11 +14,13 @@ import type { AssignmentRole, TeamRole } from '@/lib/types'
 
 interface ClientFormProps {
   client?: any
-  pods: { id: string; name: string }[]
+  pods: { id: string; name: string; clientCount: number }[]
   podTeamDefaults?: Record<string, { strategistId: string | null; managerId: string | null }>
   teamMembers?: { id: string; first_name: string; last_name: string; role: string }[]
   initialAssignments?: Record<string, string>
 }
+
+const POD_CAPACITY = 20
 
 const FORM_ASSIGNMENT_ROLES: AssignmentRole[] = [
   'strategist', 'manager', 'senior_editor', 'editor', 'designer', 'senior_designer', 'senior_writer',
@@ -30,6 +32,7 @@ export function ClientForm({ client, pods, podTeamDefaults, teamMembers, initial
   const [onboardingClientId, setOnboardingClientId] = useState<string | null>(null)
   const [onboardingClientName, setOnboardingClientName] = useState<string | null>(null)
   const [assignments, setAssignments] = useState<Record<string, string>>(initialAssignments ?? {})
+  const [selectedPodId, setSelectedPodId] = useState<string>(client?.pod_id ?? '')
   const isEdit = !!client
 
   async function handleSubmit(formData: FormData) {
@@ -100,43 +103,74 @@ export function ClientForm({ client, pods, podTeamDefaults, teamMembers, initial
       {/* Header fields — always visible at top */}
       <div className="grid grid-cols-2 gap-4">
         {field('name', 'Client Name *')}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="pod_id" className="text-xs font-medium text-muted-foreground">Pod</Label>
-            <select id="pod_id" name="pod_id" defaultValue={client?.pod_id ?? ''}
-              onChange={(e) => {
-                const podId = e.target.value
-                if (podId && podTeamDefaults?.[podId]) {
-                  const defaults = podTeamDefaults[podId]
-                  setAssignments(prev => ({
-                    ...prev,
-                    ...(defaults.strategistId ? { strategist: defaults.strategistId } : {}),
-                    ...(defaults.managerId ? { manager: defaults.managerId } : {}),
-                  }))
-                } else {
-                  // Clear auto-populated strategist/manager when pod is removed
-                  setAssignments(prev => {
-                    const next = { ...prev }
-                    delete next.strategist
-                    delete next.manager
-                    return next
-                  })
-                }
-              }}
-              className="mt-1.5 w-full px-3 py-2 border border-border rounded-md text-sm bg-card">
-              <option value="">No pod</option>
-              {pods.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-            </select>
-          </div>
-          <div>
-            <Label htmlFor="status" className="text-xs font-medium text-muted-foreground">Status</Label>
-            <select id="status" name="status" defaultValue={client?.status ?? 'onboarding'}
-              className="mt-1.5 w-full px-3 py-2 border border-border rounded-md text-sm bg-card">
-              {Object.entries(CLIENT_STATUS_LABELS).map(([v, l]) => (
-                <option key={v} value={v}>{l}</option>
-              ))}
-            </select>
-          </div>
+        <div>
+          <Label htmlFor="status" className="text-xs font-medium text-muted-foreground">Status</Label>
+          <select id="status" name="status" defaultValue={client?.status ?? 'onboarding'}
+            className="mt-1.5 w-full px-3 py-2 border border-border rounded-md text-sm bg-card">
+            {Object.entries(CLIENT_STATUS_LABELS).map(([v, l]) => (
+              <option key={v} value={v}>{l}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Pod cards */}
+      <div className="col-span-2">
+        <Label className="text-xs font-medium text-muted-foreground mb-2 block">Pod</Label>
+        <input type="hidden" name="pod_id" value={selectedPodId} />
+        <div className="flex gap-2 flex-wrap">
+          {/* No pod option */}
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedPodId('')
+              setAssignments(prev => {
+                const next = { ...prev }
+                delete next.strategist
+                delete next.manager
+                return next
+              })
+            }}
+            className={`px-3 py-2 rounded-[8px] border text-[12px] font-medium transition-colors ${
+              selectedPodId === '' ? 'border-brand-accent bg-brand-accent/10 text-brand-text-1' : 'border-border text-muted-foreground hover:border-brand-text-3'
+            }`}
+          >
+            No pod
+          </button>
+          {pods.map(pod => {
+            const pct = Math.min((pod.clientCount / POD_CAPACITY) * 100, 100)
+            const isSelected = selectedPodId === pod.id
+            return (
+              <button
+                key={pod.id}
+                type="button"
+                onClick={() => {
+                  setSelectedPodId(pod.id)
+                  if (podTeamDefaults?.[pod.id]) {
+                    const defaults = podTeamDefaults[pod.id]
+                    setAssignments(prev => ({
+                      ...prev,
+                      ...(defaults.strategistId ? { strategist: defaults.strategistId } : {}),
+                      ...(defaults.managerId ? { manager: defaults.managerId } : {}),
+                    }))
+                  }
+                }}
+                className={`flex flex-col items-start px-3 py-2 rounded-[8px] border min-w-[100px] transition-colors ${
+                  isSelected ? 'border-brand-accent bg-brand-accent/10' : 'border-border hover:border-brand-text-3'
+                }`}
+              >
+                <span className={`text-[12px] font-medium ${isSelected ? 'text-brand-text-1' : 'text-muted-foreground'}`}>{pod.name}</span>
+                <span className="text-[10px] text-muted-foreground mt-0.5">{pod.clientCount} / {POD_CAPACITY} clients</span>
+                {/* Capacity bar */}
+                <div className="w-full h-1 bg-border rounded-full mt-1.5">
+                  <div
+                    className={`h-1 rounded-full transition-all ${pct >= 90 ? 'bg-red-400' : pct >= 70 ? 'bg-amber-400' : 'bg-[#6BBF8E]'}`}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+              </button>
+            )
+          })}
         </div>
       </div>
 
