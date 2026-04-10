@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server'
-import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
 import { Sidebar } from '@/components/shared/sidebar'
 import type { TeamRole } from '@/lib/types'
@@ -36,31 +35,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       }
       teamMember = memberByEmail
     } else {
-      // New user — create team member via service-role client (bypasses RLS)
-      const serviceSupabase = createServiceClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
-      )
-
-      const meta = user.user_metadata ?? {}
-      const firstName = meta.given_name || meta.full_name?.split(' ')[0] || user.email.split('@')[0]
-      const lastName = meta.family_name || meta.full_name?.split(' ').slice(1).join(' ') || ''
-
-      const { data: newMember } = await serviceSupabase
-        .from('team_members')
-        .insert({
-          auth_user_id: user.id,
-          email: user.email,
-          first_name: firstName,
-          last_name: lastName || '-',
-          role: 'editor',
-          status: 'active',
-        })
-        .select('id, first_name, last_name, role, auth_user_id')
-        .single()
-
-      if (!newMember) redirect('/login?error=provision_failed')
-      teamMember = newMember
+      // Unknown email — sign out and redirect to access denied
+      await supabase.auth.signOut()
+      redirect('/access-denied')
     }
   }
 

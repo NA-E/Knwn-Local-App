@@ -38,6 +38,11 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse
   }
 
+  // Allow access-denied page through (user is signed out before redirect)
+  if (pathname === '/access-denied') {
+    return supabaseResponse
+  }
+
   // Unauthenticated → login
   if (!user && pathname !== '/login') {
     return copySupabaseCookies(supabaseResponse, NextResponse.redirect(new URL('/login', request.url)))
