@@ -20,27 +20,18 @@ export function canDropProject(
     return { allowed: true }
   }
 
-  const transitions = STATUS_TRANSITIONS[project.status]
-
-  // Find a transition to the target status
-  const transition = transitions.find((t) => t.to === targetStatus)
-
-  if (!transition) {
-    const fromLabel = PROJECT_STATUS_LABELS[project.status]
-    const toLabel = PROJECT_STATUS_LABELS[targetStatus]
-    return {
-      allowed: false,
-      reason: `No direct transition from "${fromLabel}" to "${toLabel}"`,
-    }
-  }
-
-  // Check if user's role is permitted for this transition
-  if (!transition.roles.includes(userRole)) {
-    return {
-      allowed: false,
-      reason: 'Your role cannot make this transition',
-    }
-  }
+  // --- Relaxed mode: allow any status transition for now ---
+  // TODO: Re-enable strict transition validation when roles are finalized
+  // const transitions = STATUS_TRANSITIONS[project.status]
+  // const transition = transitions.find((t) => t.to === targetStatus)
+  // if (!transition) {
+  //   const fromLabel = PROJECT_STATUS_LABELS[project.status]
+  //   const toLabel = PROJECT_STATUS_LABELS[targetStatus]
+  //   return { allowed: false, reason: `No direct transition from "${fromLabel}" to "${toLabel}"` }
+  // }
+  // if (!transition.roles.includes(userRole)) {
+  //   return { allowed: false, reason: 'Your role cannot make this transition' }
+  // }
 
   return { allowed: true }
 }

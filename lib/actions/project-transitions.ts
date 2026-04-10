@@ -130,27 +130,27 @@ export async function transitionProjectStatus(
 
   const fromStatus = project.status as ProjectStatus
 
+  // --- Relaxed mode: allow any status transition for now ---
+  // TODO: Re-enable strict transition + role validation when roles are finalized
   // 2. Look up allowed transitions
-  const transitions = STATUS_TRANSITIONS[fromStatus]
-  if (!transitions) {
-    return { error: `No transitions defined from status "${fromStatus}".`, project: null }
-  }
-
-  const matchingTransition = transitions.find(t => t.to === toStatus)
-  if (!matchingTransition) {
-    return {
-      error: `Cannot transition from "${fromStatus}" to "${toStatus}". This transition is not allowed.`,
-      project: null,
-    }
-  }
-
+  // const transitions = STATUS_TRANSITIONS[fromStatus]
+  // if (!transitions) {
+  //   return { error: `No transitions defined from status "${fromStatus}".`, project: null }
+  // }
+  // const matchingTransition = transitions.find(t => t.to === toStatus)
+  // if (!matchingTransition) {
+  //   return {
+  //     error: `Cannot transition from "${fromStatus}" to "${toStatus}". This transition is not allowed.`,
+  //     project: null,
+  //   }
+  // }
   // 3. Verify role authorization
-  if (!matchingTransition.roles.includes(member.role)) {
-    return {
-      error: `Your role (${member.role}) is not authorized for this transition.`,
-      project: null,
-    }
-  }
+  // if (!matchingTransition.roles.includes(member.role)) {
+  //   return {
+  //     error: `Your role (${member.role}) is not authorized for this transition.`,
+  //     project: null,
+  //   }
+  // }
 
   // 4. Check preconditions
   const preconditionResult = checkPreconditions(project, fromStatus, toStatus, metadata)
@@ -248,14 +248,15 @@ export async function getAvailableTransitions(projectId: string): Promise<{
   }
 
   const currentStatus = project.status as ProjectStatus
-  const allTransitions = STATUS_TRANSITIONS[currentStatus] ?? []
 
-  // Filter to transitions allowed for this user's role
-  const available = allTransitions
-    .filter(t => t.roles.includes(member.role))
-    .map(t => ({
-      to: t.to,
-      label: PROJECT_STATUS_LABELS[t.to],
+  // --- Relaxed mode: show all statuses as available transitions ---
+  // TODO: Re-enable strict filtering when roles are finalized
+  const allStatuses = Object.keys(PROJECT_STATUS_LABELS) as ProjectStatus[]
+  const available = allStatuses
+    .filter(s => s !== currentStatus)
+    .map(s => ({
+      to: s,
+      label: PROJECT_STATUS_LABELS[s],
     }))
 
   return { error: null, transitions: available }
