@@ -129,21 +129,21 @@ Module 0 → 1 → 2 → 3 → 4. Commit after each module. See SPEC.md for deta
 
 ### Client Onboarding Automation
 - Architecture: fire-and-forget API route (`/api/onboard`) + Supabase Realtime + service-role client
-- Service layer: `lib/services/` (slack.ts, dropbox.ts, gdrive.ts, onboarding.ts)
-- Parallel execution: Phase 1 (Slack+Dropbox+GDrive), Phase 2 (invite+welcome+notify)
+- Service layer: `lib/services/` (slack.ts, dropbox.ts, onboarding.ts)
+- Parallel execution: Phase 1 (Slack+Dropbox), Phase 2 (invite+welcome+notify)
 - Modal: `components/clients/onboarding-modal.tsx` — realtime subscription, spinner/tick/X, retry, stall detection
-- Env vars in `.env.local`: SUPABASE_SERVICE_ROLE_KEY, SLACK_BOT_TOKEN, DROPBOX_APP_KEY/SECRET/REFRESH_TOKEN, GOOGLE_SERVICE_ACCOUNT_JSON, GOOGLE_DRIVE_PARENT_FOLDER_ID, ONBOARD_INVITE_EMAILS
-- Dependency: `google-auth-library` for Google Drive JWT auth
+- Env vars in `.env.local`: SUPABASE_SERVICE_ROLE_KEY, SLACK_BOT_TOKEN, DROPBOX_APP_KEY/SECRET/REFRESH_TOKEN, ONBOARD_INVITE_EMAILS
+- **Google Drive integration removed** — not being integrated
 
 ### Supabase Project
 - Project ref: `tcpynxcruaddahdhuugb`
 - Organization: **Known Local** org (transferred from NA-E's Org on 2026-04-07 to isolate from other apps, Free plan / Nano compute)
 - Region: East US (North Virginia)
 - Admin user: `admin@knownlocal.com` (linked to team_members table)
-- 9 migrations (001_schema, 002_rls, 003_seed, 004_fixes, 005_phase4_fixes, 006_module2_prep, 007_onboarding, 008_schema_fixes, 009_notion_client_data)
+- 18 migrations (001_schema through 018_documentation_comments)
 - 009_notion_client_data.sql: Real data from Notion — 80 clients (74 active + 6 onboarding), 35 team members, 306 assignments, 77 channels, 40 contacts. Replaced all test/seed data.
 - Realtime enabled on `onboarding_steps` table (via ALTER PUBLICATION in 007)
-- Supabase CLI migration tracking synced (all 9 migrations)
+- Supabase CLI migration tracking synced (all 18 migrations)
 - **`supabase db push` gotcha:** It wraps each migration file in its own transaction — do NOT include `BEGIN`/`COMMIT` in migration SQL files (causes nested transaction issues)
 
 ### Meeting Transcripts & Process Maps
@@ -178,7 +178,8 @@ Module 0 → 1 → 2 → 3 → 4. Commit after each module. See SPEC.md for deta
 - Supabase Google provider: enabled in "Known Local" org with Client ID + Secret
 - Supabase redirect URLs: includes `https://knwn-local-app-production.up.railway.app/**` for Railway production
 - OAuth consent screen: External, app name "Known Local", email: ekanourin@gmail.com
-- Code files: `app/(auth)/login/google-auth.ts` (client-side OAuth), `app/auth/callback/route.ts` (code exchange), `app/(app)/layout.tsx` (auto-link/provision team member)
+- Code files: `app/(auth)/login/google-auth.ts` (client-side OAuth), `app/auth/callback/route.ts` (code exchange), `app/(app)/layout.tsx` (auto-link existing team member)
+- **Security:** Auto-create removed. Unknown emails → signed out → `/access-denied`. Only pre-existing team members can sign in.
 - **Gotcha:** Google Cloud new Auth Platform no longer shows client secrets after creation — must copy immediately or generate new
 
 ### Bug Fix Status
@@ -203,3 +204,50 @@ Module 0 → 1 → 2 → 3 → 4. Commit after each module. See SPEC.md for deta
 - Kanban column and project card patterns
 - Status badge colors and design status dot specs
 - What NOT to do (fonts, shadows, gradients to avoid)
+
+## Project Rules & Conventions
+
+### Data Integrity
+- **Team members are NEVER hard-deleted.** Set `status = 'inactive'` instead. Hard delete breaks project history, assignment trails, and `supervised_by` references.
+- **Clients are NEVER hard-deleted.** Use status lifecycle (`active → disengaged → inactive`). Hard delete orphans projects, contacts, channels, and onboarding history.
+- **Portal tokens are permanent.** No "regenerate" option — once generated, the token persists with a 90-day expiry.
+
+### Roles & Assignments
+- `team_members.role` = who the person IS (job title/capability: writer, editor, admin, etc.)
+- `client_assignments.assignment_role` = which slot they FILL for a specific client (strategist, manager, editor, etc.)
+- `senior_writer` in assignment_role is display-only for board filtering — not expected in real client assignment rows
+- Writer/editor dropdowns must include `writer + senior_writer + admin` and `editor + senior_editor + admin` respectively — not just the base role
+- Pod selection on client form auto-populates strategist and manager from pod's team members
+
+### Security
+- All server actions that mutate data must check the user's role via `team_members.auth_user_id`
+- Team/pod mutations → admin only
+- Client mutations → admin, strategist, jr_strategist
+- Project mutations → role-based field allowlists in `lib/actions/projects.ts`
+- OAuth sign-in restricted to pre-existing team members. Unknown emails → `/access-denied`.
+- `onboarding_steps` table is written via service-role key (bypasses RLS), read via Realtime subscription
+
+### UI Conventions
+- Field labels must be consistent between read-only detail views and edit forms
+- Pod names render as pill badges: `rounded-full px-2.5 py-0.5 text-[11px] font-medium bg-[#EDEAE2] text-[#78756C]`
+- Card sections use: `bg-card border border-border rounded-[10px] p-5`
+- Section headers use: `text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A8A59D] mb-3`
+- Client edit form mirrors the detail view layout (2-column card grid)
+- Pod selection uses visual cards with client counts and capacity bars, not plain dropdown
+- Toasts via `sonner` — `<Toaster>` mounted in root layout
+
+### Integrations
+- **Slack**: Active. Bot token in env, used for onboarding notifications.
+- **Dropbox**: Planned. App credentials needed. Used for client folder creation during onboarding.
+- **Google Drive**: NOT integrating. Remove any remaining GDrive code.
+
+### Task Management
+- `docs/master-tasklist.md` — active/open items only, kept lean
+- `docs/archive/` — completed items, organized by date, max 1000 lines per file
+- New tasks go in master-tasklist; move to archive when done
+
+### Migration Rules
+- Never include `BEGIN`/`COMMIT` in migration SQL files (Supabase wraps each in a transaction)
+- Always use `IF NOT EXISTS` / `IF EXISTS` for idempotent migrations
+- After any project data import, reset `project_task_seq` to max existing value
+- Run `npx supabase db push` to apply; `--dry-run` to preview

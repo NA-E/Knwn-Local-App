@@ -195,6 +195,25 @@
 
 - Migration 010-015: Schema fixes + Module 2 enhancements applied (all 15 migrations live)
 
+## Module 3: Team Boards — COMPLETE
+
+> My Board page at `/projects/my-board`. Board config in `lib/constants/boards.ts`.
+
+- Role detection → board config mapping (`BOARD_COLUMNS`, `BOARD_FILTERS`, `BOARD_LABELS`)
+- Writer board (scriptwriting, fix_script columns, filtered by writer_id)
+- Editor board (client_uploaded through client_adjustments_needed, filtered by editor_id)
+- Senior Writer board (review_script, filtered by supervised_by)
+- Senior Editor board (ready_for_internal_review, filtered by supervised_by)
+- Manager board (script/edit send/sent, ready_to_post, filtered by assignment)
+- Designer board (editing, internal_review, edit_ready_to_send, filtered by assignment)
+- Senior Designer board (editing, internal_review, filtered by assignment)
+- Jr Strategist board (all statuses, all projects)
+- Strategist board (all statuses, all projects)
+- Admin board (all statuses + cancelled, all projects)
+- My Board page — auto-renders correct board based on logged-in user's role
+- Server-side filtering via `getProjectsForBoard()` in `lib/actions/project-filters.ts`
+- Drag-and-drop with role-based transition validation
+
 ## Module 4: Migration & Polish (completed items)
 
 - Build migration script (`scripts/generate_migration.py`)

@@ -28,7 +28,7 @@
 - [!] Get `supervised_by` mapping from Paulo/Clayton (C-2) — blocks Senior Writer/Editor boards
 - [!] Clarify writer/senior_writer role question with Paulo/Clayton (I-7) — blocks Writer board
 - [ ] Get Dropbox API credentials (app key, secret, refresh token)
-- [ ] Get Google Drive service account + share Clients folder
+- [ ] Remove Google Drive integration code (not integrating GDrive)
 - [ ] Browser test full onboarding flow (9 test phases in `docs/onboarding-test-plan.md`)
 - [ ] Reset admin@knownlocal.com password in Supabase Dashboard (login fails on production)
 - [ ] Manual test: Google OAuth sign-in on production
@@ -39,23 +39,11 @@
 
 - [ ] Add bulk status update — multi-select projects, move to next valid status
 
-## Module 3: Team Boards — NOT STARTED
+## Module 3: Team Boards — COMPLETE
 
-> No detailed plan yet. Spec: `SPEC.md` lines 621-633
+> All role boards implemented. My Board page at `/projects/my-board`.
 
-- [ ] Write Module 3 implementation plan
-- [ ] Build role detection → board config mapping
-- [ ] Implement Writer board
-- [ ] Implement Editor board
-- [ ] Implement Designer board
-- [ ] Implement Senior Designer board
-- [ ] Implement Senior Writer board
-- [ ] Implement Senior Editor board
-- [ ] Implement Manager board
-- [ ] Implement Jr Strategist board
-- [ ] Implement Strategist board
-- [ ] Implement Admin board (Full Pipeline + extra controls)
-- [ ] Build My Board page — auto-renders correct board based on logged-in user's role
+Moved to archive: `docs/archive/completed-2026-04-10.md`
 
 ## Module 4: Migration & Polish — Remaining
 
