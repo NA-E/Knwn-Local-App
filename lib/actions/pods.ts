@@ -18,6 +18,15 @@ export async function createPod(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
 
+  const { data: currentMember } = await supabase
+    .from('team_members')
+    .select('role')
+    .eq('auth_user_id', user.id)
+    .single()
+  if (!currentMember || currentMember.role !== 'admin') {
+    return { error: 'Only admins can create pods.' }
+  }
+
   const name = formData.get('name') as string
   if (!name?.trim()) return { error: 'Pod name is required.' }
 
@@ -32,6 +41,15 @@ export async function updatePod(id: string, formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
+
+  const { data: currentMember } = await supabase
+    .from('team_members')
+    .select('role')
+    .eq('auth_user_id', user.id)
+    .single()
+  if (!currentMember || currentMember.role !== 'admin') {
+    return { error: 'Only admins can update pods.' }
+  }
 
   const name = formData.get('name') as string
   if (!name?.trim()) return { error: 'Pod name is required.' }
