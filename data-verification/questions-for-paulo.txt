@@ -9,26 +9,27 @@ Generated: 2026-04-10
 These team members have an email in Notion but no name/profile.
 Please fill in their real first and last names.
 
-   a) arthur.rubens3@gmail.com    — Ghostwriter, POD 3/2/1. Is this "Arthur Rubens"?
-   b) giancamposm@gmail.com       — Ghostwriter, POD 1/3/2. Real name?
-   c) karinadayone@gmail.com      — YouTube Manager, POD 4. Real name?
-   d) milena.ortizhdz@gmail.com   — Ghostwriter, no pod. Real name?
-   e) alejandroramoscorral@gmail.com — Senior Editor, POD 1. We have him as "Alejandro Ramos". Correct?
-   f) sabriigues@gmail.com        — Video Editor, POD 2. We have her as "Sabrina Gues". Correct?
-   g) juanf.audiovisual@gmail.com — YouTube Manager, POD 1. We have him as "Juan Bravo". Correct?
+   a) arthur.rubens3@gmail.com    — Ghostwriter, POD 3/2/1. Is this "Arthur Rubens"? -> Yes, "Arthur Rubens" 
+   b) giancamposm@gmail.com       — Ghostwriter, POD 1/3/2. Real name? -> "Gian Campos"
+   c) karinadayone@gmail.com      — YouTube Manager, POD 4. Real name? -> "Karina Dayone", POD 4 
+   d) milena.ortizhdz@gmail.com   — Ghostwriter, no pod. Real name? -> "Milena Ortiz" Pod 1, 2 and 3
+   e) alejandroramoscorral@gmail.com — Senior Editor, POD 1. We have him as "Alejandro Ramos". Correct? -> Correct
+   f) sabriigues@gmail.com        — Video Editor, POD 2. We have her as "Sabrina Gues". Correct? -> Correct
+   g) juanf.audiovisual@gmail.com — YouTube Manager, POD 1. We have him as "Juan Bravo". Correct? -> Correct
 
 
 2. MISSING ROLE (1 person)
 ----------------------------
    Laura Carreno — Onboarding, POD 2, no email, no role in Notion.
    What role should she have? (editor, writer, designer, manager, etc.)
-   What is her email?
+   What is her email? -> She doesn't work with us anymore, we can deactivate her profile
+
 
 
 4. VIRTUAL ASSISTANT ROLE
 --------------------------
    Efiphanie Abuyabor — listed as "Virtual Assistant" in Notion, status: Onboarding.
-   We are adding "virtual_assistant" as a new role in our system. Correct?
+   We are adding "virtual_assistant" as a new role in our system. Correct? -> Yes
 
 
 5. SUPERVISED_BY MAPPING
@@ -46,19 +47,41 @@ supervises which writers:
      - Jessica Gonzatto (POD 1, 2, 3)
      - Livia Russi (POD 2, 3, 1)
      - [giancamposm@gmail.com] (POD 1, 3, 2)
-     - [milena.ortizhdz@gmail.com] (no pod)
+     - [milena.ortizhdz@gmail.com] (no pod) -> (POD 1, 2, 3)
      - [arthur.rubens3@gmail.com] (POD 3, 2, 1)
 
    Question: Which Senior Writer supervises which writers?
    (Or do both supervise all of them?)
+   Both supervise them all of them
 
    Same question for Senior Editors → Editors:
      Senior Editors:
        - Diego Oliveira (POD 1)
-       - Alejandro Ramos (POD 1)
+       - Alejandro Ramos (POD 1) -> Alejandro is Pod 2
 
      Which editors does each Senior Editor supervise?
+- Diego Oliveira (POD 1)
+Alex Silva
+Anderson
+Erivelton
+Gabriel Borba
+Jonatan Vargas
+Mateus
+Nelson
+Rafael Borin
+Rafael Salazar
+Andres H
 
+- Alejandro Ramos (POD 2)
+Amarú Monsalve
+Andrea Osio
+Jorge Pérez
+Juliana Antonello
+Késsia Andrade
+Luisa Pinto
+Sabrina Gües
+William Zheng
+Andrés Jurado (POD 4) -> this is the only editor on Pod 4 for now
 
 6. OFFBOARDED / CONTRACT PAUSED TEAM MEMBERS
 -----------------------------------------------
@@ -73,6 +96,7 @@ Should we add these to the system with their inactive statuses?
 They would appear as "offboarded" or "contract_paused" — not visible
 to team boards, but useful for historical records and project trails.
 
+There is no need to add these to the system
 
 7. NON-ACTIVE CLIENTS
 -----------------------
@@ -88,6 +112,7 @@ Should we import the Inactive/Disengaged/Pending clients?
 They would be stored with their correct status and not appear
 in active dashboards, but would preserve the full client history.
 
+Yes, let's import the Inactive/Disengaged/Pending clients
 
 8. REVIEW THE FULL CSV
 ------------------------
@@ -95,3 +120,5 @@ Please review team_members_verification.csv and confirm:
   - All 24 "ADD" members should be added to the system
   - All "OK" members have correct roles
   - Any corrections to names, emails, phones, pods, or roles
+
+//CHECKING//
