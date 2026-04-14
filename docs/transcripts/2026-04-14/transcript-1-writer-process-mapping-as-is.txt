@@ -1,0 +1,463 @@
+Senior Writers Meeting - April 14
+VIEW RECORDING - 32 mins (No highlights): https://fathom.video/share/7ZLJjW8pBm1sfbVxka143Q_yzmeVdrHH
+
+---
+
+0:27 - Jessica Gonzatto
+  Hello.
+
+0:28 - Rafael Stiborski
+  Hi. This meeting is being recorded. How's it going?
+
+0:33 - Paulo Folly
+  Hey guys, Nourin.
+
+0:41 - Nourin
+  Hello, hi everyone. Sorry, I'm not ready for camera today.
+
+0:45 - Paulo Folly
+  No worries. Okay.
+
+0:55 - Rafael Stiborski
+  think Vivian here?
+
+0:57 - Paulo Folly
+  Yeah, that's what's... I was about to ask.
+
+1:01 - Rafael Stiborski
+  I can text her.
+
+1:06 - Nourin
+  Thank you.
+
+1:08 - Paulo Folly
+  Can you hear me okay?
+
+1:11 - Rafael Stiborski
+  Yes.
+
+1:13 - Nourin
+  Yeah.
+
+1:25 - Rafael Stiborski
+  Hey Nourin, while we wait for Vivian, I was just curious, did you talk to Andrew about the scriptwriting agent?  I don't know what happened with that. I think he just stopped.
+
+1:39 - Nourin
+  Yeah, I'm not sure about that.
+
+1:41 - Rafael Stiborski
+  Yeah, I think he never asked us anything about it. So I think he just kind of like, put it aside.  So I think now the focus is the app, probably. Yeah, was just curious.
+
+1:55 - Paulo Folly
+  I think he's working on it like, by himself. But I'm not really sure what's the, what's the, where is the progress of it.
+
+2:06 - Rafael Stiborski
+  He has those skills?
+
+2:08 - Paulo Folly
+  I didn't know. He's using Claude.
+
+2:12 - Rafael Stiborski
+  He's very proud.
+
+2:13 - Paulo Folly
+  He sends me a lot of messages like, oh, you don't believe what I did today with Claude and et cetera.
+
+2:19 - Rafael Stiborski
+  He probably gets all excited.
+
+2:21 - Paulo Folly
+  Yeah, he's very excited with Claude.
+
+2:24 - Rafael Stiborski
+  Everyone can feel like a software engineer with Claude, a little bit.
+
+2:30 - Paulo Folly
+  I was surprised when I discovered he was a gamer, like professional gamer.
+
+2:36 - Jessica Gonzatto
+  Really?
+
+2:37 - Rafael Stiborski
+  Okay.
+
+2:37 - Jessica Gonzatto
+  What does he play?
+
+2:39 - Rafael Stiborski
+  Yeah, now we're going to talk about it now.
+
+2:41 - Paulo Folly
+  I didn't remember what he played, but he was like pro.
+
+2:47 - Rafael Stiborski
+  Wow, okay.
+
+2:48 - Jessica Gonzatto
+  cool. Unexpected.
+
+2:50 - Vivian Vardasca
+  Wow. Unexpected.
+
+2:51 - Paulo Folly
+  Yeah.
+
+2:52 - Rafael Stiborski
+  Okay.
+
+2:55 - Nourin
+  Vivian is here.
+
+2:57 - Paulo Folly
+  Hello.
+
+2:57 - Vivian Vardasca
+  Yeah. Yeah. Hi. Hi, everyone.
+
+3:01 - Paulo Folly
+  Hey, Vivian.
+
+3:03 - Vivian Vardasca
+  You guys were talking about the script writing agent.
+
+3:06 - Rafael Stiborski
+  Yeah, I was just asking what happened with that, if he put it aside or something like that. But apparently, yes.  Or he's working by himself on it. I don't know. Yeah.
+
+3:20 - Paulo Folly
+  Yeah, apparently. Yeah.
+
+3:25 - Nourin
+  Okay. So the reason I wanted to talk with you guys is that we are working on this operational app.  a non-local app. And we are trying to make life easy for all of us, like across the team, across the company.  So our everyday task, it's like divided into many apps, right? Like Notion, Google Drive, and then what else? Dropbox, Slack, etc.  So we are trying to make a centralized, customized app for all of us, and for that, I need to get as exact view of your everyday life, like the process as is.  So for Vivian and Rafael, my request is that if you could like pick a recent project you finished, and just walk me through it from the moment you first got it, like it was assigned to you or however that was, and till the moment it ended.  So like every step, every app you touch, and everything. So if you could just walk me through that.
+
+4:46 - Paulo Folly
+  Yeah, and just as a comment, of course you can do it. Jessica, we want you to be here because since Vivian and Rafael are more on the senior role, they are not so much like right.  So any notes that you have about the writing process per se, not just the pipeline, that would be very helpful as well, if you have anything to complement or whatever.
+
+5:16 - Jessica Gonzatto
+  No, I'm going to wait for them because the writing process is very different, so I think I should just wait for my turn, because we use other apps, so I'm going to wait for them.
+
+5:28 - Vivian Vardasca
+  Yeah, I'm actually thinking like, do you mean on the reviewing part or any other things that we do besides that?  Because I think reviewing is pretty, we don't actually use much plot or et cetera, it's more me and Hafa reading the script.
+  ACTION ITEM: Draft app requirements: Notion-like Kanban, calendars, writer pages, status, Word links, side-projects; client comms/notifications; align w/ Clayton - WATCH: https://fathom.video/share/7ZLJjW8pBm1sfbVxka143Q_yzmeVdrHH?timestamp=358.9999  It's... ... Adjusting a few things, checking the links, etc. We don't actually use AI or any other PowerPoint for review.
+
+6:09 - Rafael Stiborski
+  Just for some more context, so the app will substitute Notion at some point. Is that it? So we're going to have all the same kind of features, but in this app.  So for us, most of our work is reviewing, like Vivian mentioned. And so what you're trying to understand is how we use the review process on Notion so you can transfer to the app, so you can visualize?
+
+6:40 - Nourin
+  Yeah, exactly. I want to, if you could walk me through, like show your screen and walk me through how a project gets started, like at which point you enter in the process.  And then what to do, like every other step. I to, like Okay, If this project is no longer a tool, so from the start to the end, maybe that will be more helpful.
+
+7:10 - Rafael Stiborski
+  Yeah. I mean, we do have some scripts that we receive to distribute, maybe we can do that and then show the screen.
+
+7:22 - Paulo Folly
+  I think if you can like walk her through the moment that you receive the idea from the strategist until you send, you have the client approval.
+
+7:37 - Vivian Vardasca
+  Do you want me, let me share my screen because I'm, it is open.
+
+7:46 - Rafael Stiborski
+  Okay.
+  SCREEN SHARING: Vivian started screen sharing - WATCH: https://fathom.video/share/7ZLJjW8pBm1sfbVxka143Q_yzmeVdrHH?timestamp=469.70446
+
+7:50 - Vivian Vardasca
+  Can you guys see it?
+
+7:54 - Rafael Stiborski
+  Yes.
+
+7:57 - Vivian Vardasca
+  So, um, basically we were. So the task, the notion task from the strategist, and then we're going to distribute between the writers.  So I remember Clayton saying that maybe this is going to be automatized, but I don't think that's a good idea.  Because what we do is kind of like I open the task, and I first check the dual date for the client.  So for example, this one is for April 17th, and we have to look at the writers. I often check here, because this thing keeps going.  So I usually enter the writers page to check how is their calendars. So for example, Jean had two yesterday, but today it was empty.  So I added him to work on this task for today. So... We have it ready on 17. Being automatized, I don't think it's going to work because sometimes it happens like we have a script for, we have an urgent script for tomorrow, and we don't have like any other writer.  We have just one writer that doesn't have anything to do, or we have a writer, we have all the writers doing something, but the dual dates are different.  So we can kind of organize using that, you know, I don't know if you've got it, what I meant.
+
+9:40 - Nourin
+  No, actually. Can you explain?
+
+9:44 - Vivian Vardasca
+  Sorry. Yeah, so for example, we receive a task and the dual date is for tomorrow, 15. Who sets the due date?
+
+9:54 - Nourin
+  Sorry.
+
+9:56 - Vivian Vardasca
+  What? Sorry.
+
+9:57 - Nourin
+  Who sets the due date?
+
+9:58 - Vivian Vardasca
+  It's the Strategist.
+
+10:00 - Nourin
+  Okay.
+
+10:03 - Vivian Vardasca
+  So, yeah, if we get a task, let's say Joe sends a script and the dual dates for tomorrow, I would go check all the writers' dashboards, and then I would see, everyone has something to do today, so they are not being able to write it today, but Joe, he has, like, three scripts that can be delivered until the 17, so I can, like, push them for tomorrow, and add the one that is urgent for today.  So, being automatized, I don't think it's going to work because of that, because we need to kind of think in a way that everyone has something to do, and everyone can reach the dual dates for the clients.
+
+10:54 - Nourin
+  Yeah, that's fine. Like, we're not trying to figure out what we can auto- We just want to learn exactly how the process it is now.
+
+11:07 - Vivian Vardasca
+  Okay. So I add the writer here and we also put the writer's page because that's how we are going to track the KPIs.  And then I add the date that he's supposed to work on this task and that's it. So it's going to show up in his calendar and he knows he has to do this one today and he's going to start working on it.  Then after they finish writing, we're receiving this in our page. We have senior writer Vivian, Rafael has one too.  And then we receive here for review because after they script writing, they put it to review. And that's when it shows up in our list.  And we have like one day remaining, two days remaining because it's speaking from the dual date to the client.  And so we have like one day. We to review this one, because this one is for, actually, that's kind of a bit of wrong, because if it's for today, it was supposed to be due to date.  Yeah, but you get it, the idea, know, you know, it's for 15, so we have one day to review, so if it's for Friday, we have like three days review, and that's kind of it, we open the script, we check the script that the writer wrote, we review it, we, like I said, we don't usually use Cloud or any other platforms to do that, we kind of just read the script through and through, and check the links, check if everything is over there, check if the brief is matching with what the script is doing, like we have the brief from the stream.  Strategist, so it's kind of like what the client wants to be in the script, so we have to match if everything is over there, like Queen Anne, so yeah, the Queen Anne he talked about first, so it's okay, and then we go over all of that, and after we finish reviewing, we just change the status here to ready to send, and add this approved or not approved.  So, approved is when the script is good to go, and not approved is like when we need to send back to the writer to fix something, and that's basically it on the reviewing side, on the distributing and reviewing side.
+
+13:45 - Rafael Stiborski
+  Yeah, so this is where we spend the most time, so this is something that we would like to have like similar, as more similar as possible, so with like a calendar.  Writers pages, our pages, all the status, yeah, we have links to the scripts, because I think we're still gonna, we're gonna keep using Word documents, I think, we're gonna change that, so yeah.
+
+14:17 - Vivian Vardasca
+  Yeah, so that's mostly it, and then we also have the other side projects, like, we have a page here in Notion for the writing project, projects, then we have, like, things that we are thinking on doing, things that we start planning, things that are in progress, things that are done, and we have this spreadsheet that's where we put it all together to kind of visualize, so, for example, we are working right now in a new scriptwriter hiring process, so we decided, like, okay, we're  We're going to start on the 13th, and we are trying to go until the 15th, so it's kind of a month and a few days, and then we distribute it through the spreadsheet, like what we're going to do each day, so we can reach their goal until the 15th, and then we have other projects like we are putting over here, so this is kind of new that Clayton shared with us, but I think he wants that probably in the app too, I don't know.  Because more of us side projects that we need to work on, instead of just reviewing.
+
+15:38 - Nourin
+  Okay, what happens if you leave comments, like in the review process, like you have to leave comments, do you leave it in the Google Docs?
+
+15:52 - Vivian Vardasca
+  You mean when we review?
+
+15:54 - Nourin
+  Yeah.
+
+15:56 - Vivian Vardasca
+  Yes, probably, we usually just... When to go to the writer, if we have something that we want to ask about, but if we need something to like make a comment for the client when he received the script, then we add it over here.  Yeah, so the client can check.
+
+16:19 - Rafael Stiborski
+  And sometimes the clients leave comments too for us. Yeah. Not everyone does that, but like some clients do.
+
+16:26 - Vivian Vardasca
+  Yeah, think our part of the process is kind of simple. I think the writing part is more complicated.
+
+16:40 - Rafael Stiborski
+  Yeah. So like basically we're using like kind of like Kanban style project management, I think. So like we have the pages for the projects with the status, and then we have all this external stuff like spreadsheets and docs.  So like the pages are on Notion with the status. and we have the links to access the other documents.  So it's pretty simple, like in that sense, I think.
+
+17:07 - Nourin
+  Got it. What would you say the hardest part of the workflow? Like what takes too much time? And what leads to like communication, like more communication time, etc.
+
+17:36 - Rafael Stiborski
+  I think maybe the part that we have to communicate more with the client, because we don't talk with them directly, we have to go through the strategies, like so they're the bridge between us.  So maybe that's something that we can figure it out, like how to do better on the app, because the clients will also have access to the app, is that a...  The idea is like something that everyone's gonna be able to like, access, like, well, of course, each each role will have different pages, right?
+
+18:11 - Nourin
+  But like, maybe that's something to think about, like, if everyone could have a better communication in one place. Yeah, can you give me like, some specific examples of scenarios when you are like, waiting on the strategist to get answers back from the client?
+
+18:29 - Rafael Stiborski
+  Yeah, like, just maybe like, last week, I think we, we had to ask some more details on like, on my script.  And then we send it to the strategist, we have a channel for that, like a specific channel for asking stuff and getting feedback.  Okay. But I, I think it's more like on the clients, they, they, they, sometimes they take also because of the time zone.  So sometimes this delays the The process because we have to wait. I think it was Gabi who was writing something for a new client, and then she had some doubts like how to write the script because she didn't have enough details and then she had to ask us and then we had to send it to the channel and then, yeah, wait for instructions before she could start writing.  Yeah.
+
+19:21 - Nourin
+  Yeah.
+
+19:22 - Rafael Stiborski
+  So that's one example. Sometimes things get delayed because we're waiting for the answer and then maybe there could be a way of getting a notification with the client.  I mean, you kind of get that on Slack, right? Yeah, I'm not sure.
+
+19:42 - Vivian Vardasca
+  It could be a bit more annoying notification so they can look at it right away.
+
+19:50 - Nourin
+  So when you say channel, is it the client specific channel or it's a common channel to ask questions to the strategist?
+  SCREEN SHARING: Vivian started screen sharing - WATCH: https://fathom.video/share/7ZLJjW8pBm1sfbVxka143Q_yzmeVdrHH?timestamp=1200.942907
+
+20:00 - Rafael Stiborski
+  Yeah, so that's the point. We have this channel with us, which is like what you just said, that we talk to the strategists.
+
+20:08 - Nourin
+  And then all the strategists, they work in different pods, right?
+
+20:12 - Rafael Stiborski
+  We have pod one, pod two, pod three, pod four. And then they get what we asked or the feedback or whatever.  And then they talk to their clients. So I think they still have, because we don't have access to those, but I think they have specific channels with each client.  Is that right, Paulo? Do you know if they still have that with each client?
+
+20:32 - Paulo Folly
+  Sorry.
+
+20:34 - Rafael Stiborski
+  Do you know if the strategists each have their own channel of the client they have, right?
+
+20:40 - Paulo Folly
+  Still.
+
+20:41 - Rafael Stiborski
+  Yeah.
+
+20:43 - Paulo Folly
+  Yeah.
+
+20:45 - Rafael Stiborski
+  there's like a communication with us in the channel that they have to grab the information and then they go to the client in their specific channel.  So that's the process. And then they get back to us in our channel.
+
+20:58 - Nourin
+  Yeah. Yeah. So so... By your channel, you mean the writing brief, or which one?
+
+21:04 - Rafael Stiborski
+  I think this writing important, that's the one that Vivian is showing.
+
+21:10 - Vivian Vardasca
+  But I think this one is mostly for when we have feedback from the clients, when we need something to be changed, and the writing brief is more where we ask about the brief, so we ask for more directions.  Like this one, for example, he needed more directions for the script, because the brief didn't explain too much, so he talked to the strategist directly, to ask for a few more things, over here too, so yeah, but when it comes to receiving more feedback from the clients, it's in the writing part, important.
+
+22:00 - Nourin
+  So are these all one, two, three, four, five, five of these writing channels, are they getting used frequently? Like, for example, what is Senior Writer's Form?
+
+22:15 - Rafael Stiborski
+  That's only us, and Clayton, Paul is also there, because when we need, like, help with, like, operations, like, Notion.  So that's more like, like, projects, ideas.
+
+22:38 - Vivian Vardasca
+  Yeah, we have everything here, like, writing projects, resource, Notion, the Notion page that I showed you.
+
+22:50 - Rafael Stiborski
+  Well, use that quite often.
+
+22:56 - Nourin
+  Like, in which scenarios you need to use that channel? Senior Writer's.
+
+23:00 - Rafael Stiborski
+  When we have an update on the project, or we have a question about Clayton and Andrew, or we want to talk about a specific issue or like about a writer, of course we're not going talk about the writer in the channel with them, so we have like, and we don't need to talk with the strategist about it, it's just us and Clayton and Andrew.
+
+23:32 - Vivian Vardasca
+  Yeah, it's our direct channel with them, so everything that we need from them, we ask it here.
+
+23:43 - Nourin
+  Okay, then what about the next one, writer's room?
+
+23:47 - Vivian Vardasca
+  This one is just the writers, kind of like more helping one another.
+
+23:54 - Rafael Stiborski
+  That's the one we have without anyone else, like just us and the writers. Yeah. there's like some. Yeah. Things that they feel more comfortable to talk about, like just with us, like before it reaches Clayton and Andrew, so, but this one we've been using less and less, I think, yeah.
+
+24:14 - Vivian Vardasca
+  Okay, yeah.
+
+24:15 - Nourin
+  So, it's like open to all, all of the boards, like all writers are here.
+
+24:23 - Rafael Stiborski
+  Yes. Yeah.
+
+24:24 - Vivian Vardasca
+  Oh, Over here, it's just the writers.
+
+24:26 - Rafael Stiborski
+  It's like six writers and the two of us together.
+
+24:29 - Nourin
+  Oh, yeah. Six writers. Okay. Next one is for client-specific things, writing important.
+
+24:37 - Vivian Vardasca
+  Yeah.
+
+24:38 - Rafael Stiborski
+  Feedback. That one has the strategies.
+
+24:41 - Vivian Vardasca
+  Okay.
+
+24:42 - Rafael Stiborski
+  And I think, and also the managers, YouTube managers.
+
+24:46 - Vivian Vardasca
+  Let me check. Yeah, the two managers, the strategists, and yeah, that's it. And me and Hapa. Yeah.
+
+24:57 - Nourin
+  So, for example, Uh- Oh, Oh, Oh, Oh, Thank A strategist has set deadline for today, but no writer is available.  On those cases, you will use this channel.
+
+25:12 - Rafael Stiborski
+  Sorry, if a writer is not available?
+
+25:15 - Nourin
+  Is that what you said? Yeah, like, for example, like, one strategist assigned a writing script project for tomorrow, but no writer is, like, available.
+
+25:28 - Rafael Stiborski
+  Oh, I think you will use this channel?
+
+25:33 - Vivian Vardasca
+  Or the writing? Yeah, it's the writing work.
+
+25:38 - Rafael Stiborski
+  Because that's the one where they assign work.
+
+25:41 - Vivian Vardasca
+  Yeah, they send us the things. So sometimes I go over here and I say, oh, this dual date is not going to happen.  Can we rethink it or something like that? But usually we can make a way to figure it out. We can figure this out.
+
+26:00 - Nourin
+  So who are in this channel? Strategists are here in writing work?
+
+26:07 - Vivian Vardasca
+  It's the YouTube managers, the strategists, and the writers. The writers are also here.
+
+26:16 - Nourin
+  Okay, so like I'm trying to understand the difference between the members of writing work and writing important. It's the members, but the writing work is to assign work.
+
+26:30 - Rafael Stiborski
+  They send the scripts with the links and then we distribute them. The writing important is when we have feedback.
+
+26:37 - Vivian Vardasca
+  Yeah, but over here we don't have the writers.
+
+26:40 - Rafael Stiborski
+  The writing part is without the writers. Yeah, that's true. don't have the writers.
+
+26:44 - Vivian Vardasca
+  It's just the writers.
+
+26:46 - Nourin
+  So feedback about what specifically?
+
+26:49 - Rafael Stiborski
+  When the client doesn't like something or they want to change something.
+
+26:55 - Nourin
+  Okay, so it... Will fall in the which statuses of the project, like you are assigning, ready to send to client, and after that point, maybe we'll need to access this channel more.  Like I'm trying to map the status with the channel, like if there is a mapping, just trying to discover.
+
+27:27 - Vivian Vardasca
+  Yeah, because actually, over this one, like client goes to it's where the strategies are able to see what are the scripts that are ready to be sent.  Because it's automatized with what we do in Notion. So when we change the status, it shows up here. Like, can you see here, Joe just changes it more for brief, brief, and then it appears over here.  So that's when they know that we finished reviewing the script.
+
+28:00 - Nourin
+  Okay. And at that point, if they have comment, what do they do?
+
+28:09 - Vivian Vardasca
+  Then if they need something, they go to the writing portant. But usually that's like because we finish reviewing and then they send to the client and it goes like one, two, three days until the client checks the script.  And then if the client has something that he wants to add or delete or change, then the strategy sends to us here in the writing portant.
+
+28:41 - Nourin
+  Okay. We have covered writing team, I think. No. Okay. We have covered writing room.
+
+28:48 - Vivian Vardasca
+  What is writing team? It's the same thing that writers room, but here we have Andrew and Clayton too.
+
+28:58 - Nourin
+  Oh.
+
+29:00 - Vivian Vardasca
+  That's why we're kind of using more this one than the writer's room, this one we are using more to like, so Andrew and Clayton can like, give ideas too, can communicate with us too.
+
+29:15 - Rafael Stiborski
+  Yeah, I don't think we need the writer's room when we move to the app.
+
+29:21 - Nourin
+  Just, I don't know. So writing room is like, brainstorming.
+
+29:28 - Vivian Vardasca
+  Yeah, it's kind of more the writers helping each other. So, for example, Jun asked if anyone had ever wrote a format of Q&A script, and then we discussed it, we sent a few ones for him so he can check it out.  So it's more of a brainstorming, kind of like, discussing other things regarding scripts, regarding writing.
+
+29:58 - Nourin
+  Like the... A process of writing, but writing team is the brainstorming area for specific projects.
+
+30:09 - Vivian Vardasca
+  Yeah, we can say that.
+
+30:10 - Rafael Stiborski
+  That's where we send feedback also to the writers, the writing team.
+
+30:16 - Nourin
+  Okay.
+
+30:19 - Rafael Stiborski
+  And we give updates, and whenever I update a prompt, a writing prompt, I let them know, or if we add something to the client pages, we also let them know, so they can keep track of what we've been doing, so they can take notes and stuff.
+
+30:39 - Nourin
+  Okay.
+
+30:40 - Rafael Stiborski
+  At least they should be doing that.
+
+30:43 - Nourin
+  How about the next one, writing training?
+
+30:47 - Vivian Vardasca
+  Yeah, this one we didn't use it yet, but it's going to be more when we start hiring. So it's Andrew Clayton, me, and Rafa, and it's for hiring new writers.
+
+31:01 - Nourin
+  Okay. Anything else I need to know about? Like, what is Ghostwriters?
+
+31:10 - Vivian Vardasca
+  So over here, it's just me, Hafa, and the writers that we discussed a few things. But I think that this one is like the most important channel that we have, probably, because this is where we receive the automations from Notion.  So we know, like, when a script is ready to review, we know when a script is ready to be done, we know when a script is ready to be sent.  So this one's probably the most important one. And we have the daily reports that's kind of like, I think, probably Clayton told about that.
